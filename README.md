@@ -1,1 +1,1 @@
-## This is repository for VCCorp Intern product (June - August)
+## This is repository for VCCorp Intern project (June - August)

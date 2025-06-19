@@ -3,25 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blog Home Page</title>
+  <title>Blog Home Page</title> <!-- Thay Title vao day -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Thêm style vào đây -->
   <style>
     body {
       background-color: #f8f9fa;
     }
+    .post-preview {
+      border-bottom: 1px solid #dee2e6;
+      padding: 1rem 0;
+    }
+    .sidebar {
+      border-right: 1px solid #dee2e6;
+    }
     .post-title {
       color: #0d6efd;
+      text-decoration: none;
     }
-    .comment-box {
-      border: 1px solid #dee2e6;
-      padding: 1rem;
-      background: #fff;
-      border-radius: 5px;
-      margin-bottom: 1rem;
+    .post-title:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 <body>
   <!-- Navbar -->
    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
@@ -33,7 +37,7 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto">
           <li class="nav-item">
-            <a class="nav-link" href="#">My Post</a>
+            <a class="nav-link" href="#">My Post</a> <!-- Thay các link vào href tương ứng vào đây -->
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">About</a>
@@ -87,56 +91,10 @@
           <li><a href="#">Travel</a></li>
       </aside>
 
-      <!-- Post content -->
-      <main class="col-md-10">
-      <div class="container">
-        <article class="bg-white p-4 shadow-sm rounded">
-          <h1 class="post-title">Building a Blog with NodeJS and Angular</h1>
-          <p class="text-muted">By Quang Tran | June 10, 2025</p>
-          <p><span class="badge bg-secondary">Life</span> <span class="badge bg-secondary">Education</span></p>
-          <div class="text-center">
-            <img src="https://food.fnr.sndimg.com/content/dam/images/food/fullset/2023/2/7/picking-up-noodle-with-chopstick.jpg.rend.hgtvcom.616.440.85.suffix/1675783696038.webp" alt="Post Img" class="img-fluid" style="width: 600px; height: auto;" class="img-fluid my-4" alt="Post Image">
-          </div>
-          <p></p>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel hendrerit purus, ut hendrerit justo. Mauris convallis, elit non elementum tempor, erat purus gravida libero, eget dapibus risus nulla non felis. Duis a libero metus...</p>
-          <p>...</p>
-        </article>
-
-        <!-- Comments Section -->
-        <section class="mt-5">
-          <div class="d-flex align-items-center justify-content-between mb-2">
-            <h4 class="mb-0">Comments</h4>
-            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#commentSection" aria-expanded="true" aria-controls="commentSection">
-              <i class="bi bi-chevron-down"></i>
-            </button>
-          </div>
-
-          <div class="collapse show" id="commentSection">
-            <div class="comment-box">
-              <strong>Bob</strong> <span class="text-muted small">- June 11, 2025</span>
-              <p>This was super helpful, thanks!</p>
-            </div>
-
-            <div class="comment-box">
-              <strong>Charlie</strong> <span class="text-muted small">- June 12, 2025</span>
-              <p>Can you write more on how to use chopstick to fight demons?</p>
-            </div>
-
-            <!-- Comment Form -->
-            <form class="mt-4">
-              <div class="mb-3">
-                <label for="comment" class="form-label">Leave a Comment</label>
-                <textarea class="form-control" id="comment" rows="3" placeholder="Your comment..."></textarea>
-              </div>
-              <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
-          </div>
-        </section>
-
-      </div>
-      </main>
+      <!-- Thêm main content vào đây-->
+      
     </div>
-    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="bg-dark text-white mt-5">
@@ -149,7 +107,7 @@
         <div class="col-md-4 mb-3">
           <h5>Quick Links</h5>
           <ul class="list-unstyled">
-            <li><a href="home.html" class="text-white">Home</a></li>
+            <li><a href="home.html" class="text-white">Home</a></li> <!-- Thay các link vào các phần href tương ứng -->
             <li><a href="#" class="text-white">My Post</a></li>
             <li><a href="#" class="text-white">About</a></li>
             <li><a href="#" class="text-white">Contact</a></li>

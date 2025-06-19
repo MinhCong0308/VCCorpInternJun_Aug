@@ -19,6 +19,24 @@
       border-radius: 5px;
       margin-bottom: 1rem;
     }
+    .like-toggle {
+    display: none;
+  }
+  .like-label {
+    cursor: pointer;
+    border: 1px solid #0d6efd;
+    color: #0d6efd;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .like-toggle:checked + .like-label {
+    background-color: #0d6efd;
+    color: #fff;
+  }
   </style>
 </head>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
@@ -91,7 +109,7 @@
       <main class="col-md-10">
       <div class="container">
         <article class="bg-white p-4 shadow-sm rounded">
-          <h1 class="post-title">Building a Blog with NodeJS and Angular</h1>
+          <h1 class="post-title">How To Hold a Chopstick</h1>
           <p class="text-muted">By Quang Tran | June 10, 2025</p>
           <p><span class="badge bg-secondary">Life</span> <span class="badge bg-secondary">Education</span></p>
           <div class="text-center">
@@ -100,6 +118,14 @@
           <p></p>
           <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel hendrerit purus, ut hendrerit justo. Mauris convallis, elit non elementum tempor, erat purus gravida libero, eget dapibus risus nulla non felis. Duis a libero metus...</p>
           <p>...</p>
+          <!-- Like Button and View -->
+          <div class="d-flex align-items-center mt-3">
+            <input type="checkbox" id="like-button" class="like-toggle" />
+            <label for="like-button" class="like-label">
+              <i class="bi bi-hand-thumbs-up"></i> Like
+            </label>
+            <span class="text-muted small ms-2">42 users liked this post</span>
+          </div>
         </article>
 
         <!-- Comments Section -->
@@ -115,11 +141,18 @@
             <div class="comment-box">
               <strong>Bob</strong> <span class="text-muted small">- June 11, 2025</span>
               <p>This was super helpful, thanks!</p>
+              <button class="btn btn-link btn-sm ps-0">Reply</button>
+              <div class="comment-box ms-4">
+                <strong>Emily</strong> <span class="text-muted small">- June 11, 2025</span>
+                <p>I agree with Bob. Great explanation!</p>
+                <button class="btn btn-link btn-sm ps-0">Reply</button>
+              </div>
             </div>
 
             <div class="comment-box">
               <strong>Charlie</strong> <span class="text-muted small">- June 12, 2025</span>
-              <p>Can you write more on how to use chopstick to fight demons?</p>
+              <p>Can you write more on how to use chopsticks to fight demons?</p>
+              <button class="btn btn-link btn-sm ps-0">Reply</button>
             </div>
 
             <!-- Comment Form -->

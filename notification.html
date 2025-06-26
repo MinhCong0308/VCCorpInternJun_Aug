@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifications Settings - Blog Blog Blog</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .sidebar {
+      border-right: 1px solid #dee2e6;
+    }
+    .settings-section {
+      border-bottom: 1px solid #e6e6e6;
+      padding: 1.5rem 0;
+    }
+    .settings-section:last-child {
+      border-bottom: none;
+    }
+    .settings-label {
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 0.25rem;
+    }
+    .settings-description {
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+    .settings-value {
+      color: #333;
+      font-size: 0.9rem;
+    }
+    .settings-tabs {
+      border-bottom: 1px solid #e6e6e6;
+      margin-bottom: 2rem;
+    }
+    .settings-tabs .nav-link {
+      color: #666;
+      border: none;
+      padding: 1rem 0;
+      margin-right: 2rem;
+    }
+    .settings-tabs .nav-link.active {
+      color: #333;
+      border-bottom: 2px solid #333;
+    }
+    .form-check-input:checked {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+    .btn-link {
+      color: #0066cc;
+      text-decoration: none;
+    }
+    .btn-link:hover {
+      text-decoration: underline;
+    }
+    .text-primary {
+      color: #0066cc !important;
+    }
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 1rem;
+      margin-top: 1.5rem;
+    }
+    .section-title:first-child {
+      margin-top: 0;
+    }
+    .notification-item {
+      border-bottom: 1px solid #f0f0f0;
+      padding: 1rem 0;
+    }
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+    .container .row{
+        margin-left: 250px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+    <div class="container">
+      <a class="navbar-brand fw-bold fs-3" href="home.html">Blog Blog Blog</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="profile.html">My Post</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">About</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">💡</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Register</a>
+          </li>
+          <li class="nav-item">
+            <select class="form-select form-select-sm" aria-label="Language select">
+              <option value="en" selected>English</option>
+              <option value="vi">Tiếng Việt</option>
+            </select>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <div class="container">
+    <div class="row">
+      <!-- Sidebar -->
+      <!-- <button class="btn btn-sm btn-outline-primary d-md-none mb-2" onclick="toggleSidebar()">Toggle Sidebar</button>
+      <aside class="col-md-2 sidebar mb-4" id="sidebar">
+      </aside> -->
+      <!-- Settings Content -->
+      <main class="col-md-10">
+        <div class="bg-white rounded shadow-sm p-4">
+          <h2 class="mb-4">Settings</h2>
+          
+          <!-- Settings Tabs -->
+          <ul class="nav settings-tabs">
+            <li class="nav-item">
+              <a class="nav-link" href="account.html" data-tab="account">Account</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="publishing.html" data-tab="publishing">Publishing</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="notification.html" data-tab="notifications">Notifications</a>
+            </li>
+          </ul>
+
+          <!-- Notifications Settings Content -->
+          <div id="notifications-content">
+            <!-- Email notifications section -->
+            <div class="section-title">Email notifications</div>
+            
+            <!-- Story recommendations -->
+            <div class="notification-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">Story recommendations</div>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="storyRecommendations" checked>
+                </div>
+              </div>
+            </div>
+
+            <!-- New posts update -->
+            <div class="notification-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">New posts update</div>
+                  <div class="settings-description">Receive an email whenever writers you follow post stories, including early access to their latest stories.</div>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="newPostsUpdate">
+                </div>
+              </div>
+            </div>
+
+            <!-- Responses and following -->
+            <div class="notification-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">Responses and Following</div>
+                  <div class="settings-description">Get the activity that is happening on your writing and connecting.</div>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="responsesFollowing" checked>
+                </div>
+              </div>
+            </div>
+
+            <!-- Responses and publications -->
+            <div class="notification-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">Responses and publications</div>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="responsesPublications" checked>
+                </div>
+              </div>
+            </div>
+
+            <!-- Social activity -->
+            <div class="notification-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">Social activity</div>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="socialActivity" checked>
+                </div>
+              </div>
+            </div>
+
+            <!-- Other clapping across your writing activity -->
+            <div class="notification-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">Other clapping across your writing activity</div>
+                  <div class="settings-description">Other clapmembers discuss your writing and more or engage talking to a story.</div>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="otherClapping" checked>
+                </div>
+              </div>
+            </div>
+
+            <!-- When someone uses your link in their story -->
+            <div class="notification-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">When someone uses your link in their story</div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="me-2">Weekly</span>
+                  <button class="btn btn-link p-0 text-decoration-none">→</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top activity -->
+            <div class="notification-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">Top activity</div>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="topActivity" checked>
+                </div>
+              </div>
+            </div>
+
+            <!-- Questions of previous stories -->
+            <div class="notification-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">Questions of previous stories</div>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="questionsStories" checked>
+                </div>
+              </div>
+            </div>
+
+            <!-- When stories from the past activities -->
+            <div class="notification-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">When stories from the past activities</div>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="pastActivities" checked>
+                </div>
+              </div>
+            </div>
+
+            <!-- Offline from Medium -->
+            <div class="notification-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">Offline from Medium</div>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="offlineMedium" checked>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recommend about networks of newsletters -->
+            <div class="notification-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">Recommend about networks of newsletters</div>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="recommendNetworks" checked>
+                </div>
+              </div>
+            </div>
+
+            <!-- Medium growth and new features -->
+            <div class="notification-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">Medium growth and new features</div>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="mediumGrowth" checked>
+                </div>
+              </div>
+            </div>
+
+            <!-- Advanced notifications -->
+            <div class="notification-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">Advanced notifications</div>
+                  <div class="settings-description">Get the experience from the new blogs and new forms and features of platform.</div>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="advancedNotifications" checked>
+                </div>
+              </div>
+            </div>
+
+            <!-- Push notifications section -->
+            <div class="section-title">Push notifications</div>
+            
+            <div class="notification-item">
+              <div class="settings-description">
+                Click the bell icon next to the Follow button on writer pages to get push notifications.
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white mt-5">
+    <div class="container py-4">
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <h5>About</h5>
+          <p>Blog Blog Blog is a website sharing knowledge in everything including technology, life-hacks, politics, daily news and more.</p>
+        </div>
+        <div class="col-md-4 mb-3">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="home.html" class="text-white">Home</a></li>
+            <li><a href="#" class="text-white">My Post</a></li>
+            <li><a href="#" class="text-white">About</a></li>
+            <li><a href="#" class="text-white">Contact</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4 mb-3">
+          <h5>Follow Us</h5>
+          <p>
+            <a href="#" class="text-white me-2">Facebook</a>
+            <a href="#" class="text-white me-2">Twitter</a>
+            <a href="#" class="text-white">GitHub</a>
+          </p>
+        </div>
+      </div>
+      <div class="text-center mt-3">
+        <small>&copy; 2025 My Awesome Blog. All rights reserved.</small>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Tab switching functionality
+    document.querySelectorAll('[data-tab]').forEach(tab => {
+      tab.addEventListener('click', function(e) {
+        // Only prevent default for tabs without href or with # href
+        if (this.getAttribute('href') === '#' || !this.getAttribute('href')) {
+          e.preventDefault();
+          // Remove active class from all tabs
+          document.querySelectorAll('[data-tab]').forEach(t => t.classList.remove('active'));
+          // Add active class to clicked tab
+          this.classList.add('active');
+        }
+        // For tabs with actual URLs, let the default behavior happen
+      });
+    });
+  </script>
+</body>
+</html>

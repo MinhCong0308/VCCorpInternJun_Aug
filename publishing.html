@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Account Settings - Blog Blog Blog</title>
+  <title>Publishing Settings - Blog Blog Blog</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
@@ -27,6 +27,7 @@
     .settings-description {
       color: #666;
       font-size: 0.9rem;
+      line-height: 1.4;
     }
     .settings-value {
       color: #333;
@@ -46,8 +47,19 @@
       color: #333;
       border-bottom: 2px solid #333;
     }
-    .danger-text {
-      color: #dc3545;
+    .form-check-input:checked {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+    .btn-link {
+      color: #0066cc;
+      text-decoration: none;
+    }
+    .btn-link:hover {
+      text-decoration: underline;
+    }
+    .text-primary {
+      color: #0066cc !important;
     }
     .container .row {
       margin-left: 250px;
@@ -95,15 +107,6 @@
   <!-- Main content -->
   <div class="container">
     <div class="row">
-      <!-- Sidebar -->
-      <!-- <button class="btn btn-sm btn-outline-primary d-md-none mb-2" onclick="toggleSidebar()">Toggle Sidebar</button>
-      <aside class="col-md-2 sidebar mb-4" id="sidebar">
-        <button class="btn btn-outline-secondary btn-sm mb-3 w-100" onclick="window.location.href='home.html'">Home</button>
-        <button class="btn btn-outline-secondary btn-sm mb-3 w-100" onclick="window.location.href='user_info.html'">My profile</button>
-        <button class="btn btn-outline-secondary btn-sm mb-3 w-100" onclick="window.location.href='post.html'">Manage Blogs</button>
-        <button class="btn btn-primary btn-sm mb-3 w-100" onclick="window.location.href='account.html'">Account Setting</button>
-      </aside> -->
-
       <!-- Settings Content -->
       <main class="col-md-10">
         <div class="bg-white rounded shadow-sm p-4">
@@ -112,141 +115,132 @@
           <!-- Settings Tabs -->
           <ul class="nav settings-tabs">
             <li class="nav-item">
-              <a class="nav-link active" href="#" data-tab="account">Account</a>
+              <a class="nav-link" href="account.html" data-tab="account">Account</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="publishing.html" data-tab="publishing">Publishing</a>
+              <a class="nav-link active" href="publishing.html" data-tab="publishing">Publishing</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="notification.html" data-tab="notifications">Notifications</a>
             </li>
           </ul>
 
-          <!-- Account Settings Content -->
-          <div id="account-content">
-            <!-- Email address -->
+          <!-- Publishing Settings Content -->
+          <div id="publishing-content">
+            <!-- Manage publications -->
             <div class="settings-section">
               <div class="d-flex justify-content-between align-items-start">
                 <div>
-                  <div class="settings-label">Email address</div>
-                  <div class="settings-value">congminhnguyen0308@gmail.com</div>
+                  <div class="settings-label">Manage publications</div>
                 </div>
                 <button class="btn btn-link p-0 text-decoration-none">→</button>
               </div>
             </div>
 
-            <!-- Username and subdomain -->
+            <!-- Allow people to follow -->
             <div class="settings-section">
               <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Username and subdomain</div>
-                  <div class="settings-value">@congminhnguyen0308</div>
+                <div class="flex-grow-1">
+                  <div class="settings-label">Allow people to follow what stories you clap</div>
+                  <div class="settings-description">People notice you clapped to you and all of the publications of Editors of this publication.</div>
                 </div>
-                <button class="btn btn-link p-0 text-decoration-none">→</button>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="followClaps" checked>
+                </div>
               </div>
             </div>
 
-            <!-- Profile information -->
+            <!-- Manage spacing on your stories -->
             <div class="settings-section">
               <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Profile information</div>
-                  <div class="settings-description">Edit your photo, name, pronouns, short bio, etc.</div>
-                  <div class="settings-value mt-1">Nguyen Cong Minh 
-                    <span class="badge bg-success ms-2">🎯</span>
-                  </div>
-                </div>
-                <button class="btn btn-link p-0 text-decoration-none">→</button>
-              </div>
-            </div>
-
-            <!-- Profile design -->
-            <div class="settings-section">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Profile design</div>
-                  <div class="settings-description">Customize the appearance of your profile.</div>
-                </div>
-                <button class="btn btn-link p-0 text-decoration-none">→</button>
-              </div>
-            </div>
-
-            <!-- Custom domain -->
-            <div class="settings-section">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Custom domain</div>
-                  <div class="settings-description">Upgrade to a Premium Membership to redirect your page to a URL to a domain like yourdomain.com.</div>
-                  <div class="settings-value mt-1">None →</div>
-                </div>
-                <button class="btn btn-link p-0 text-decoration-none">→</button>
-              </div>
-            </div>
-
-            <!-- Partner Program -->
-            <div class="settings-section">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Partner Program</div>
-                  <div class="settings-description">You are not enrolled in the Partner Program.</div>
-                </div>
-                <button class="btn btn-link p-0 text-decoration-none">→</button>
-              </div>
-            </div>
-
-            <!-- Your Medium Digest frequency -->
-            <div class="settings-section">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Your Medium Digest frequency</div>
-                  <div class="settings-description">Adjust how often you see a new Digest.</div>
+                <div class="flex-grow-1">
+                  <div class="settings-label">Manage spacing on your stories</div>
+                  <div class="settings-description">Readers can leave you line-through the first-party platform of your choice.</div>
                 </div>
                 <div class="d-flex align-items-center">
-                  <span class="me-2">Daily</span>
+                  <span class="text-primary me-2">Disabled</span>
                   <button class="btn btn-link p-0 text-decoration-none">→</button>
                 </div>
               </div>
             </div>
 
-            <!-- Medium recommendations -->
+            <!-- Allow email replies -->
             <div class="settings-section">
               <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Medium recommendations</div>
-                  <div class="settings-description">Adjust recommendations by updating what you're following and more.</div>
+                <div class="flex-grow-1">
+                  <div class="settings-label">Allow email replies</div>
+                  <div class="settings-description">Let readers reply to your stories directly from their email.</div>
                 </div>
                 <button class="btn btn-link p-0 text-decoration-none">→</button>
               </div>
             </div>
 
-            <!-- Muted writers and publications -->
+            <!-- Reply-by-email address -->
             <div class="settings-section">
               <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Muted writers and publications</div>
+                <div class="flex-grow-1">
+                  <div class="settings-label">Reply-by-email address</div>
+                  <div class="settings-description">Shown to your subscribers when they reply.</div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="me-2">None</span>
+                  <button class="btn btn-link p-0 text-decoration-none">→</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Import email subscribers -->
+            <div class="settings-section">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">Import email subscribers</div>
+                  <div class="settings-description">Upload a CSV or TXT file containing up to 25,000 email addresses.</div>
                 </div>
                 <button class="btn btn-link p-0 text-decoration-none">→</button>
               </div>
             </div>
 
-            <!-- Blocked users -->
+            <!-- Promote email subscriptions -->
             <div class="settings-section">
-              <div class="settings-label danger-text">Blocked users</div>
+              <div class="settings-label">Promote email subscriptions</div>
             </div>
 
-            <!-- Deactivate account -->
+            <!-- Share your subscribe page -->
             <div class="settings-section">
-              <div>
-                <div class="settings-label danger-text">Deactivate account</div>
-                <div class="settings-description">Deactivating will suspend your account until you sign back in.</div>
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">Share your subscribe page</div>
+                  <div class="settings-description">This page drives readers to subscribe to you via email.</div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="text-primary me-2">https://medium.com/subscribe</span>
+                  <button class="btn btn-link p-0 text-decoration-none">→</button>
+                </div>
               </div>
             </div>
 
-            <!-- Delete account -->
+            <!-- Customize your subscription promotion message -->
             <div class="settings-section">
-              <div>
-                <div class="settings-label danger-text">Delete account</div>
-                <div class="settings-description">Permanently delete your account and all of your content.</div>
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">Customize your subscription promotion message</div>
+                  <div class="settings-description">This is the message on your subscribe and profile pages.</div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="me-2">Get an email whenever Nguyen...</span>
+                  <button class="btn btn-link p-0 text-decoration-none">→</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Display a subscription promotion message -->
+            <div class="settings-section">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="settings-label">Display a subscription promotion message</div>
+                  <div class="settings-description">A message will display after the second story on your profile.</div>
+                </div>
+                <button class="btn btn-link p-0 text-decoration-none">→</button>
               </div>
             </div>
           </div>
@@ -300,7 +294,7 @@
           // Add active class to clicked tab
           this.classList.add('active');
         }
-        // For tabs with actual URLs (like publishing.html), let the default behavior happen
+        // For tabs with actual URLs (like account.html), let the default behavior happen
       });
     });
   </script>

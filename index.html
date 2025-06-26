@@ -1,134 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./assets/css/admin_style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/fonts/themify-icons/themify-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/css/admin_style.css">
 </head>
+
 <body>
-
-    <div class="d-flex admin-wrapper">
-        <!-- Sidebar -->
-        <aside class="sidebar d-flex flex-column flex-shrink-0 p-3" style="height: 100vh">
-            <a href="index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-                <span class="logo">BlogBlogBlog</span>
-            </a>
-            <hr>
-            <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item">
-                    <a href="index.html" class="nav-link active">Dashboard</a>
-                </li>
-                <li><a href="./pages/usersManagement.html" class="nav-link text-secondary">User Management</a></li>
-                <li><a href="./pages/categoriesManagement.html" class="nav-link text-secondary">Category Management</a></li>
-                <li><a href="./pages/languagesManagement.html" class="nav-link text-secondary">Language Management</a></li>
-                <li><a href="./pages/moderationManagement.html" class="nav-link text-secondary">Post Moderation</a></li>
-            </ul>
-            <hr>
-            <div class="dropdown">
-                <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="https://i.pravatar.cc/40?u=superadmin" alt="" width="32" height="32" class="rounded-circle me-2">
-                    <strong>Super Admin</strong>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                    <li><a class="dropdown-item" href="#">Settings</a></li>
-                    <li><a class="dropdown-item" href="#">Profile</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#">Sign out</a></li>
-                </ul>
-            </div>
-            <!-- User Profile Dropdown -->
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content p-4 p-md-5">
-            <div class="container-fluid">
-                <header class="pb-3 mb-4 border-bottom">
-                    <h1 class="h2 page-title">Dashboard</h1>
-                </header>
-
-                <!-- Stat Cards -->
-                <div class="row">
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-light shadow-sm h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs fw-bold text-primary text-uppercase mb-1">Total Users</div>
-                                        <div class="h5 mb-0 fw-bold text-gray-800">1,245</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-light shadow-sm h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs fw-bold text-success text-uppercase mb-1">Total Posts</div>
-                                        <div class="h5 mb-0 fw-bold text-gray-800">8,921</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-light shadow-sm h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs fw-bold text-info text-uppercase mb-1">Pending Posts</div>
-                                        <div class="h5 mb-0 fw-bold text-gray-800">18</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-light shadow-sm h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs fw-bold text-warning text-uppercase mb-1">Flagged Comments</div>
-                                        <div class="h5 mb-0 fw-bold text-gray-800">4</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Activity Section -->
-                <h2 class="h4 mt-4">Recent Posts</h2>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle table-medium">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Author</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Resumes Are Dying—Here’s What’s Replacing Them</td>
-                                <td>George J. Ziogas</td>
-                                <td>Oct 27, 2023</td>
-                            </tr>
-                            <tr>
-                                <td>Coding vs VIBE Coding</td>
-                                <td>Adarsh Gupta</td>
-                                <td>Oct 26, 2023</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand logo" href="index.html">BlogBlogBlog</a>
+      <div class="flex-grow-1 mx-4 d-none d-md-block">
+        <div class="search-bar-group input-group" style="margin-left: -16px;">
+          <span class="input-group-text bg-transparent border-0">
+            <i class="ti-search"></i>
+          </span>
+          <input type="text" class="form-control bg-transparent border-0" placeholder="Search" style="box-shadow: none;" />
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-4">
+        <a href="#" class="text-secondary text-decoration-none">
+          <i class="ti-bell fs-5"></i>
+        </a>
+        <div class="dropdown">
+          <a href="#" class="d-block" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg" class="rounded-circle" width="32" height="32" alt="Profile" />
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end mt-2">
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><a class="dropdown-item" href="#">Admin Panel</a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="#">Sign out</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <main class="col-lg-9 col-md-9">
+        <div class="admin-main-card">
+          <h2 class="page-title">Dashboard</h2>
+          <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+              <div class="stat-card">
+                <div class="stat-title">Total Users</div>
+                <div class="stat-value">1,245</div>
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="stat-card">
+                <div class="stat-title">Total Posts</div>
+                <div class="stat-value">8,921</div>
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="stat-card">
+                <div class="stat-title">Categories</div>
+                <div class="stat-value">12</div>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="fs-6 fw-bold mt-5 mb-3">Recent Activity</h3>
+          <div class="table-responsive">
+            <table class="table table-admin">
+              <thead>
+                <tr><th>User</th><th>Action</th><th>Date</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>john.doe</td>
+                  <td>Created a new post: "The Future of AI"</td>
+                  <td>Just now</td>
+                </tr>
+                <tr>
+                  <td>jane.smith</td>
+                  <td>Commented on "Data Science Trends"</td>
+                  <td>5 minutes ago</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+      <aside class="col-lg-3 col-md-3 border-start bg-white pt-4">
+        <ul class="nav flex-column admin-nav ps-3">
+          <li class="nav-item"><a class="nav-link active" href="index.html">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link " href="./pages/usersManagement.html">User Management</a></li>
+          <li class="nav-item"><a class="nav-link" href="./pages/categoriesManagement.html">Category Management</a></li>
+          <li class="nav-item"><a class="nav-link" href="./pages/languagesManagement.html">Language Management</a></li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

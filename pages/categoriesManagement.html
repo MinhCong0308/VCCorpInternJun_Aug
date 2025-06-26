@@ -1,122 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Category Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/admin_style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Category Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/fonts/themify-icons/themify-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/admin_style.css" />
 </head>
 <body>
-
-    <div class="d-flex admin-wrapper">
-        <!-- Sidebar -->
-        <aside class="sidebar d-flex flex-column flex-shrink-0 p-3" style="height: 100vh">
-            <a href="../index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-                <span class="logo">BlogBlogBlog</span>
-            </a>
-            <hr>
-            <ul class="nav nav-pills flex-column mb-auto">
-                <li><a href="../index.html" class="nav-link text-secondary">Dashboard</a></li>
-                <li><a href="usersManagement.html" class="nav-link text-secondary">User Management</a></li>
-                <li><a href="categoriesManagement.html" class="nav-link active">Category Management</a></li>
-                <li><a href="languagesManagement.html" class="nav-link text-secondary">Language Management</a></li>
-                <li><a href="moderationManagement.html" class="nav-link text-secondary">Post Moderation</a></li>
-            </ul>
-            <hr>
-            <div class="dropdown">
-                <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="https://i.pravatar.cc/40?u=superadmin" alt="" width="32" height="32" class="rounded-circle me-2">
-                    <strong>Super Admin</strong>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                    <li><a class="dropdown-item" href="#">Settings</a></li>
-                    <li><a class="dropdown-item" href="#">Profile</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#">Sign out</a></li>
-                </ul>
-            </div>
-            <!-- User Profile Dropdown -->
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content p-4 p-md-5">
-            <div class="container-fluid">
-                <header class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
-                    <h1 class="h2 page-title">Category Management</h1>
-                    <button class="btn btn-dark flex-shrink-0" data-bs-toggle="modal" data-bs-target="#categoryModal">New Category</button>
-                </header>
-
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle table-medium">
-                        <thead>
-                            <tr>
-                                <th>Category Name</th>
-                                <th>Created By</th>
-                                <th>Post Count</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Technology</td>
-                                <td>Super Admin</td>
-                                <td>152</td>
-                                <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-secondary">Edit</button>
-                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Data Science</td>
-                                <td>Super Admin</td>
-                                <td>88</td>
-                                <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-secondary">Edit</button>
-                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                </td>
-                            </tr>
-                             <tr>
-                                <td>Self Improvement</td>
-                                <td>Super Admin</td>
-                                <td>210</td>
-                                <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-secondary">Edit</button>
-                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Category Modal -->
-    <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="categoryModalLabel">Add/Edit Category</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label for="categoryName" class="form-label">Category Name</label>
-                            <input type="text" class="form-control" id="categoryName" placeholder="e.g., Technology">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-dark">Save changes</button>
-                </div>
-            </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand logo" href="../index.html">BlogBlogBlog</a>
+      <div class="flex-grow-1 mx-4 d-none d-md-block">
+        <div class="search-bar-group input-group" style="margin-left: -16px;">
+          <span class="input-group-text bg-transparent border-0">
+            <i class="ti-search"></i>
+          </span>
+          <input type="text" class="form-control bg-transparent border-0" placeholder="Search" style="box-shadow: none;" />
         </div>
+      </div>
+      <div class="d-flex align-items-center gap-4">
+        <a href="#" class="text-secondary text-decoration-none">
+          <i class="ti-bell fs-5"></i>
+        </a>
+        <div class="dropdown">
+          <a href="#" class="d-block" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg" class="rounded-circle" width="32" height="32" alt="Profile" />
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end mt-2">
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><a class="dropdown-item" href="#">Admin Panel</a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="#">Sign out</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
+  </nav>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Main Content -->
+      <main class="col-lg-9 col-md-9">
+        <div class="admin-main-card">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="page-title m-0">Category Management</h2>
+            <button class="btn btn-dark rounded-pill px-4">Add Category</button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-admin">
+              <thead>
+                <tr>
+                  <th>Category Name</th>
+                  <th>Post Count</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Technology</td>
+                  <td>152</td>
+                  <td class="text-end">
+                    <div class="d-flex justify-content-end align-items-center" style="height: 100%;">
+                        <a href="#" class="action-icon d-flex justify-content-center align-items-center">
+                             <i class="ti-more-alt"></i>
+                        </a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Data Science</td>
+                  <td>88</td>
+                  <td class="text-end">
+                    <div class="d-flex justify-content-end align-items-center" style="height: 100%;">
+                        <a href="#" class="action-icon d-flex justify-content-center align-items-center">
+                             <i class="ti-more-alt"></i>
+                        </a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Self Improvement</td>
+                  <td>210</td>
+                  <td class="text-end">
+                    <div class="d-flex justify-content-end align-items-center" style="height: 100%;">
+                        <a href="#" class="action-icon d-flex justify-content-center align-items-center">
+                             <i class="ti-more-alt"></i>
+                        </a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Navigation -->
+      <aside class="col-lg-3 col-md-3 border-start bg-white pt-4">
+        <ul class="nav flex-column admin-nav ps-3">
+          <li class="nav-item"><a class="nav-link" href="../index.html">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link active" href="usersManagement.html">User Management</a></li>
+          <li class="nav-item"><a class="nav-link" href="categoriesManagement.html">Category Management</a></li>
+          <li class="nav-item"><a class="nav-link" href="languagesManagement.html">Language Management</a></li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

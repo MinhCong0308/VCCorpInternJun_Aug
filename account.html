@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account Settings - Blog Blog Blog</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .sidebar {
+      border-right: 1px solid #dee2e6;
+    }
+    .settings-section {
+      border-bottom: 1px solid #e6e6e6;
+      padding: 1.5rem 0;
+    }
+    .settings-section:last-child {
+      border-bottom: none;
+    }
+    .settings-label {
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 0.25rem;
+    }
+    .settings-description {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    .settings-value {
+      color: #333;
+      font-size: 0.9rem;
+    }
+    .settings-tabs {
+      border-bottom: 1px solid #e6e6e6;
+      margin-bottom: 2rem;
+    }
+    .settings-tabs .nav-link {
+      color: #666;
+      border: none;
+      padding: 1rem 0;
+      margin-right: 2rem;
+    }
+    .settings-tabs .nav-link.active {
+      color: #333;
+      border-bottom: 2px solid #333;
+    }
+    .danger-text {
+      color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+    <div class="container">
+      <a class="navbar-brand fw-bold fs-3" href="home.html">Blog Blog Blog</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">My Post</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">About</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">💡</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Register</a>
+          </li>
+          <li class="nav-item">
+            <select class="form-select form-select-sm" aria-label="Language select">
+              <option value="en" selected>English</option>
+              <option value="vi">Tiếng Việt</option>
+            </select>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <div class="container">
+    <div class="row">
+      <!-- Sidebar -->
+      <button class="btn btn-sm btn-outline-primary d-md-none mb-2" onclick="toggleSidebar()">Toggle Sidebar</button>
+      <aside class="col-md-2 sidebar mb-4" id="sidebar">
+        <button class="btn btn-outline-secondary btn-sm mb-3 w-100" onclick="window.location.href='home.html'">Home</button>
+        <button class="btn btn-outline-secondary btn-sm mb-3 w-100" onclick="window.location.href='user_info.html'">My profile</button>
+        <button class="btn btn-outline-secondary btn-sm mb-3 w-100" onclick="window.location.href='post.html'">Manage Blogs</button>
+        <button class="btn btn-primary btn-sm mb-3 w-100" onclick="window.location.href='account.html'">Account Setting</button>
+      </aside>
+
+      <!-- Settings Content -->
+      <main class="col-md-10">
+        <div class="bg-white rounded shadow-sm p-4">
+          <h2 class="mb-4">Settings</h2>
+          
+          <!-- Settings Tabs -->
+          <ul class="nav settings-tabs">
+            <li class="nav-item">
+              <a class="nav-link active" href="#" data-tab="account">Account</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-tab="publishing">Publishing</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-tab="notifications">Notifications</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-tab="membership">Membership and payment</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-tab="security">Security and apps</a>
+            </li>
+          </ul>
+
+          <!-- Account Settings Content -->
+          <div id="account-content">
+            <!-- Email address -->
+            <div class="settings-section">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="settings-label">Email address</div>
+                  <div class="settings-value">congminhnguyen0308@gmail.com</div>
+                </div>
+                <button class="btn btn-link p-0 text-decoration-none">→</button>
+              </div>
+            </div>
+
+            <!-- Username and subdomain -->
+            <div class="settings-section">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="settings-label">Username and subdomain</div>
+                  <div class="settings-value">@congminhnguyen0308</div>
+                </div>
+                <button class="btn btn-link p-0 text-decoration-none">→</button>
+              </div>
+            </div>
+
+            <!-- Profile information -->
+            <div class="settings-section">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="settings-label">Profile information</div>
+                  <div class="settings-description">Edit your photo, name, pronouns, short bio, etc.</div>
+                  <div class="settings-value mt-1">Nguyen Cong Minh 
+                    <span class="badge bg-success ms-2">🎯</span>
+                  </div>
+                </div>
+                <button class="btn btn-link p-0 text-decoration-none">→</button>
+              </div>
+            </div>
+
+            <!-- Profile design -->
+            <div class="settings-section">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="settings-label">Profile design</div>
+                  <div class="settings-description">Customize the appearance of your profile.</div>
+                </div>
+                <button class="btn btn-link p-0 text-decoration-none">→</button>
+              </div>
+            </div>
+
+            <!-- Custom domain -->
+            <div class="settings-section">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="settings-label">Custom domain</div>
+                  <div class="settings-description">Upgrade to a Premium Membership to redirect your page to a URL to a domain like yourdomain.com.</div>
+                  <div class="settings-value mt-1">None →</div>
+                </div>
+                <button class="btn btn-link p-0 text-decoration-none">→</button>
+              </div>
+            </div>
+
+            <!-- Partner Program -->
+            <div class="settings-section">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="settings-label">Partner Program</div>
+                  <div class="settings-description">You are not enrolled in the Partner Program.</div>
+                </div>
+                <button class="btn btn-link p-0 text-decoration-none">→</button>
+              </div>
+            </div>
+
+            <!-- Your Medium Digest frequency -->
+            <div class="settings-section">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="settings-label">Your Medium Digest frequency</div>
+                  <div class="settings-description">Adjust how often you see a new Digest.</div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="me-2">Daily</span>
+                  <button class="btn btn-link p-0 text-decoration-none">→</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Medium recommendations -->
+            <div class="settings-section">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="settings-label">Medium recommendations</div>
+                  <div class="settings-description">Adjust recommendations by updating what you're following and more.</div>
+                </div>
+                <button class="btn btn-link p-0 text-decoration-none">→</button>
+              </div>
+            </div>
+
+            <!-- Muted writers and publications -->
+            <div class="settings-section">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="settings-label">Muted writers and publications</div>
+                </div>
+                <button class="btn btn-link p-0 text-decoration-none">→</button>
+              </div>
+            </div>
+
+            <!-- Blocked users -->
+            <div class="settings-section">
+              <div class="settings-label danger-text">Blocked users</div>
+            </div>
+
+            <!-- Deactivate account -->
+            <div class="settings-section">
+              <div>
+                <div class="settings-label danger-text">Deactivate account</div>
+                <div class="settings-description">Deactivating will suspend your account until you sign back in.</div>
+              </div>
+            </div>
+
+            <!-- Delete account -->
+            <div class="settings-section">
+              <div>
+                <div class="settings-label danger-text">Delete account</div>
+                <div class="settings-description">Permanently delete your account and all of your content.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white mt-5">
+    <div class="container py-4">
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <h5>About</h5>
+          <p>Blog Blog Blog is a website sharing knowledge in everything including technology, life-hacks, politics, daily news and more.</p>
+        </div>
+        <div class="col-md-4 mb-3">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="home.html" class="text-white">Home</a></li>
+            <li><a href="#" class="text-white">My Post</a></li>
+            <li><a href="#" class="text-white">About</a></li>
+            <li><a href="#" class="text-white">Contact</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4 mb-3">
+          <h5>Follow Us</h5>
+          <p>
+            <a href="#" class="text-white me-2">Facebook</a>
+            <a href="#" class="text-white me-2">Twitter</a>
+            <a href="#" class="text-white">GitHub</a>
+          </p>
+        </div>
+      </div>
+      <div class="text-center mt-3">
+        <small>&copy; 2025 My Awesome Blog. All rights reserved.</small>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Tab switching functionality
+    document.querySelectorAll('[data-tab]').forEach(tab => {
+      tab.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Remove active class from all tabs
+        document.querySelectorAll('[data-tab]').forEach(t => t.classList.remove('active'));
+        // Add active class to clicked tab
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

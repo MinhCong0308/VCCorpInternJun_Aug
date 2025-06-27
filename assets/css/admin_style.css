@@ -7,7 +7,7 @@
       --background-color: #ffffff;
     }
 
-    
+
 
     body {
       font-family: var(--font-sans);
@@ -145,7 +145,7 @@
       letter-spacing: 0.5px;
     }
 
-    .action-icon {
+    /* .action-icon {
       width: 36px;
       height: 36px;
       border-radius: 50%;
@@ -158,4 +158,4 @@
       background-color: #f3f3f3;
       color: var(--text-primary);
       text-decoration: none;
-    }
+    } */

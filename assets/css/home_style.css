@@ -52,12 +52,14 @@ html, body {
     vertical-align: middle;
     color: var(--text-secondary);
 }
-.nav-category-scroll {
+.nav-category-scroll nav {
     overflow-x: auto;
     white-space: nowrap;
+    -ms-overflow-style: none;  /* Ẩn thanh cuộn ngang trên IE, Edge */
+    scrollbar-width: none;     /* Ẩn thanh cuộn ngang trên Firefox */
 }
 .nav-category-scroll::-webkit-scrollbar {
-    display: none;
+    display: none;  /* Ẩn thanh cuộn ngang trên Chrome, Safari, Opera */
 }
 .nav-category-bar .nav-link {
     color: var(--text-secondary);
@@ -155,6 +157,10 @@ html, body {
         min-width: 0;
         height: 150px;
         margin-left: 0;
+    }
+    .center {
+        width: 100%;
+        padding: 4px;
     }
 }
 /* Sidebar */

@@ -1,22 +1,24 @@
 import { Component } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'app-register',
-  standalone: false,
   templateUrl: './register.html',
+  imports: [CommonModule, FormsModule, RouterModule],
   styleUrls: ['./register.css']
 })
 export class Register {
-  name: string = '';
   email: string = '';
   password: string = '';
   constructor(private router: Router) {}
 
-  register(form: NgForm): void {
-    if (form.valid) {
-        console.log(`Registered with name: ${this.name}, email: ${this.email}`);
-        alert(`Registered with name: ${this.name}, email: ${this.email}`);
+  register(): void {
+    console.log('Registering user...');
+    if (this.email && this.password) {
+        console.log(`Registered with email: ${this.email}`);
+        alert(`Registered with email: ${this.email}`);
         this.router.navigate(['/auth/login']); // Redirect to login page after registration
     } else {
       alert('Please fill in all required fields.');

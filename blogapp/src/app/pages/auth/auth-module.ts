@@ -8,12 +8,13 @@ import { Register } from './register/register';
 
 
 @NgModule({
-  declarations: [Login, Register],
+  declarations: [Login],
   imports: [
     CommonModule,
     FormsModule,
     RouterModule, // Import RouterModule for routing
     RouterModule.forChild(authRoutes) // Register auth routes
   ],
+  
 })
 export class AuthModule { }

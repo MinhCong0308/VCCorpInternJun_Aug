@@ -1,310 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nguyen Cong Minh - Blog Blog Blog</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="./assets/font/themify-icons/themify-icons.css" rel="stylesheet">
-  <style>
-    body {
-      background-color: #ffffff;
-      font-family: 'Georgia', serif;
-    }
-    .profile-header {
-      border-bottom: 1px solid #e6e6e6;
-      padding: 2rem 0;
-    }
-    .profile-name {
-      font-size: 2.5rem;
-      font-weight: 400;
-      color: #242424;
-      margin-bottom: 1rem;
-    }
-    .profile-nav {
-      border-bottom: 1px solid #e6e6e6;
-      margin-bottom: 2rem;
-    }
-    .profile-nav .nav-link {
-      color: #757575;
-      border: none;
-      padding: 1rem 0;
-      margin-right: 2rem;
-      text-decoration: none;
-      font-size: 1rem;
-    }
-    .profile-nav .nav-link.active {
-      color: #242424;
-      border-bottom: 1px solid #242424;
-    }
-    .profile-nav .nav-link:hover {
-      color: #242424;
-    }
-    .profile-avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    .profile-info {
-      margin-left: 1rem;
-    }
-    .profile-name-small {
-      font-size: 1.25rem;
-      font-weight: 500;
-      color: #242424;
-      margin-bottom: 0.25rem;
-    }
-    .edit-profile-link {
-      color: #1a8917;
-      text-decoration: none;
-      font-size: 0.9rem;
-    }
-    .edit-profile-link:hover {
-      text-decoration: underline;
-    }
-    .blog-post {
-      border-bottom: 1px solid #f2f2f2;
-      padding: 2rem 0;
-    }
-    .blog-post:last-child {
-      border-bottom: none;
-    }
-    .blog-title {
-      font-size: 1.375rem;
-      font-weight: 700;
-      color: #242424;
-      text-decoration: none;
-      line-height: 1.4;
-      margin-bottom: 0.5rem;
-    }
-    .blog-title:hover {
-      color: #242424;
-    }
-    .blog-subtitle {
-      font-size: 1rem;
-      color: #757575;
-      line-height: 1.4;
-      margin-bottom: 0.5rem;
-    }
-    .blog-meta {
-      font-size: 0.875rem;
-      color: #757575;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .blog-date {
-      color: #757575;
-    }
-
-    .bookmark-icon {
-      color: #757575;
-      cursor: pointer;
-      margin-left: auto;
-    }
-    .bookmark-icon:hover {
-      color: #242424;
-    }
-    .more-options {
-      color: #757575;
-      cursor: pointer;
-      font-size: 1.2rem;
-    }
-    .more-options:hover {
-      color: #242424;
-    }
-    .sidebar-info {
-      position: sticky;
-      top: 2rem;
-      height: calc(100vh - 4rem);
-      display: flex;
-      flex-direction: column;
-    }
-    .footer-links {
-      font-size: 0.875rem;
-      color: #757575;
-      margin-top: auto;
-      padding-top: 2rem;
-      line-height: 1.8;
-    }
-    .footer-links a {
-      color: #757575;
-      text-decoration: none;
-      margin-right: 1rem;
-    }
-    .footer-links a:hover {
-      color: #242424;
-      text-decoration: underline;
-    }
-    .write-link {
-    text-decoration: none;
-    color: #242424;
-  }
-  
-  .write-link:hover {
-    color: #242424;
-    text-decoration: none;
-  }
-  
-  .write-link .ti-pencil-alt {
-    color: #242424;
-  }
-  .input-group {
-    background-color: transparent;
-    border: 1.5px solid #5b5a5a;
-    border-radius: 10px;
-    max-width: 500px;
-  }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BlogBlogBlog - Template</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Themify Icons -->
+    <link rel="stylesheet" href="../assets/fonts/themify-icons/themify-icons.css"> <!-- Set lại href nếu cần -->
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../assets/css/home_style.css"> <!-- Set lại href nếu cần -->
 </head>
 <body>
   <!-- Top Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
-    <div class="container">
-      <a class="navbar-brand fw-bold fs-3" href="home.html">BlogBlogBlog</a>
-      
-      <!-- Search Bar -->
-      <div class="flex-grow-1 mx-4">
-        <div class="input-group">
-          <span class="input-group-text bg-transparent border-0 ti-search"></span>
-          <input type="text" class="form-control border-0" placeholder="Search" style="box-shadow: none;">
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand logo" href="#">BlogBlogBlog</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="flex-grow-1 mx-4 d-none d-md-block">
+                    <div class="search-bar-group input-group" style="margin-left: -16px;">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="ti-search"></i>
+                        </span>
+                        <input type="text" class="form-control bg-transparent border-0" placeholder="Search" style="box-shadow: none;" />
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-3 ms-auto">
+                    <a href="#" class="btn btn-write">
+                        <i class="ti-pencil-alt"></i> Write
+                    </a>
+                    <!-- Language Dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
+                            type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span style="font-size: 1.2em;">🇺🇸</span>
+                            <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="langDropdown">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                    <span style="font-size:1.2em;">🇻🇳</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                    <span style="font-size:1.2em;">🇫🇷</span>
+                                </a>
+                            </li>
+                            <!-- Thêm các ngôn ngữ khác nếu cần -->
+                        </ul>
+                    </div>
+                    <a href="#" class="text-secondary text-decoration-none ms-2 me-1">
+                        <i class="ti-bell fs-5"></i>
+                    </a>
+                    <div class="dropdown">
+                        <a href="#" class="d-block" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg" class="rounded-circle" width="32" height="32" alt="Profile" />
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end mt-2">
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Admin Panel</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item" href="#">Sign out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-      
-      <!-- Right side icons -->
-      <div class="d-flex align-items-center gap-3">
-        <a href="#" class="write-link">
-          <div>
-            <span class="ti-pencil-alt" style="font-size: 1.5rem;"></span>
-            <span class="ms-1 text-dark">Write</span>
-          </div>
-        </a>
-        <span class="ti-bell" style="font-size: 1.5rem;"></span>
-        <img src="https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg" class="rounded-circle" width="32" height="32" alt="Profile">
-      </div>
-    </div>
-  </nav>
-
+    </nav>
   <!-- Main Content -->
-  <div class="container my-5">
-    <div class="row">
-      <!-- Main Content Area -->
-      <div class="col-lg-8">
-        <!-- Profile Header -->
-        <div class="profile-header">
-          <h1 class="profile-name">Nguyen Cong Minh</h1>
-        </div>
+    <div class="container main-content">
+        <div class="row">
+            <!-- Main Section -->
+            <main class="col-lg-9 col-md-9">
+              <div class="profile-header">
+                <h1 class="profile-name">Nguyen Cong Minh</h1>
+              </div>
+              <nav class="profile-nav">
+                <ul class="nav">
+                  <li class="nav-item">
+                    <a class="nav-link active" href="#" data-tab="home">Home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#" data-tab="lists">Lists</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#" data-tab="about">About</a>
+                  </li>
+                </ul>
+              </nav>
+              <div id="home-content">
+                <!-- Blog Post 1 -->
+                <article class="blog-post">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                      <h2><a href="#" class="blog-title">Generating IELTS Writing Task 2 with GPT-2</a></h2>
+                      <p class="blog-subtitle">Step 1: Data Preprocessing for IELTS Essay Generation</p>
+                      <div class="blog-meta">
+                        <span class="blog-date">Just now</span>
+                        <span class="bookmark-icon ti-bookmark"></span>
+                        <span class="more-options">⋯</span>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+                <!-- Blog Post 2 -->
+                <article class="blog-post">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                      <h2><a href="#" class="blog-title">Understanding Machine Learning Fundamentals</a></h2>
+                      <p class="blog-subtitle">A comprehensive guide to getting started with ML concepts and practical applications</p>
+                      <div class="blog-meta">
+                        <span class="blog-date">2 days ago</span>
+                        <span class="bookmark-icon ti-bookmark"></span>
+                        <span class="more-options">⋯</span>
+                      </div>
+                    </div>
+                  </div>
+                </article>
 
-        <!-- Profile Navigation -->
-        <nav class="profile-nav">
-          <ul class="nav">
-            <li class="nav-item">
-              <a class="nav-link active" href="#" data-tab="home">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#" data-tab="lists">Lists</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#" data-tab="about">About</a>
-            </li>
-          </ul>
-        </nav>
+                <!-- Blog Post 3 -->
+                <article class="blog-post">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                      <h2><a href="#" class="blog-title">The Future of Web Development</a></h2>
+                      <p class="blog-subtitle">Exploring emerging trends and technologies that will shape the next decade of web development</p>
+                      <div class="blog-meta">
+                        <span class="blog-date">1 week ago</span>
+                        <span class="bookmark-icon ti-bookmark"></span>
+                        <span class="more-options">⋯</span>
+                      </div>
+                    </div>
+                  </div>
+                </article>
 
-        <!-- Blog Posts Content -->
-        <div id="home-content">
-          <!-- Blog Post 1 -->
-          <article class="blog-post">
-            <div class="d-flex justify-content-between align-items-start">
-              <div class="flex-grow-1">
-                <h2><a href="#" class="blog-title">Generating IELTS Writing Task 2 with GPT-2</a></h2>
-                <p class="blog-subtitle">Step 1: Data Preprocessing for IELTS Essay Generation</p>
-                <div class="blog-meta">
-                  <span class="blog-date">Just now</span>
-                  <span class="bookmark-icon ti-bookmark"></span>
-                  <span class="more-options">⋯</span>
+                <!-- Blog Post 4 -->
+                <article class="blog-post">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                      <h2><a href="#" class="blog-title">Data Science Best Practices</a></h2>
+                      <p class="blog-subtitle">Essential techniques and methodologies for effective data analysis and visualization</p>
+                      <div class="blog-meta">
+                        <span class="blog-date">2 weeks ago</span>
+                        <span class="bookmark-icon ti-bookmark"></span>
+                        <span class="more-options">⋯</span>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </div>
+              <div id="lists-content" style="display: none;">
+                <div class="text-center py-5">
+                  <p class="text-muted">No lists created yet.</p>
                 </div>
               </div>
-            </div>
-          </article>
 
-          <!-- Blog Post 2 -->
-          <article class="blog-post">
-            <div class="d-flex justify-content-between align-items-start">
-              <div class="flex-grow-1">
-                <h2><a href="#" class="blog-title">Understanding Machine Learning Fundamentals</a></h2>
-                <p class="blog-subtitle">A comprehensive guide to getting started with ML concepts and practical applications</p>
-                <div class="blog-meta">
-                  <span class="blog-date">2 days ago</span>
-                  <span class="bookmark-icon ti-bookmark"></span>
-                  <span class="more-options">⋯</span>
+              <!-- About Content (Hidden by default) -->
+              <div id="about-content" style="display: none;">
+                <div class="py-3">
+                  <p>Passionate writer and technology enthusiast sharing insights on machine learning, web development, and data science.</p>
                 </div>
               </div>
-            </div>
-          </article>
-
-          <!-- Blog Post 3 -->
-          <article class="blog-post">
-            <div class="d-flex justify-content-between align-items-start">
-              <div class="flex-grow-1">
-                <h2><a href="#" class="blog-title">The Future of Web Development</a></h2>
-                <p class="blog-subtitle">Exploring emerging trends and technologies that will shape the next decade of web development</p>
-                <div class="blog-meta">
-                  <span class="blog-date">1 week ago</span>
-                  <span class="bookmark-icon ti-bookmark"></span>
-                  <span class="more-options">⋯</span>
+            </main>
+            <!-- Sidebar -->
+            <aside class="col-lg-3 col-md-3 d-none d-md-block border-start bg-white pt-4">
+                <div class="sidebar-inner ps-4">
+                  <div class="d-flex align-items-start mb-4">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg" class="profile-avatar" alt="Nguyen Cong Minh">
+                    <div class="profile-info">
+                      <h3 class="profile-name-small">Nguyen Cong Minh</h3>
+                      <a href="account.html" class="edit-profile-link">Edit profile</a>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </article>
-
-          <!-- Blog Post 4 -->
-          <article class="blog-post">
-            <div class="d-flex justify-content-between align-items-start">
-              <div class="flex-grow-1">
-                <h2><a href="#" class="blog-title">Data Science Best Practices</a></h2>
-                <p class="blog-subtitle">Essential techniques and methodologies for effective data analysis and visualization</p>
-                <div class="blog-meta">
-                  <span class="blog-date">2 weeks ago</span>
-                  <span class="bookmark-icon ti-bookmark"></span>
-                  <span class="more-options">⋯</span>
-                </div>
-              </div>
-            </div>
-          </article>
+            </aside>
         </div>
-
-        <!-- Lists Content (Hidden by default) -->
-        <div id="lists-content" style="display: none;">
-          <div class="text-center py-5">
-            <p class="text-muted">No lists created yet.</p>
-          </div>
-        </div>
-
-        <!-- About Content (Hidden by default) -->
-        <div id="about-content" style="display: none;">
-          <div class="py-3">
-            <p>Passionate writer and technology enthusiast sharing insights on machine learning, web development, and data science.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Sidebar -->
-      <div class="col-lg-4">
-        <div class="sidebar-info">
-          <!-- Profile Card -->
-          <div class="d-flex align-items-start mb-4">
-            <img src="https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg" class="profile-avatar" alt="Nguyen Cong Minh">
-            <div class="profile-info">
-              <h3 class="profile-name-small">Nguyen Cong Minh</h3>
-              <a href="account.html" class="edit-profile-link">Edit profile</a>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
 
+  <!-- Footer -->
+  <footer class="main-footer mt-1">
+        <hr class="footer-divider mb-4" />
+        <div class="footer-links">
+            <a href="#">Help</a>
+            <a href="#">Status</a>
+            <a href="#">About</a>
+            <a href="#">Careers</a>
+            <a href="#">Press</a>
+            <a href="#">Blog</a>
+            <a href="#">Privacy</a>
+            <a href="#">Rules</a>
+            <a href="#">Terms</a>
+            <a href="#">Text to speech</a>
+        </div>
+  </footer> 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // Tab switching functionality

@@ -1,308 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Account Settings - Blog Blog Blog</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background-color: #f8f9fa;
-    }
-    .sidebar {
-      border-right: 1px solid #dee2e6;
-    }
-    .settings-section {
-      border-bottom: 1px solid #e6e6e6;
-      padding: 1.5rem 0;
-    }
-    .settings-section:last-child {
-      border-bottom: none;
-    }
-    .settings-label {
-      font-weight: 500;
-      color: #333;
-      margin-bottom: 0.25rem;
-    }
-    .settings-description {
-      color: #666;
-      font-size: 0.9rem;
-    }
-    .settings-value {
-      color: #333;
-      font-size: 0.9rem;
-    }
-    .settings-tabs {
-      border-bottom: 1px solid #e6e6e6;
-      margin-bottom: 2rem;
-    }
-    .settings-tabs .nav-link {
-      color: #666;
-      border: none;
-      padding: 1rem 0;
-      margin-right: 2rem;
-    }
-    .settings-tabs .nav-link.active {
-      color: #333;
-      border-bottom: 2px solid #333;
-    }
-    .danger-text {
-      color: #dc3545;
-    }
-    .container .row {
-      margin-left: 250px;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BlogBlogBlog - Template</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Themify Icons -->
+    <link rel="stylesheet" href="../assets/fonts/themify-icons/themify-icons.css"> <!-- Set lại href nếu cần -->
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../assets/css/home_style.css"> <!-- Set lại href nếu cần -->
 </head>
-<body>
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
-    <div class="container">
-      <a class="navbar-brand fw-bold fs-3" href="home.html">Blog Blog Blog</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="profile.html">My Post</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">About</a>
-          </li>
-        </ul>
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="#">💡</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Login</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Register</a>
-          </li>
-          <li class="nav-item">
-            <select class="form-select form-select-sm" aria-label="Language select">
-              <option value="en" selected>English</option>
-              <option value="vi">Tiếng Việt</option>
-            </select>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
 
-  <!-- Main content -->
-  <div class="container">
-    <div class="row">
-      <!-- Sidebar -->
-      <!-- <button class="btn btn-sm btn-outline-primary d-md-none mb-2" onclick="toggleSidebar()">Toggle Sidebar</button>
-      <aside class="col-md-2 sidebar mb-4" id="sidebar">
-        <button class="btn btn-outline-secondary btn-sm mb-3 w-100" onclick="window.location.href='home.html'">Home</button>
-        <button class="btn btn-outline-secondary btn-sm mb-3 w-100" onclick="window.location.href='user_info.html'">My profile</button>
-        <button class="btn btn-outline-secondary btn-sm mb-3 w-100" onclick="window.location.href='post.html'">Manage Blogs</button>
-        <button class="btn btn-primary btn-sm mb-3 w-100" onclick="window.location.href='account.html'">Account Setting</button>
-      </aside> -->
-
-      <!-- Settings Content -->
-      <main class="col-md-10">
-        <div class="bg-white rounded shadow-sm p-4">
-          <h2 class="mb-4">Settings</h2>
-          
-          <!-- Settings Tabs -->
-          <ul class="nav settings-tabs">
-            <li class="nav-item">
-              <a class="nav-link active" href="#" data-tab="account">Account</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="publishing.html" data-tab="publishing">Publishing</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="notification.html" data-tab="notifications">Notifications</a>
-            </li>
-          </ul>
-
-          <!-- Account Settings Content -->
-          <div id="account-content">
-            <!-- Email address -->
-            <div class="settings-section">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Email address</div>
-                  <div class="settings-value">congminhnguyen0308@gmail.com</div>
+<body class="d-flex flex-column min-vh-100">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand logo" href="#">BlogBlogBlog</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="flex-grow-1 mx-4 d-none d-md-block">
+                    <div class="search-bar-group input-group" style="margin-left: -16px;">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="ti-search"></i>
+                        </span>
+                        <input type="text" class="form-control bg-transparent border-0" placeholder="Search" style="box-shadow: none;" />
+                    </div>
                 </div>
-                <button class="btn btn-link p-0 text-decoration-none">→</button>
-              </div>
-            </div>
-
-            <!-- Username and subdomain -->
-            <div class="settings-section">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Username and subdomain</div>
-                  <div class="settings-value">@congminhnguyen0308</div>
+                <div class="d-flex align-items-center gap-3 ms-auto">
+                    <a href="#" class="btn btn-write">
+                        <i class="ti-pencil-alt"></i> Write
+                    </a>
+                    <!-- Language Dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
+                            type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span style="font-size: 1.2em;">🇺🇸</span>
+                            <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="langDropdown">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                    <span style="font-size:1.2em;">🇻🇳</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                    <span style="font-size:1.2em;">🇫🇷</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <a href="#" class="text-secondary text-decoration-none ms-2 me-1">
+                        <i class="ti-bell fs-5"></i>
+                    </a>
+                    <div class="dropdown">
+                        <a href="#" class="d-block" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg" class="rounded-circle" width="32" height="32" alt="Profile" />
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end mt-2">
+                            <li><a class="dropdown-item" href="profile.html">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Admin Panel</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item" href="#">Sign out</a></li>
+                        </ul>
+                    </div>
                 </div>
-                <button class="btn btn-link p-0 text-decoration-none">→</button>
-              </div>
             </div>
+        </div>
+    </nav>
 
-            <!-- Profile information -->
-            <div class="settings-section">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Profile information</div>
-                  <div class="settings-description">Edit your photo, name, pronouns, short bio, etc.</div>
-                  <div class="settings-value mt-1">Nguyen Cong Minh 
-                    <span class="badge bg-success ms-2">🎯</span>
+    <!-- Main Content -->
+    <div class="container main-content">
+        <div class="row">
+            <!-- Main Section -->
+            <main class="col-lg-9 col-md-9">
+              <div class="bg-white rounded shadow-sm p-4">
+                <h2 class="mb-4">Settings</h2>
+                <!-- Settings Tabs -->
+                <ul class="nav settings-tabs">
+                  <li class="nav-item">
+                    <a class="nav-link active" href="account.html" data-tab="account">Account</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="publishing.html" data-tab="publishing">Publishing</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="notification.html" data-tab="notifications">Notifications</a>
+                  </li>
+                </ul>
+                <!--Setting contents-->
+                <div id="account-content">
+                  <!-- Email address -->
+                  <div class="settings-section">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div>
+                        <div class="settings-label">Email address</div>
+                        <div class="settings-value">congminhnguyen0308@gmail.com</div>
+                      </div>
+                      <button class="btn btn-link p-0 text-decoration-none">→</button>
+                    </div>
+                  </div>
+
+                  <!-- Username and subdomain -->
+                  <div class="settings-section">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div>
+                        <div class="settings-label">Username and subdomain</div>
+                        <div class="settings-value">@congminhnguyen0308</div>
+                      </div>
+                      <button class="btn btn-link p-0 text-decoration-none">→</button>
+                    </div>
+                  </div>
+
+                  <!-- Profile information -->
+                  <div class="settings-section">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div>
+                        <div class="settings-label">Profile information</div>
+                        <div class="settings-description">Edit your photo, name, pronouns, short bio, etc.</div>
+                        <div class="settings-value mt-1">Nguyen Cong Minh 
+                          <span class="badge bg-success ms-2">🎯</span>
+                        </div>
+                      </div>
+                      <button class="btn btn-link p-0 text-decoration-none">→</button>
+                    </div>
+                  </div>
+
+                  <!-- Profile design -->
+                  <div class="settings-section">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div>
+                        <div class="settings-label">Profile design</div>
+                        <div class="settings-description">Customize the appearance of your profile.</div>
+                      </div>
+                      <button class="btn btn-link p-0 text-decoration-none">→</button>
+                    </div>
+                  </div>
+
+                  <!-- Custom domain -->
+                  <div class="settings-section">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div>
+                        <div class="settings-label">Custom domain</div>
+                        <div class="settings-description">Upgrade to a Premium Membership to redirect your page to a URL to a domain like yourdomain.com.</div>
+                        <div class="settings-value mt-1">None →</div>
+                      </div>
+                      <button class="btn btn-link p-0 text-decoration-none">→</button>
+                    </div>
+                  </div>
+
+                  <!-- Partner Program -->
+                  <div class="settings-section">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div>
+                        <div class="settings-label">Partner Program</div>
+                        <div class="settings-description">You are not enrolled in the Partner Program.</div>
+                      </div>
+                      <button class="btn btn-link p-0 text-decoration-none">→</button>
+                    </div>
+                  </div>
+
+                  <!-- Your Medium Digest frequency -->
+                  <div class="settings-section">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div>
+                        <div class="settings-label">Your Medium Digest frequency</div>
+                        <div class="settings-description">Adjust how often you see a new Digest.</div>
+                      </div>
+                      <div class="d-flex align-items-center">
+                        <span class="me-2">Daily</span>
+                        <button class="btn btn-link p-0 text-decoration-none">→</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Medium recommendations -->
+                  <div class="settings-section">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div>
+                        <div class="settings-label">Medium recommendations</div>
+                        <div class="settings-description">Adjust recommendations by updating what you're following and more.</div>
+                      </div>
+                      <button class="btn btn-link p-0 text-decoration-none">→</button>
+                    </div>
+                  </div>
+
+                  <!-- Muted writers and publications -->
+                  <div class="settings-section">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div>
+                        <div class="settings-label">Muted writers and publications</div>
+                      </div>
+                      <button class="btn btn-link p-0 text-decoration-none">→</button>
+                    </div>
+                  </div>
+
+                  <!-- Blocked users -->
+                  <div class="settings-section">
+                    <div class="settings-label danger-text">Blocked users</div>
+                  </div>
+
+                  <!-- Deactivate account -->
+                  <div class="settings-section">
+                    <div>
+                      <div class="settings-label danger-text">Deactivate account</div>
+                      <div class="settings-description">Deactivating will suspend your account until you sign back in.</div>
+                    </div>
+                  </div>
+
+                  <!-- Delete account -->
+                  <div class="settings-section">
+                    <div>
+                      <div class="settings-label danger-text">Delete account</div>
+                      <div class="settings-description">Permanently delete your account and all of your content.</div>
+                    </div>
                   </div>
                 </div>
-                <button class="btn btn-link p-0 text-decoration-none">→</button>
               </div>
-            </div>
-
-            <!-- Profile design -->
-            <div class="settings-section">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Profile design</div>
-                  <div class="settings-description">Customize the appearance of your profile.</div>
-                </div>
-                <button class="btn btn-link p-0 text-decoration-none">→</button>
+            </main>
+            <!-- Sidebar -->
+            <aside class="col-lg-3 col-md-3 d-none d-md-block border-start bg-white pt-4">
+              <div class="help-articles">
+                <h6>Suggested help articles</h6>
+                <ul>
+                  <li><a href="#">Sign in or sign up to Medium</a></li>
+                  <li><a href="#">Your profile page</a></li>
+                  <li><a href="#">Writing and publishing your first story</a></li>
+                  <li><a href="#">About Medium's distribution system</a></li>
+                  <li><a href="#">Get started with the Partner Program</a></li>
+                </ul>
               </div>
-            </div>
-
-            <!-- Custom domain -->
-            <div class="settings-section">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Custom domain</div>
-                  <div class="settings-description">Upgrade to a Premium Membership to redirect your page to a URL to a domain like yourdomain.com.</div>
-                  <div class="settings-value mt-1">None →</div>
-                </div>
-                <button class="btn btn-link p-0 text-decoration-none">→</button>
-              </div>
-            </div>
-
-            <!-- Partner Program -->
-            <div class="settings-section">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Partner Program</div>
-                  <div class="settings-description">You are not enrolled in the Partner Program.</div>
-                </div>
-                <button class="btn btn-link p-0 text-decoration-none">→</button>
-              </div>
-            </div>
-
-            <!-- Your Medium Digest frequency -->
-            <div class="settings-section">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Your Medium Digest frequency</div>
-                  <div class="settings-description">Adjust how often you see a new Digest.</div>
-                </div>
-                <div class="d-flex align-items-center">
-                  <span class="me-2">Daily</span>
-                  <button class="btn btn-link p-0 text-decoration-none">→</button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Medium recommendations -->
-            <div class="settings-section">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Medium recommendations</div>
-                  <div class="settings-description">Adjust recommendations by updating what you're following and more.</div>
-                </div>
-                <button class="btn btn-link p-0 text-decoration-none">→</button>
-              </div>
-            </div>
-
-            <!-- Muted writers and publications -->
-            <div class="settings-section">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="settings-label">Muted writers and publications</div>
-                </div>
-                <button class="btn btn-link p-0 text-decoration-none">→</button>
-              </div>
-            </div>
-
-            <!-- Blocked users -->
-            <div class="settings-section">
-              <div class="settings-label danger-text">Blocked users</div>
-            </div>
-
-            <!-- Deactivate account -->
-            <div class="settings-section">
-              <div>
-                <div class="settings-label danger-text">Deactivate account</div>
-                <div class="settings-description">Deactivating will suspend your account until you sign back in.</div>
-              </div>
-            </div>
-
-            <!-- Delete account -->
-            <div class="settings-section">
-              <div>
-                <div class="settings-label danger-text">Delete account</div>
-                <div class="settings-description">Permanently delete your account and all of your content.</div>
-              </div>
-            </div>
-          </div>
+            </aside>
         </div>
-      </main>
     </div>
-  </div>
 
-  <!-- Footer -->
-  <footer class="bg-dark text-white mt-5">
-    <div class="container py-4">
-      <div class="row">
-        <div class="col-md-4 mb-3">
-          <h5>About</h5>
-          <p>Blog Blog Blog is a website sharing knowledge in everything including technology, life-hacks, politics, daily news and more.</p>
+    <!-- Footer -->
+    <footer class="main-footer mt-1">
+        <hr class="footer-divider mb-4" />
+        <div class="footer-links">
+            <a href="#">Help</a>
+            <a href="#">Status</a>
+            <a href="#">About</a>
+            <a href="#">Careers</a>
+            <a href="#">Press</a>
+            <a href="#">Blog</a>
+            <a href="#">Privacy</a>
+            <a href="#">Rules</a>
+            <a href="#">Terms</a>
+            <a href="#">Text to speech</a>
         </div>
-        <div class="col-md-4 mb-3">
-          <h5>Quick Links</h5>
-          <ul class="list-unstyled">
-            <li><a href="home.html" class="text-white">Home</a></li>
-            <li><a href="#" class="text-white">My Post</a></li>
-            <li><a href="#" class="text-white">About</a></li>
-            <li><a href="#" class="text-white">Contact</a></li>
-          </ul>
-        </div>
-        <div class="col-md-4 mb-3">
-          <h5>Follow Us</h5>
-          <p>
-            <a href="#" class="text-white me-2">Facebook</a>
-            <a href="#" class="text-white me-2">Twitter</a>
-            <a href="#" class="text-white">GitHub</a>
-          </p>
-        </div>
-      </div>
-      <div class="text-center mt-3">
-        <small>&copy; 2025 My Awesome Blog. All rights reserved.</small>
-      </div>
-    </div>
-  </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Tab switching functionality
-    document.querySelectorAll('[data-tab]').forEach(tab => {
-      tab.addEventListener('click', function(e) {
-        // Only prevent default for tabs without href or with # href
-        if (this.getAttribute('href') === '#' || !this.getAttribute('href')) {
-          e.preventDefault();
-          // Remove active class from all tabs
-          document.querySelectorAll('[data-tab]').forEach(t => t.classList.remove('active'));
-          // Add active class to clicked tab
-          this.classList.add('active');
-        }
-        // For tabs with actual URLs (like publishing.html), let the default behavior happen
-      });
-    });
-  </script>
+    </footer>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

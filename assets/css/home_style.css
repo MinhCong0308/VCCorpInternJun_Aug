@@ -46,6 +46,32 @@ body {
 .search-bar-group .form-control::placeholder {
     color: #8a8a8a;
 }
+.btn-login {
+    color: green;
+    background: #fff;
+    border: none;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 6px 15px 6px 15px;
+}
+.btn-signup {
+    color: green;
+    background: #fff;
+    border: 1.5px solid green;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 6px 15px 6px 15px;
+    margin-right: 14px;
+}
+.btn-login:hover {
+    color: green;
+}
+.btn-signup:hover {
+    color: green;
+    border: 1.5px solid green;
+}
 .nav-category-bar {
     position: sticky;
     top: 0;

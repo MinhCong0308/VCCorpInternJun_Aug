@@ -130,10 +130,13 @@ body {
     font-family: var(--body-font);
     font-size: 1.45rem;
     font-weight: 700;
-    color: #1a1919;
     margin-bottom: 7px;
     line-height: 1.19;
     letter-spacing: -.01em;
+}
+.post-title a {
+    text-decoration: none;
+    color: var(--text-primary);
 }
 .post-sneak {
     color: var(--text-secondary);
@@ -157,7 +160,13 @@ body {
 .author-name {
     font-size: 0.8rem;
     margin-right: 12px;
+}
+.author-name a {
     color: var(--text-primary);
+    text-decoration: none;
+}
+.author-name a:hover {
+    text-decoration: underline;
 }
 .post-img-thumb {
     width: 150px;
@@ -214,6 +223,14 @@ aside {
     margin-bottom: 0.7rem;
     color: #151515;
 }
+.sidebar-post-title {
+    font-family: var(--body-font);
+    font-weight: 700;
+}
+.sidebar-post-title a {
+    text-decoration: none;
+    color: var(--text-primary);
+}
 .sidebar-footer {
     font-size: 0.7rem;
     color: var(--text-secondary);
@@ -258,6 +275,17 @@ aside {
     background: #fff;
     color: var(--text-primary);
     text-decoration: none;
+}
+.full-list {
+    font-size: 13px;
+    padding-top: 0.9rem;
+}
+.full-list a {
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+.full-list a:hover {
+    text-decoration: underline;
 }
 /* Footer */
 .main-footer {

@@ -19,7 +19,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
         <div class="container-fluid px-4">
-            <a class="navbar-brand logo" href="#">BlogBlogBlog</a>
+            <a class="navbar-brand logo" href="home.html">BlogBlogBlog</a>
             <span class="text-muted">Draft in Nguyen Cong Minh</span>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -72,11 +72,12 @@
         <div class="row">
             <!-- Main Section -->
              <main class="col-12 d-flex justify-content-center">
-                <div class="editor-wrapper mt-5 px-3 w-100" style="max-width: 700px;">
+                <div class="editor-wrapper mt-5 px-3 w-100" style="max-width: 1000px;">
                     <!-- Blog Title -->
-                    <textarea class="form-control editor-title mb-4"
+                    <textarea id="blogTitle" class="form-control editor-title mb-4"
                         placeholder="Title" rows="1"
-                        style="font-size: 2.8rem; font-weight: bold; border: none; outline: none; resize: none; font-family: 'Playfair Display', serif;"></textarea>
+                        style="font-size: 2.8rem; font-weight: lighter; border: none; outline: none; resize: none; font-family: 'Playfair Display', serif; color: #e5e5e0;"></textarea>
+
                     <div class="border rounded p-2 bg-white" style="min-height: 400px;">
                         <div id="quill-editor" style="min-height: 350px;"></div>
                     </div>
@@ -125,8 +126,8 @@
                 const content = quill.root.innerHTML.trim();
                 console.log('Blog Title:', title);
                 console.log('Blog Content (HTML):', content);
-                alert('Your blog with ' + title +  ' and content: ' + content + ' will be processing. Redirecting...');
-                window.location.href = 'profile.html';
+                alert('Your blog with title: ' + title +  ' and content: ' + content + ' will be processing. Redirecting...');
+                window.location.href = 'home.html';
         });
     </script>
 </body>

@@ -165,7 +165,7 @@ body {
     border: none;
     background: none;
     font-size: 14px;
-    color: #555;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: color 0.14s;
 }
@@ -199,7 +199,7 @@ body {
 .response .btn-link:focus, .response .btn-link:active {
   box-shadow: none;
 }
-.btn-see-all, .btn-see-more {
+.btn-more-res, .btn-more-rec, .btn-hide-res {
     color: var(--text-primary);
     background: #fff;
     border: 1px solid var(--text-primary);
@@ -209,12 +209,32 @@ body {
     margin-right: 14px;
     transition: background 0.2s;
 }
-.btn-see-all:hover, .btn-see-more:hover {
+.btn-more-res:hover, .btn-more-rec:hover, .btn-hide-res:hover {
     background: #000;
     color: #e6e6e6;
 }
 .reply-form .form-control::placeholder {
     color: #8a8a8a84;
+}
+.interact .btn-link {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+.interact .btn-link:hover {
+    color: var(--text-primary);
+}
+.response-child-list {
+  margin-left: 2rem;
+  border-left: 2px solid #eee;
+  padding-left: 1rem;
+}
+.response-child {
+  margin-bottom: 0.7rem;
+}
+.btn-see-more-child,
+.btn-hide-child {
+  font-size: 13px;
 }
 /* Recommendation */
 .rec .btn-link {

@@ -18,7 +18,10 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
         <div class="container-fluid px-4">
-            <a class="navbar-brand logo" href="home.html">BlogBlogBlog</a>
+            <a class="navbar-brand logo" href="home.html">
+                <img src="../img/logo.png" class="logo-img" alt="logo-image">
+                BlogBlogBlog
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -83,12 +86,9 @@
                 <h1 class="post-title">18 Cheat Codes to Life, to Put You 10 Years Ahead of 90% Of People</h1>
                 <div class="post-subtitle">(You have the power to change your life. Take small steps every day, and soon you’ll be unstoppable)</div>
                 <div class="post-meta-detail mb-3">
-                    <img src="https://randomuser.me/api/portraits/men/11.jpg" alt="Author" class="author-avatar" />
-                    <div>
-                        <span class="author-name">Olly J</span>
-                        <button class="btn btn-follow ms-auto">Follow</button>
-                        <span>4 min read</span>
-                        <span class="mx-2">·</span>
+                    <a href="#"><img src="https://randomuser.me/api/portraits/men/11.jpg" alt="Author" class="author-avatar" /></a>
+                    <div class="post-author">
+                        <a href="#"><span class="author-name">Olly J</span></a>
                         <span>Mar 5, 2025</span>
                     </div>
                 </div>
@@ -148,56 +148,111 @@
 
                 <!-- Responses -->
                 <section class="post-responses mt-5 mb-4">
-                <h4 class="fw-bold mb-4" style="font-size: 1.35rem;">Responses (8)</h4>
-                <!-- Form nhập phản hồi -->
-                <div class="mb-4">
-                    <div class="d-flex align-items-start">
-                    <img src="https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg" alt="Your avatar" class="rounded-circle" style="width:32px;height:32px;margin-right:12px;">
-                    <textarea class="form-control" rows="3" placeholder="What are your thoughts?" style="resize:none;"></textarea>
+                    <h4 class="fw-bold mb-4" style="font-size: 1.35rem;">Responses (8)</h4>
+                    <!-- Form bình luận mới (ở đầu) -->
+                    <div class="mb-4">
+                        <div class="reply-form d-flex align-items-start">
+                        <a href="#"><img src="https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg" class="rounded-circle" style="width:32px;height:32px;margin-right:12px;"></a>
+                        <textarea class="form-control" rows="3" placeholder="What are your thoughts?" style="resize:none;"></textarea>
+                        </div>
+                        <div class="text-end mt-2">
+                        <button class="btn btn-white btn-sm rounded-pill px-4">Cancel</button>
+                        <button class="btn btn-dark btn-sm rounded-pill px-4">Send</button>
+                        </div>
                     </div>
-                    <div class="text-end mt-2">
-                    <button class="btn btn-dark btn-sm rounded-pill px-4">Send</button>
+                    <!-- Danh sách bình luận -->
+                    <div id="response-list">
+                        <!-- Bình luận gốc 1 -->
+                        <div class="response mb-4 pb-3 border-bottom" data-root="1">
+                        <div class="d-flex align-items-center mb-2">
+                            <a href="#"><img src="https://randomuser.me/api/portraits/women/52.jpg" class="rounded-circle" style="width:30px;height:30px;object-fit:cover;margin-right:10px;"></a>
+                            <a href="#"><span class="me-2" style="font-size: 14px;">Lily Bloom</span></a>
+                            <span style="font-size:13px;color:#888;">· 2 days ago</span>
+                        </div>
+                        <div style="font-size:14px;">So true! Waiting often brings more clarity. I need to practice this more.</div>
+                        <div class="interact d-flex align-items-center mt-1" style="font-size:13px;">
+                            <button class="btn btn-link px-0 me-2"><i class="ti-thumb-up"></i> 5</button>
+                            <button class="btn btn-link px-3 text-decoration-underline btn-reply">Reply</button>
+                        </div>
+                        <!-- Bình luận con - hiển thị mặc định 1, các con còn lại ẩn -->
+                        <div class="response-child-list ms-5 mt-2">
+                            <div class="response-child" data-child="1">
+                            <div class="d-flex align-items-center mb-1">
+                                <a href="#"><img src="https://randomuser.me/api/portraits/men/24.jpg" class="rounded-circle" style="width:26px;height:26px;object-fit:cover;margin-right:8px;"></a>
+                                <a href="#"><span class="me-2" style="font-size: 13px;">Peter Pham</span></a>
+                                <span style="font-size:12px;color:#888;">· 1 day ago</span>
+                            </div>
+                            <div style="font-size:13px;">Agree with you!</div>
+                            <div class="interact d-flex align-items-center mt-1" style="font-size:12px;">
+                                <button class="btn btn-link px-0 me-2"><i class="ti-thumb-up"></i> 1</button>
+                                <button class="btn btn-link px-3 text-decoration-underline btn-reply">Reply</button>
+                            </div>
+                            </div>
+                            <!-- Bình luận con 2, ẩn mặc định -->
+                            <div class="response-child d-none" data-child="2">
+                            <div class="d-flex align-items-center mb-1">
+                                <a href="#"><img src="https://randomuser.me/api/portraits/women/36.jpg" class="rounded-circle" style="width:26px;height:26px;object-fit:cover;margin-right:8px;"></a>
+                                <a href="#"><span class="me-2" style="font-size: 13px;">Anna Smith</span></a>
+                                <span style="font-size:12px;color:#888;">· 1 day ago</span>
+                            </div>
+                            <div style="font-size:13px;">Thanks for your insight!</div>
+                            <div class="interact d-flex align-items-center mt-1" style="font-size:12px;">
+                                <button class="btn btn-link px-0 me-2"><i class="ti-thumb-up"></i> 1</button>
+                                <button class="btn btn-link px-3 text-decoration-underline btn-reply">Reply</button>
+                            </div>
+                            </div>
+                            <!-- Nút xem thêm bình luận con -->
+                            <button class="btn btn-link btn-see-more-child px-0 py-1 mt-1" style="font-size: 13px;">See more replies</button>
+                            <button class="btn btn-link btn-hide-child px-0 py-1 mt-1 d-none" style="font-size: 13px;">Hide replies</button>
+                        </div>
+                        </div>
+                        <!-- Bình luận gốc 2 -->
+                        <div class="response mb-4 pb-3 border-bottom" data-root="2">
+                        <div class="d-flex align-items-center mb-2">
+                            <a href="#"><img src="https://randomuser.me/api/portraits/men/15.jpg" class="rounded-circle" style="width:30px;height:30px;object-fit:cover;margin-right:10px;"></a>
+                            <a href="#"><span class="me-2" style="font-size: 14px;">Alex Lee</span></a>
+                            <span style="font-size:13px;color:#888;">· 3 days ago</span>
+                        </div>
+                        <div style="font-size:14px;">This is the best post I've read about decision making. Thank you!</div>
+                        <div class="interact d-flex align-items-center mt-1" style="font-size:13px;">
+                            <button class="btn btn-link px-0 me-2"><i class="ti-thumb-up"></i> 2</button>
+                            <button class="btn btn-link px-3 text-decoration-underline btn-reply">Reply</button>
+                        </div>
+                        <!-- Không có bình luận con -->
+                        </div>
+                        <!-- Bình luận gốc 3 -->
+                        <div class="response mb-4 pb-3 border-bottom" data-root="3">
+                        <div class="d-flex align-items-center mb-2">
+                            <a href="#"><img src="https://randomuser.me/api/portraits/men/41.jpg" class="rounded-circle" style="width:30px;height:30px;object-fit:cover;margin-right:10px;"></a>
+                            <a href="#"><span class="me-2" style="font-size: 14px;">Chris Do</span></a>
+                            <span style="font-size:13px;color:#888;">· 5 days ago</span>
+                        </div>
+                        <div style="font-size:14px;">Agree! More people should see this advice. 👍</div>
+                        <div class="interact d-flex align-items-center mt-1" style="font-size:13px;">
+                            <button class="btn btn-link px-0 me-2"><i class="ti-thumb-up"></i> 1</button>
+                            <button class="btn btn-link px-3 text-decoration-underline btn-reply">Reply</button>
+                        </div>
+                        </div>
+                        <!-- Các bình luận gốc khác, mặc định ẩn, khi ấn See more responses sẽ hiện -->
+                        <div class="response mb-4 pb-3 border-bottom d-none" data-root="4">
+                        <!-- ... giống trên ... -->
+                        <div class="d-flex align-items-center mb-2">
+                            <a href="#"><img src="https://randomuser.me/api/portraits/women/31.jpg" class="rounded-circle" style="width:30px;height:30px;object-fit:cover;margin-right:10px;"></a>
+                            <a href="#"><span class="me-2" style="font-size: 14px;">Diana Prince</span></a>
+                            <span style="font-size:13px;color:#888;">· 8 days ago</span>
+                        </div>
+                        <div style="font-size:14px;">Love this article!</div>
+                        <div class="interact d-flex align-items-center mt-1" style="font-size:13px;">
+                            <button class="btn btn-link px-0 me-2"><i class="ti-thumb-up"></i> 0</button>
+                            <button class="btn btn-link px-3 text-decoration-underline btn-reply">Reply</button>
+                        </div>
+                        <!-- Có thể có bình luận con như trên -->
+                        </div>
+                        <!-- ... Thêm bình luận khác nếu muốn ... -->
                     </div>
-                </div>
-                <!-- Danh sách các responses -->
-                <div class="response mb-4 pb-3 border-bottom">
-                    <div class="d-flex align-items-center mb-2">
-                    <img src="https://randomuser.me/api/portraits/women/52.jpg" class="rounded-circle" style="width:30px;height:30px;object-fit:cover;margin-right:10px;">
-                    <span class="me-2" style="font-size: 14px;">Lily Bloom</span>
-                    <span style="font-size:13px;color:#888;">· 2 days ago</span>
-                    </div>
-                    <div style="font-size:14px;">So true! Waiting often brings more clarity. I need to practice this more.</div>
-                    <div class="d-flex align-items-center mt-1" style="font-size:13px;">
-                    <button class="btn btn-link text-secondary px-0 me-2"><i class="ti-thumb-up"></i> 5</button>
-                    <button class="btn btn-link text-secondary px-3">Reply</button>
-                    </div>
-                </div>
-                <div class="response mb-4 pb-3 border-bottom">
-                    <div class="d-flex align-items-center mb-2">
-                    <img src="https://randomuser.me/api/portraits/men/15.jpg" class="rounded-circle" style="width:30px;height:30px;object-fit:cover;margin-right:10px;">
-                    <span class="me-2" style="font-size: 14px;">Alex Lee</span>
-                    <span style="font-size:13px;color:#888;">· 3 days ago</span>
-                    </div>
-                    <div style="font-size:14px;">This is the best post I've read about decision making. Thank you!</div>
-                    <div class="d-flex align-items-center mt-1" style="font-size:13px;">
-                    <button class="btn btn-link text-secondary px-0 me-2"><i class="ti-thumb-up"></i> 2</button>
-                    <button class="btn btn-link text-secondary px-3">Reply</button>
-                    </div>
-                </div>
-                <div class="response mb-4 pb-3 border-bottom">
-                    <div class="d-flex align-items-center mb-2">
-                    <img src="https://randomuser.me/api/portraits/men/41.jpg" class="rounded-circle" style="width:30px;height:30px;object-fit:cover;margin-right:10px;">
-                    <span class="me-2" style="font-size: 14px;">Chris Do</span>
-                    <span style="font-size:13px;color:#888;">· 5 days ago</span>
-                    </div>
-                    <div style="font-size:14px;">Agree! More people should see this advice. 👍</div>
-                    <div class="d-flex align-items-center mt-1" style="font-size:13px;">
-                    <button class="btn btn-link text-secondary px-0 me-2"><i class="ti-thumb-up"></i> 1</button>
-                    <button class="btn btn-link text-secondary px-3">Reply</button>
-                    </div>
-                </div>
+                    <button class="btn btn-more-res px-4">See more responses</button>
+                    <button class="btn btn-hide-res px-4 d-none">Hide responses</button>
                 </section>
-                <button class="btn btn-see-all ms-auto">See all responses</button>
 
                 <!-- Recommendation -->
                 <section class="recommended-posts py-4 mt-5 border-top">
@@ -207,9 +262,9 @@
                 <div class="rec col-md-6 mb-5">
                     <a href="#"><img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80"
                         alt="cover" class="rec-article-cover mb-2"></a>
-                    <div class="d-flex align-items-center mb-2">
-                    <img src="https://randomuser.me/api/portraits/men/37.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;">
-                    <span style="font-size:13px;">Ryan Holiday</span>
+                    <div class="rec-author d-flex align-items-center mb-2">
+                    <a href="#"><img src="https://randomuser.me/api/portraits/men/37.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;"></a>
+                    <a href="#"><span style="font-size:13px;">Ryan Holiday</span></a>
                     </div>
                     <div class="rec-title fw-bold" style="font-size:1.15rem;line-height:1.3;"><a href="#">How to Be Patient in an Impatient World</a></div>
                     <div class="text-secondary mb-2" style="font-size:0.97rem;">Patience is a virtue we often ignore.</div>
@@ -226,9 +281,9 @@
                 <div class="rec col-md-6 mb-5">
                     <a href="#"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
                         alt="cover" class="rec-article-cover mb-2"></a>
-                    <div class="d-flex align-items-center mb-2">
-                    <img src="https://randomuser.me/api/portraits/women/81.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;">
-                    <span style="font-size:13px;">Marie Kondo</span>
+                    <div class="rec-author d-flex align-items-center mb-2">
+                    <a href="#"><img src="https://randomuser.me/api/portraits/women/81.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;"></a>
+                    <a href="#"><span style="font-size:13px;">Marie Kondo</span></a>
                     </div>
                     <div class="rec-title fw-bold" style="font-size:1.15rem;line-height:1.3;"><a href="#">Declutter Your Decisions</a></div>
                     <div class="text-secondary mb-2" style="font-size:0.97rem;">A simple approach to mental clarity.</div>
@@ -245,9 +300,9 @@
                 <div class="rec col-md-6 mb-5">
                     <a href="#"><img src="https://blog.journey.cloud/content/images/2022/12/atomic-habits-an-easy-proven-way-to-build-good-habits-break-bad-ones-by-james-clear.png"
                         alt="cover" class="rec-article-cover mb-2"></a>
-                    <div class="d-flex align-items-center mb-2">
-                    <img src="https://randomuser.me/api/portraits/men/75.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;">
-                    <span style="font-size:13px;">James Clear</span>
+                    <div class="rec-author d-flex align-items-center mb-2">
+                    <a href="#"><img src="https://randomuser.me/api/portraits/men/75.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;"></a>
+                    <a href="#"><span style="font-size:13px;">James Clear</span></a>
                     </div>
                     <div class="rec-title fw-bold" style="font-size:1.15rem;line-height:1.3;"><a href="#">Atomic Habits: The Power of Tiny Changes</a></div>
                     <div class="text-secondary mb-2" style="font-size:0.97rem;">Tiny decisions create big outcomes.</div>
@@ -264,9 +319,9 @@
                 <div class="rec col-md-6 mb-5">
                     <a href="#"><img src="https://images.unsplash.com/photo-1454023492550-5696f8ff10e1?auto=format&fit=crop&w=400&q=80"
                         alt="cover" class="rec-article-cover mb-2"></a>
-                    <div class="d-flex align-items-center mb-2">
-                    <img src="https://randomuser.me/api/portraits/women/55.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;">
-                    <span style="font-size:13px;">Jane Doe</span>
+                    <div class="rec-author d-flex align-items-center mb-2">
+                    <a href="#"><img src="https://randomuser.me/api/portraits/women/55.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;"></a>
+                    <a href="#"><span style="font-size:13px;">Jane Doe</span></a>
                     </div>
                     <div class="rec-title fw-bold" style="font-size:1.15rem;line-height:1.3;"><a href="#">Making Choices When Nothing Feels Right</a></div>
                     <div class="text-secondary mb-2" style="font-size:0.97rem;">Practical tips for difficult moments.</div>
@@ -280,7 +335,7 @@
                     </div>
                 </div>
             </div>
-                <button class="btn btn-see-more ms-auto">See more recommendations</button>
+                <button class="btn btn-more-rec ms-auto">See more recommendations</button>
                 </section>
             </div>
         </div>
@@ -304,5 +359,72 @@
     </footer>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    // Mở rộng/thu gọn responses gốc
+    const btnSeeMore = document.querySelector('.btn-more-res');
+    const btnHide = document.querySelector('.btn-hide-res');
+    const hiddenResponses = document.querySelectorAll('.response.d-none[data-root]');
+    btnSeeMore?.addEventListener('click', function() {
+        hiddenResponses.forEach(e => e.classList.remove('d-none'));
+        btnSeeMore.classList.add('d-none');
+        btnHide.classList.remove('d-none');
+    });
+    btnHide?.addEventListener('click', function() {
+        hiddenResponses.forEach(e => e.classList.add('d-none'));
+        btnSeeMore.classList.remove('d-none');
+        btnHide.classList.add('d-none');
+        window.scrollTo({top: document.querySelector('#response-list').offsetTop - 100, behavior:'smooth'});
+    });
+
+    // Mở rộng/thu gọn reply con
+    document.querySelectorAll('.btn-see-more-child').forEach(btn => {
+        btn.addEventListener('click', function(){
+        const childList = btn.closest('.response-child-list');
+        childList.querySelectorAll('.response-child.d-none').forEach(e => e.classList.remove('d-none'));
+        btn.classList.add('d-none');
+        childList.querySelector('.btn-hide-child').classList.remove('d-none');
+        });
+    });
+    document.querySelectorAll('.btn-hide-child').forEach(btn => {
+        btn.addEventListener('click', function(){
+        const childList = btn.closest('.response-child-list');
+        // ẩn tất cả child trừ child đầu
+        childList.querySelectorAll('.response-child:not(:first-child)').forEach(e => e.classList.add('d-none'));
+        btn.classList.add('d-none');
+        childList.querySelector('.btn-see-more-child').classList.remove('d-none');
+        });
+    });
+
+    // Form reply động dưới từng comment
+    let currentReplyForm;
+    document.querySelectorAll('.btn-reply').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Nếu đã có reply form thì bỏ trước đó
+        if (currentReplyForm) currentReplyForm.remove();
+        // Tạo form mới
+        const replyDiv = document.createElement('div');
+        replyDiv.innerHTML = `
+            <div class="reply-form d-flex align-items-start mt-2">
+            <a href="#"><img src="https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg" class="rounded-circle" style="width:28px;height:28px;margin-right:10px;"></a>
+            <textarea class="form-control" rows="2" placeholder="Reply..."></textarea>
+            </div>
+            <div class="text-end mt-2">
+            <button class="btn btn-white btn-sm rounded-pill px-4 btn-cancel-reply">Cancel</button>
+            <button class="btn btn-dark btn-sm rounded-pill px-4">Send</button>
+            </div>
+        `;
+        btn.closest('.response, .response-child').appendChild(replyDiv);
+        currentReplyForm = replyDiv;
+        // Xử lý nút Cancel của form reply
+        replyDiv.querySelector('.btn-cancel-reply').onclick = function() {
+            replyDiv.remove();
+        }
+        });
+    });
+    });
+    </script>
+
 </body>
 </html>

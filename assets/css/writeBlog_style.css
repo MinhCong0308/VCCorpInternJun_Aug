@@ -541,3 +541,8 @@ aside {
 #quill-editor .ql-editor {
   padding: 0;
 }
+.logo-img {
+    height: 35px;
+    width: 35px;
+    padding-bottom: 5px;
+}

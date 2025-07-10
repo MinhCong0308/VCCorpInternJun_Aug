@@ -181,6 +181,10 @@ body {
     align-items: center;
     gap: 1.1rem;
 }
+.post-meta a {
+    color: var(--text-secondary);
+    text-decoration: none;
+}
 .author-avatar {
     width: 30px;
     height: 30px;

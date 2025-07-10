@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin - User Management</title>
+  <title>Admin - Posts Management</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="../assets/fonts/themify-icons/themify-icons.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
@@ -11,7 +11,7 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-  <!-- Navbar -->
+  <!-- Navbar (Đã được dọn dẹp) -->
   <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
     <div class="container-fluid px-4">
       <a class="navbar-brand logo" href="#">
@@ -72,60 +72,62 @@
         <div class="admin-main-card">
           <div class="d-flex justify-content-between align-items-center">
 
-            <h2 class="page-title">User Management</h2>
+            <h2 class="page-title">Posts Management</h2>
           </div>
           <hr class="content-divider">
-
           <div class="table-responsive">
             <table class="table table-admin">
               <thead>
                 <tr>
-                  <th style="text-align: left">User</th>
-                  <th>Status</th>
-                  <th>Last Login</th>
+                  <th style="text-align: left">Title</th>
+                  <th>Author</th>
+                  <th>Date</th>
                   <th class="text-end text-align-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td style="text-align: left">
-                    <div class="user-name">John Doe</div>
-                    <div class="text-secondary small">john.doe@example.com</div>
-                  </td>
-                  <td>Active</td>
-                  <td>Oct 27, 2023</td>
+                  <td style="text-align: left">Understanding JavaScript Closures</td>
+                  <td>John Doe</td>
+                  <td>June 25, 2025</td>
                   <td class="text-end text-align-center">
                     <div class="dropdown">
-                      <a href="#" class="action-icon" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="ti-more-alt"></i>
-                      </a>
+                      <a href="#" class="action-icon" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti-more-alt"></i></a>
                       <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editUserModal">Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#">Disable</a></li>
+                        <li><a class="dropdown-item" href="#">View</a></li>
+                        <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
                       </ul>
                     </div>
                   </td>
                 </tr>
                 <tr>
-                  <td style="text-align: left">
-                    <div class="user-name">Jane Smith</div>
-                    <div class="text-secondary small">jane.smith@example.com</div>
-                  </td>
-                  <td>Locked</td>
-                  <td>Oct 26, 2023</td>
-                  <td class="text-end text-align-center">
+                  <td style="text-align: left">10 CSS Tricks You Need to Know</td>
+                  <td>Jane Smith</td>
+                  <td>June 24, 2025</td>
+                   <td class="text-end text-align-center">
                     <div class="dropdown">
-                      <a href="#" class="action-icon" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="ti-more-alt"></i>
-                      </a>
+                      <a href="#" class="action-icon" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti-more-alt"></i></a>
                       <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editUserModal">Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#">Disable</a></li>
+                        <li><a class="dropdown-item" href="#">View</a></li>
+                        <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
                       </ul>
                     </div>
                   </td>
                 </tr>
-                <!-- Các hàng khác tương tự -->
+                <tr>
+                  <td style="text-align: left">Node.js Streams Explained</td>
+                  <td>Peter Jones</td>
+                  <td>June 23, 2025</td>
+                   <td class="text-end text-align-center">
+                    <div class="dropdown">
+                      <a href="#" class="action-icon" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti-more-alt"></i></a>
+                      <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#">View</a></li>
+                        <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -137,42 +139,17 @@
         <div class="sidebar-inner ps-4">
           <ul class="nav flex-column admin-nav ps-3">
             <li class="nav-item"><a class="nav-link" href="admin.html">Dashboard</a></li>
-            <li class="nav-item"><a class="nav-link active" href="usersManagement.html">User Management</a></li>
+            <li class="nav-item"><a class="nav-link" href="usersManagement.html">User Management</a></li>
             <li class="nav-item"><a class="nav-link" href="categoriesManagement.html">Category Management</a></li>
             <li class="nav-item"><a class="nav-link" href="languagesManagement.html">Language Management</a></li>
-            <li class="nav-item"><a class="nav-link" href="postsManagement.html">Posts Management</a></li>
+            <li class="nav-item"><a class="nav-link active" href="postsManagement.html">Posts Management</a></li>
           </ul>
         </div>
       </aside>
     </div>
   </div>
 
-  <!-- Edit User Modal (Không có style inline, giữ nguyên) -->
-  <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="editUserForm">
-            <div class="mb-3">
-              <label for="editUserName" class="form-label">Name</label>
-              <input type="text" class="form-control" id="editUserName" required>
-            </div>
-            <div class="mb-3">
-              <label for="editUserEmail" class="form-label">Email</label>
-              <input type="email" class="form-control" id="editUserEmail" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Footer (Giữ nguyên) -->
+  <!-- Footer -->
   <footer class="main-footer mt-auto">
     <hr class="footer-divider mb-4" />
     <div class="footer-links">

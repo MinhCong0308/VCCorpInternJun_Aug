@@ -9,139 +9,124 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../assets/css/admin_style.css" />
 </head>
+
 <body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
-        <div class="container-fluid px-4">
-            <a class="navbar-brand logo" href="#">
-              <img src="../img/logo.png" class="logo-img" alt="logo-image">
-              BlogBlogBlog
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="flex-grow-1 mx-4 d-none d-md-block">
-                    <div class="search-bar-group input-group" style="margin-left: -16px;">
-                        <span class="input-group-text bg-transparent border-0">
-                            <i class="ti-search"></i>
-                        </span>
-                        <input type="text" class="form-control bg-transparent border-0" placeholder="Search" style="box-shadow: none;" />
-                    </div>
-                </div>
-                <div class="d-flex align-items-center gap-3 ms-auto">
-                    <!-- <a href="#" class="btn btn-write">
-                        <i class="ti-pencil-alt"></i> Write
-                    </a> -->
-                    <!-- Language Dropdown -->
-                    <div class="dropdown">
-                        <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
-                            type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span style="font-size: 1.2em;">🇺🇸</span>
-                            <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="langDropdown">
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2" href="#">
-                                    <span style="font-size:1.2em;">🇻🇳</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2" href="#">
-                                    <span style="font-size:1.2em;">🇫🇷</span>
-                                </a>
-                            </li>
-                            <!-- Thêm các ngôn ngữ khác nếu cần -->
-                        </ul>
-                    </div>
-                    <a href="#" class="text-secondary text-decoration-none ms-2 me-1">
-                        <i class="ti-bell fs-5"></i>
-                    </a>
-                    <div class="dropdown">
-                        <a href="#" class="d-block" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg" class="rounded-circle" width="32" height="32" alt="Profile" />
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end mt-2">
-                            <li><a class="dropdown-item" href="#">Profile</a></li>
-                            <li><a class="dropdown-item" href="#">Admin Panel</a></li>
-                            <li><hr class="dropdown-divider" /></li>
-                            <li><a class="dropdown-item" href="#">Sign out</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand logo" href="#">
+        <img src="../img/logo.png" class="logo-img" alt="logo-image">
+        BlogBlogBlog
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="flex-grow-1 mx-4 d-none d-md-block">
+          <div class="search-bar-group input-group">
+            <span class="input-group-text bg-transparent border-0">
+              <i class="ti-search"></i>
+            </span>
+            <input type="text" class="form-control bg-transparent border-0 shadow-none" placeholder="Search" />
+          </div>
         </div>
-    </nav>
+        <div class="d-flex align-items-center gap-3 ms-auto">
+          <a href="#" class="btn btn-write">
+            <i class="ti-pencil-alt"></i> Write
+          </a>
+          <!-- Language Dropdown -->
+          <div class="dropdown">
+            <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1 lang-dropdown" type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="lang-flag">🇺🇸</span>
+              <i class="ti-angle-down lang-arrow"></i>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="langDropdown">
+              <li><a class="dropdown-item" href="#"><span class="lang-flag">🇻🇳</span> Vietnamese</a></li>
+              <li><a class="dropdown-item" href="#"><span class="lang-flag">🇫🇷</span> French</a></li>
+            </ul>
+          </div>
+          <a href="#" class="text-secondary text-decoration-none ms-2 me-1">
+            <i class="ti-bell fs-5"></i>
+          </a>
+          <!-- Profile Dropdown -->
+          <div class="dropdown">
+            <a href="#" class="d-block" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg" class="rounded-circle" width="32" height="32" alt="Profile" />
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end mt-2">
+              <li><a class="dropdown-item" href="#">Profile</a></li>
+              <li><a class="dropdown-item" href="#">Admin Panel</a></li>
+              <li><hr class="dropdown-divider" /></li>
+              <li><a class="dropdown-item" href="#">Sign out</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-
-  <div class="container main-content">
+  <!-- Main Content -->
+  <div class="container-fluid main-content">
     <div class="row">
-      <!-- Main Content -->
       <main class="col-lg-9 col-md-9">
         <div class="admin-main-card">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="page-title m-0">Category Management</h2>
-            <button class="btn btn-dark rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Category</button>
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="page-title">Category Management</h2>
+            <button type="submit" class="btn btn-dark rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Category</button>
           </div>
-          <hr style="border: none; height: 0.5px; background-color: rgb(125, 123, 123); margin-top: 0;">
+          <hr class="content-divider">
           <div class="table-responsive">
-            <table class="table table-admin ">
+            <table class="table table-admin">
               <thead>
                 <tr>
-                  <th>Category Name</th>
+                  <th style="text-align: left">Category Name</th>
                   <th>Post Count</th>
-                  <th class="text-end">Actions</th>
+                  <th class="text-end text-align-center" style="float: right;">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td >Technology</td>
+                  <td style="text-align: left">Technology</td>
                   <td>152</td>
-                  <td class="text-end">
-                    <div class="d-flex justify-content-end align-items-center" style="height: 100%;">
-                        <div class="dropdown">
-                        <a href="#" class="action-icon d-flex justify-content-center align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
-                          <i class="ti-more-alt"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                          <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editCategoryModal">Edit</a></li>
-                          <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
-                        </ul>
-                      </div>
+                  <td class="text-end text-align-center "style="float: right;>
+                    <div class="dropdown">
+                      <a href="#" class="action-icon" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="ti-more-alt"></i>
+                      </a>
+                      <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editCategoryModal">Edit</a></li>
+                        <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+                      </ul>
                     </div>
                   </td>
                 </tr>
                 <tr>
-                  <td>Data Science</td>
+                  <td style="text-align: left">Data Science</td>
                   <td>88</td>
-                  <td class="text-end">
-                    <div class="d-flex justify-content-end align-items-center" style="height: 100%;">
-                        <div class="dropdown">
-                        <a href="#" class="action-icon d-flex justify-content-center align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
-                          <i class="ti-more-alt"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                          <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editCategoryModal">Edit</a></li>
-                          <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
-                        </ul>
-                      </div>
+                  <td class="text-end text-align-center " style="float: right;">
+                    <div class="dropdown">
+                      <a href="#" class="action-icon" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="ti-more-alt"></i>
+                      </a>
+                      <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editCategoryModal">Edit</a></li>
+                        <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+                      </ul>
                     </div>
                   </td>
                 </tr>
                 <tr>
-                  <td>Self Improvement</td>
+                  <td style="text-align: left">Self Improvement</td>
                   <td>210</td>
-                  <td class="text-end">
-                    <div class="d-flex justify-content-end align-items-center" style="height: 100%;">
-                        <div class="dropdown">
-                        <a href="#" class="action-icon d-flex justify-content-center align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
-                          <i class="ti-more-alt"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                          <li><a class="dropdown-item" href="#"
-                            data-bs-toggle="modal" data-bs-target="#editCategoryModal">Edit</a></li>
-                          <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
-                        </ul>
-                      </div>
+                  <td class="text-end text-align-center" style="float: right;">
+                    <div class="dropdown">
+                      <a href="#" class="action-icon" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="ti-more-alt"></i>
+                      </a>
+                      <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editCategoryModal">Edit</a></li>
+                        <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+                      </ul>
                     </div>
                   </td>
                 </tr>
@@ -151,79 +136,78 @@
         </div>
       </main>
 
-      <!-- Right Navigation -->
+      <!-- Sidebar -->
       <aside class="col-lg-3 col-md-3 d-none d-md-block border-start bg-white pt-4">
         <div class="sidebar-inner ps-4">
-          
           <ul class="nav flex-column admin-nav ps-3">
-            <li class="nav-item"><a class="nav-link" href="../admin.html">Dashboard</a></li>
-            <li class="nav-item"><a class="nav-link " href="usersManagement.html">User Management</a></li>
+            <li class="nav-item"><a class="nav-link" href="admin.html">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="usersManagement.html">User Management</a></li>
             <li class="nav-item"><a class="nav-link active" href="categoriesManagement.html">Category Management</a></li>
             <li class="nav-item"><a class="nav-link" href="languagesManagement.html">Language Management</a></li>
+            <li class="nav-item"><a class="nav-link" href="postsManagement.html">Posts Management</a></li>
           </ul>
         </div>
       </aside>
     </div>
   </div>
 
-  <!-- Add Category Modal -->
-<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addCategoryModalLabel">Add Category</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="addCategoryForm">
-          <div class="mb-3">
-            <label for="addCategoryName" class="form-label">Category Name</label>
-            <input type="text" class="form-control" id="addCategoryName" required>
-          </div>
-          <button type="submit" class="btn btn-dark rounded-pill px-4">Add Category</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Edit Category Modal -->
-<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="editCategoryForm">
-          <div class="mb-3">
-            <label for="editCategoryName" class="form-label">Category Name</label>
-            <input type="text" class="form-control" id="editCategoryName" required>
-          </div>
-          <button type="submit" class="btn btn-dark rounded-pill px-4">Save Changes</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Footer -->
-    <footer class="main-footer mt-1">
-        <hr class="footer-divider mb-4" />
-        <div class="footer-links">
-            <a href="#">Help</a>
-            <a href="#">Status</a>
-            <a href="#">About</a>
-            <a href="#">Careers</a>
-            <a href="#">Press</a>
-            <a href="#">Blog</a>
-            <a href="#">Privacy</a>
-            <a href="#">Rules</a>
-            <a href="#">Terms</a>
-            <a href="#">Text to speech</a>
+  <!-- Modals -->
+  <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCategoryModalLabel">Add Category</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-    </footer>
+        <div class="modal-body">
+          <form id="addCategoryForm">
+            <div class="mb-3">
+              <label for="addCategoryName" class="form-label">Category Name</label>
+              <input type="text" class="form-control" id="addCategoryName" required>
+            </div>
+            <button type="submit" class="btn btn-dark">Add Category</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editCategoryForm">
+            <div class="mb-3">
+              <label for="editCategoryName" class="form-label">Category Name</label>
+              <input type="text" class="form-control" id="editCategoryName" required>
+            </div>
+            <button type="submit" class="btn btn-dark">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer  -->
+  <footer class="main-footer mt-auto">
+    <hr class="footer-divider mb-4" />
+    <div class="footer-links">
+      <a href="#">Help</a>
+      <a href="#">Status</a>
+      <a href="#">About</a>
+      <a href="#">Careers</a>
+      <a href="#">Press</a>
+      <a href="#">Blog</a>
+      <a href="#">Privacy</a>
+      <a href="#">Rules</a>
+      <a href="#">Terms</a>
+      <a href="#">Text to speech</a>
+    </div>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -555,3 +555,16 @@ aside {
     width: 20px;
     height: 20px;
 }
+/* Style for small dropdown inside blog posts */
+.post-options .dropdown-menu {
+  font-size: 0.875rem;
+  min-width: auto;
+}
+.more-options {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.danger-text {
+    color : red;
+}

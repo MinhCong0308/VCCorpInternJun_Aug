@@ -67,7 +67,6 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end mt-2">
                             <li><a class="dropdown-item" href="profile.html">Profile</a></li>
-                            <li><a class="dropdown-item" href="#">Admin Panel</a></li>
                             <li><hr class="dropdown-divider" /></li>
                             <li><a class="dropdown-item" href="login.html">Sign out</a></li>
                         </ul>
@@ -100,81 +99,43 @@
                 <div id="account-content">
                   <!-- Email address -->
                   <div class="settings-section">
-                    <div class="d-flex justify-content-between align-items-start">
-                      <div>
-                        <div class="settings-label">Email address</div>
-                        <div class="settings-value">congminhnguyen0308@gmail.com</div>
-                      </div>
-                      <button class="btn btn-link p-0 text-decoration-none">→</button>
+                    <div>
+                      <div class="settings-label">Email address</div>
+                      <div id="email-display" class="settings-value" onclick="toggleEdit('email')">congminhnguyen0308@gmail.com</div>
+                      <form id="email-form" class="d-none mt-2" onsubmit="return saveEdit('email')">
+                        <input type="email" class="form-control form-control-sm" id="email-input" value="congminhnguyen0308@gmail.com" />
+                      </form>
                     </div>
                   </div>
-
                   <!-- Username and subdomain -->
                   <div class="settings-section">
-                    <div class="d-flex justify-content-between align-items-start">
-                      <div>
-                        <div class="settings-label">Username and subdomain</div>
-                        <div class="settings-value">@congminhnguyen0308</div>
-                      </div>
-                      <button class="btn btn-link p-0 text-decoration-none">→</button>
+                    <div>
+                      <div class="settings-label">Username and subdomain</div>
+                      <div id="username-display" class="settings-value" onclick="toggleEdit('username')">@congminhnguyen0308</div>
+                      <form id="username-form" class="d-none mt-2" onsubmit="return saveEdit('username')">
+                        <input type="text" class="form-control form-control-sm" id="username-input" value="congminhnguyen0308" />
+                      </form>
                     </div>
                   </div>
-
                   <!-- Profile information -->
                   <div class="settings-section">
-                    <div class="d-flex justify-content-between align-items-start">
-                      <div>
-                        <div class="settings-label">Profile information</div>
-                        <div class="settings-description">Edit your photo, name, pronouns, short bio, etc.</div>
-                        <div class="settings-value mt-1">Nguyen Cong Minh 
-                          <span class="badge bg-success ms-2">🎯</span>
-                        </div>
+                    <div>
+                      <div class="settings-label">Profile information</div>
+                      <div class="settings-description">Edit your photo, name, pronouns, short bio, etc.</div>
+                      <div id="profile-display" class="settings-value mt-1" onclick="toggleEdit('profile')">Nguyen Cong Minh 
                       </div>
-                      <button class="btn btn-link p-0 text-decoration-none">→</button>
+                      <form id="profile-form" class="d-none mt-2" onsubmit="return saveEdit('profile')">
+                        <input type="text" class="form-control form-control-sm" id="profile-input" value="Nguyen Cong Minh" />
+                      </form>
                     </div>
                   </div>
-
-                  <!-- Profile design -->
-                  <div class="settings-section">
-                    <div class="d-flex justify-content-between align-items-start">
-                      <div>
-                        <div class="settings-label">Profile design</div>
-                        <div class="settings-description">Customize the appearance of your profile.</div>
-                      </div>
-                      <button class="btn btn-link p-0 text-decoration-none">→</button>
-                    </div>
-                  </div>
-
-                  <!-- Custom domain -->
-                  <div class="settings-section">
-                    <div class="d-flex justify-content-between align-items-start">
-                      <div>
-                        <div class="settings-label">Custom domain</div>
-                        <div class="settings-description">Upgrade to a Premium Membership to redirect your page to a URL to a domain like yourdomain.com.</div>
-                        <div class="settings-value mt-1">None →</div>
-                      </div>
-                      <button class="btn btn-link p-0 text-decoration-none">→</button>
-                    </div>
-                  </div>
-
-                  <!-- Medium recommendations -->
-                  <div class="settings-section">
-                    <div class="d-flex justify-content-between align-items-start">
-                      <div>
-                        <div class="settings-label">Medium recommendations</div>
-                        <div class="settings-description">Adjust recommendations by updating what you're following and more.</div>
-                      </div>
-                      <button class="btn btn-link p-0 text-decoration-none">→</button>
-                    </div>
-                  </div>
-
                   <!-- Muted writers and publications -->
                   <div class="settings-section">
                     <div class="d-flex justify-content-between align-items-start">
                       <div>
                         <div class="settings-label">Muted writers and publications</div>
                       </div>
-                      <button class="btn btn-link p-0 text-decoration-none">→</button>
+                      <button class="btn btn-link p-0 text-decoration-none"></button>
                     </div>
                   </div>
 
@@ -235,5 +196,28 @@
     </footer>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function toggleEdit(type) {
+      document.getElementById(`${type}-display`).classList.add("d-none");
+      document.getElementById(`${type}-form`).classList.remove("d-none");
+      document.getElementById(`${type}-input`).focus();
+    }
+    function saveEdit(type) {
+      const input = document.getElementById(`${type}-input`);
+      const display = document.getElementById(`${type}-display`);
+      const value = input.value.trim();
+
+      if (value !== '') {
+        if (type === 'username') {
+          display.textContent = '@' + value;
+        } else {
+          display.textContent = value;
+        }
+      }
+      display.classList.remove("d-none");
+      document.getElementById(`${type}-form`).classList.add("d-none");
+      return false; // Prevent form submission
+    }
+  </script>
 </body>
 </html>

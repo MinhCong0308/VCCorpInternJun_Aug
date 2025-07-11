@@ -67,7 +67,6 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end mt-2">
                             <li><a class="dropdown-item" href="profile.html">Profile</a></li>
-                            <li><a class="dropdown-item" href="#">Admin Panel</a></li>
                             <li><hr class="dropdown-divider" /></li>
                             <li><a class="dropdown-item" href="login.html">Sign out</a></li>
                         </ul>
@@ -90,9 +89,6 @@
                     <a class="nav-link active" href="#" data-tab="home">Home</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="#" data-tab="lists">Lists</a>
-                  </li>
-                  <li class="nav-item">
                     <a class="nav-link" href="#" data-tab="about">About</a>
                   </li>
                 </ul>
@@ -107,7 +103,13 @@
                       <div class="blog-meta">
                         <span class="blog-date">Just now</span>
                         <span class="bookmark-icon ti-bookmark"></span>
-                        <span class="more-options">⋯</span>
+                        <div class="dropdown post-options">
+                          <span class="more-options dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">⋯</span>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item edit-post-btn" href="#">Edit</a></li>
+                            <li><a class="dropdown-item delete-post-btn" href="#">Delete</a></li>
+                          </ul>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -121,7 +123,13 @@
                       <div class="blog-meta">
                         <span class="blog-date">2 days ago</span>
                         <span class="bookmark-icon ti-bookmark"></span>
-                        <span class="more-options">⋯</span>
+                        <div class="dropdown post-options">
+                          <span class="more-options dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">⋯</span>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item edit-post-btn" href="#">Edit</a></li>
+                            <li><a class="dropdown-item delete-post-btn" href="#">Delete</a></li>
+                          </ul>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -136,7 +144,13 @@
                       <div class="blog-meta">
                         <span class="blog-date">1 week ago</span>
                         <span class="bookmark-icon ti-bookmark"></span>
-                        <span class="more-options">⋯</span>
+                        <div class="dropdown post-options">
+                          <span class="more-options dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">⋯</span>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item edit-post-btn" href="#">Edit</a></li>
+                            <li><a class="dropdown-item delete-post-btn" href="#">Delete</a></li>
+                          </ul>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -151,18 +165,18 @@
                       <div class="blog-meta">
                         <span class="blog-date">2 weeks ago</span>
                         <span class="bookmark-icon ti-bookmark"></span>
-                        <span class="more-options">⋯</span>
+                        <div class="dropdown post-options">
+                          <span class="more-options dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">⋯</span>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item edit-post-btn" href="#">Edit</a></li>
+                            <li><a class="dropdown-item delete-post-btn" href="#">Delete</a></li>
+                          </ul>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </article>
               </div>
-              <div id="lists-content" style="display: none;">
-                <div class="text-center py-5">
-                  <p class="text-muted">No lists created yet.</p>
-                </div>
-              </div>
-
               <!-- About Content (Hidden by default) -->
               <div id="about-content" style="display: none;">
                 <div class="py-3">
@@ -207,17 +221,13 @@
     document.querySelectorAll('[data-tab]').forEach(tab => {
       tab.addEventListener('click', function(e) {
         e.preventDefault();
-        
         // Remove active class from all tabs
         document.querySelectorAll('[data-tab]').forEach(t => t.classList.remove('active'));
         // Add active class to clicked tab
-        this.classList.add('active');
-        
+        this.classList.add('active');        
         // Hide all content sections
         document.getElementById('home-content').style.display = 'none';
-        document.getElementById('lists-content').style.display = 'none';
         document.getElementById('about-content').style.display = 'none';
-        
         // Show the selected content
         const tabType = this.getAttribute('data-tab');
         document.getElementById(tabType + '-content').style.display = 'block';

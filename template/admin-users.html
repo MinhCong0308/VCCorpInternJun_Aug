@@ -9,7 +9,7 @@
     <!-- AdminLTE 3 CSS (Sử dụng Font Awesome) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
-    <!-- Google Font (Tùy chọn) -->
+
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
 
@@ -34,29 +34,7 @@
             </ul>
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
-                <!-- Notifications Dropdown Menu -->
-                <!-- <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="#">
-                        <i class="far fa-bell"></i>
-                        <span class="badge badge-warning navbar-badge">15</span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-item dropdown-header">15 Notifications</span>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-envelope mr-2"></i> 4 new posts
-                            <span class="float-right text-muted text-sm">3 mins</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-users mr-2"></i> 8 new users
-                            <span class="float-right text-muted text-sm">12 hours</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-                    </div>
-                </li> -->
-                <!-- End Notifications -->
+
                 <li class="nav-item">
                     <a class="nav-link" data-widget="fullscreen" href="#" role="button">
                         <i class="fas fa-expand-arrows-alt"></i>
@@ -137,12 +115,13 @@
                                 <div class="card-header">
                                     <h3 class="card-title">All Users</h3>
                                     <!-- Add New User  -->
-                                    <!-- <div class="card-tools">
-                                        <a href="#" class="btn btn-primary">
+                                    <div class="card-tools">
+                                        <a href="#" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#addUserModal">
                                             <i class="fas fa-plus-circle mr-1"></i>
                                             Add New User
                                         </a>
-                                    </div> -->
+                                    </div>
                                 </div>
                                 <!-- /.card-header -->
                                 <div class="card-body p-0">
@@ -151,9 +130,9 @@
                                             <tr>
                                                 <th style="width: 60px;">#</th>
                                                 <th>User</th>
-                                                <th>Email</th> 
-                                                <th style="width: 120px; text-align: center;">Status</th>
-                                                <th style="width: 200px; text-align: center;">Actions</th>
+                                                <th>Email</th>
+                                                <th style="width: 150px; text-align: center;">Status</th>
+                                                <th style="width: 150px; ">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -163,7 +142,7 @@
                                                 <td>alex.p@example.com</td>
                                                 <td style="text-align: center;"><span
                                                         class="badge bg-success">Active</span></td>
-                                                <td style="text-align: center;">
+                                                <td>
                                                     <a href="#" class="btn btn-sm btn-info" data-toggle="tooltip"
                                                         title="Edit User">
                                                         <i class="fas fa-pencil-alt"></i>
@@ -180,7 +159,7 @@
                                                 <td>jane.d@example.com</td>
                                                 <td style="text-align: center;"><span
                                                         class="badge bg-success">Active</span></td>
-                                                <td style="text-align: center;">
+                                                <td>
                                                     <a href="#" class="btn btn-sm btn-info" data-toggle="tooltip"
                                                         title="Edit User">
                                                         <i class="fas fa-pencil-alt"></i>
@@ -197,7 +176,7 @@
                                                 <td>john.s@example.com</td>
                                                 <td style="text-align: center;"><span
                                                         class="badge bg-danger">Disabled</span></td>
-                                                <td style="text-align: center;">
+                                                <td>
                                                     <a href="#" class="btn btn-sm btn-info" data-toggle="tooltip"
                                                         title="Edit User">
                                                         <i class="fas fa-pencil-alt"></i>
@@ -214,7 +193,7 @@
                                                 <td>jan.d@example.com</td>
                                                 <td style="text-align: center;"><span
                                                         class="badge bg-success">Active</span></td>
-                                                <td style="text-align: center;">
+                                                <td>
                                                     <a href="#" class="btn btn-sm btn-info" data-toggle="tooltip"
                                                         title="Edit User">
                                                         <i class="fas fa-pencil-alt"></i>
@@ -231,7 +210,7 @@
                                                 <td>ohn.s@example.com</td>
                                                 <td style="text-align: center;"><span
                                                         class="badge bg-danger">Disabled</span></td>
-                                                <td style="text-align: center;">
+                                                <td>
                                                     <a href="#" class="btn btn-sm btn-info" data-toggle="tooltip"
                                                         title="Edit User">
                                                         <i class="fas fa-pencil-alt"></i>
@@ -242,7 +221,7 @@
                                                     </a>
                                                 </td>
                                             </tr>
-                                            <!-- SỬA LỖI 2: Xóa thẻ <tr> rỗng bị thừa ở đây -->
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -271,6 +250,54 @@
             All rights reserved.
         </footer>
     </div>
+
+    <div class="modal fade" id="addUserModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add New User</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form -->
+                    <form id="formAddNewUser">
+                        <div class="form-group">
+                            <label for="userName">User Name</label>
+                            <input type="text" class="form-control" id="userName" placeholder="Enter full name"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userEmail">Email address</label>
+                            <input type="email" class="form-control" id="userEmail" placeholder="Enter email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userPassword">Password</label>
+                            <input type="password" class="form-control" id="userPassword" placeholder="Password"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userConfirmPassword">Confirm Password</label>
+                            <input type="password" class="form-control" id="userConfirmPassword"
+                                placeholder="Confirm Password" required>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="userStatus" checked>
+                            <label class="form-check-label" for="userStatus">Active</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveUserBtn">Save changes</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
 
     <!-- REQUIRED SCRIPTS -->
     <!-- jQuery -->

@@ -9,7 +9,7 @@
   <!-- AdminLTE 3 CSS (Sử dụng Font Awesome) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
-  <!-- Google Font (Tùy chọn) -->
+
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
 
@@ -34,29 +34,7 @@
       </ul>
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
-        <!-- Notifications Dropdown Menu -->
-        <!-- <li class="nav-item dropdown">
-          <a class="nav-link" data-toggle="dropdown" href="#">
-            <i class="far fa-bell"></i>
-            <span class="badge badge-warning navbar-badge">15</span>
-          </a>
-          <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            <span class="dropdown-item dropdown-header">15 Notifications</span>
-            <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item">
-              <i class="fas fa-envelope mr-2"></i> 4 new posts
-              <span class="float-right text-muted text-sm">3 mins</span>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item">
-              <i class="fas fa-users mr-2"></i> 8 new users
-              <span class="float-right text-muted text-sm">12 hours</span>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-          </div>
-        </li> -->
-        <!-- End Notifications -->
+
         <li class="nav-item">
           <a class="nav-link" data-widget="fullscreen" href="#" role="button">
             <i class="fas fa-expand-arrows-alt"></i>
@@ -129,114 +107,129 @@
 
       <!-- Main content -->
       <section class="content">
-    <div class="container-fluid">
-        <div class="row">
+        <div class="container-fluid">
+          <div class="row">
             <div class="col-12">
-                <!-- Bảng quản lý Posts với các nút hành động -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">All Posts</h3>
-                        <!-- <div class="card-tools">
-                            <a href="#" class="btn btn-primary">
+              <!-- Bảng quản lý Posts với các nút hành động -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">All Posts</h3>
+                  <!-- <div class="card-tools">
+                            <a href="#" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#addUserModal">
                                 <i class="fas fa-plus-circle mr-1"></i>
                                 Add New Post
                             </a>
                         </div> -->
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body p-0">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <!-- SỬA LỖI 1: Áp dụng kích thước cột nhất quán và hợp lý -->
-                                    <th style="width: 60px;">#</th>
-                                    <th>Post</th> <!-- Để cột này tự co giãn -->
-                                    <th>Author</th>
-                                    <th style="width: 120px; text-align: center;">Status</th>
-                                    <th style="width: 200px; text-align: center;">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1.</td>
-                                    <td>10 CSS Tricks You Need to Know</td>
-                                    <td>Alex Mount</td>
-                                    <td style="text-align: center;"><span class="badge bg-danger">Draft</span></td>
-                                    <td style="text-align: center;">
-                                        <a href="#" class="btn btn-sm btn-primary" data-toggle="tooltip" title="View"><i class="fas fa-eye"></i></a>
-                                        <a href="#" class="btn btn-sm btn-success" data-toggle="tooltip" title="Approve">
-                                            <i class="fas fa-check-circle"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>2.</td>
-                                    <td>Understanding JavaScript Closures</td>
-                                    <td>Jane Boss</td>
-                                    <td style="text-align: center;"><span class="badge bg-danger">Draft</span></td>
-                                    <td style="text-align: center;">
-                                        <a href="#" class="btn btn-sm btn-primary" data-toggle="tooltip" title="View"><i class="fas fa-eye"></i></a>
-                                        <a href="#" class="btn btn-sm btn-success" data-toggle="tooltip" title="Approve">
-                                            <i class="fas fa-check-circle"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>3.</td>
-                                    <td>Node.js Streams Explained</td>
-                                    <td>John Hart</td>
-                                    <td style="text-align: center;"><span class="badge bg-danger">Draft</span></td>
-                                    <td style="text-align: center;">
-                                        <a href="#" class="btn btn-sm btn-primary" data-toggle="tooltip" title="View"><i class="fas fa-eye"></i></a>
-                                        <a href="#" class="btn btn-sm btn-success" data-toggle="tooltip" title="Approve">
-                                            <i class="fas fa-check-circle"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>4.</td>
-                                    <td>The Ultimate Guide to React Hooks</td>
-                                    <td>Jan Doe</td>
-                                    <td style="text-align: center;"><span class="badge bg-success">Published</span></td>
-                                    <td style="text-align: center;">
-                                        <a href="#" class="btn btn-sm btn-primary" data-toggle="tooltip" title="View"><i class="fas fa-eye"></i></a>
-                                        <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Unpublish">
-                                            <i class="fas fa-ban"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>5.</td>
-                                    <td>Getting Started with Docker</td>
-                                    <td>Ohn Hon</td>
-                                    <td style="text-align: center;"><span class="badge bg-success">Published</span></td>
-                                    <td style="text-align: center;">
-                                        <a href="#" class="btn btn-sm btn-primary" data-toggle="tooltip" title="View"><i class="fas fa-eye"></i></a>
-                                        <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Unpublish">
-                                            <i class="fas fa-ban"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <!-- SỬA LỖI 2: Xóa thẻ <tr> rỗng bị thừa ở đây -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- /.card-body -->
-                    <div class="card-footer clearfix">
-                        <ul class="pagination pagination-sm m-0 float-right">
-                            <li class="page-item"><a class="page-link" href="#">«</a></li>
-                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="page-link" href="#">»</a></li>
-                        </ul>
-                    </div>
                 </div>
-                <!-- /.card -->
+                <!-- /.card-header -->
+                <div class="card-body p-0">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+
+                        <th style="width: 60px;">#</th>
+                        <th>Post</th>
+                        <th>Author</th>
+                        <th style="width: 150px; text-align: center;">Status</th>
+                        <th style="width: 150px;">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>1.</td>
+                        <td>10 CSS Tricks You Need to Know</td>
+                        <td>Alex Mount</td>
+                        <td style="text-align: center;"><span class="badge bg-danger">Draft</span></td>
+                        <td>
+                          <a href="#" class="btn btn-sm btn-primary" data-toggle="tooltip" title="View"><i
+                              class="fas fa-eye"></i></a>
+                          <a href="#" class="btn btn-sm btn-success" data-toggle="tooltip" title="Approve">
+                            <i class="fas fa-check-circle"></i>
+                          </a>
+                          <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Unpublish">
+                            <i class="fas fa-ban"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>2.</td>
+                        <td>Understanding JavaScript Closures</td>
+                        <td>Jane Boss</td>
+                        <td style="text-align: center;"><span class="badge bg-danger">Draft</span></td>
+                        <td>
+                          <a href="#" class="btn btn-sm btn-primary" data-toggle="tooltip" title="View"><i
+                              class="fas fa-eye"></i></a>
+                          <a href="#" class="btn btn-sm btn-success" data-toggle="tooltip" title="Approve">
+                            <i class="fas fa-check-circle"></i>
+                          </a>
+                          <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Unpublish">
+                            <i class="fas fa-ban"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>3.</td>
+                        <td>Node.js Streams Explained</td>
+                        <td>John Hart</td>
+                        <td style="text-align: center;"><span class="badge bg-danger">Draft</span></td>
+                        <td>
+                          <a href="#" class="btn btn-sm btn-primary" data-toggle="tooltip" title="View"><i
+                              class="fas fa-eye"></i></a>
+                          <a href="#" class="btn btn-sm btn-success" data-toggle="tooltip" title="Approve">
+                            <i class="fas fa-check-circle"></i>
+                          </a>
+                          <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Unpublish">
+                            <i class="fas fa-ban"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>4.</td>
+                        <td>The Ultimate Guide to React Hooks</td>
+                        <td>Jan Doe</td>
+                        <td style="text-align: center;"><span class="badge bg-success">Published</span></td>
+                        <td>
+                          <a href="#" class="btn btn-sm btn-primary" data-toggle="tooltip" title="View"><i
+                              class="fas fa-eye"></i></a>
+                          <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Unpublish">
+                            <i class="fas fa-ban"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>5.</td>
+                        <td>Getting Started with Docker</td>
+                        <td>Ohn Hon</td>
+                        <td style="text-align: center;"><span class="badge bg-success">Published</span></td>
+                        <td>
+                          <a href="#" class="btn btn-sm btn-primary" data-toggle="tooltip" title="View"><i
+                              class="fas fa-eye"></i></a>
+                          <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Unpublish">
+                            <i class="fas fa-ban"></i>
+                          </a>
+                        </td>
+                      </tr>
+
+                    </tbody>
+                  </table>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer clearfix">
+                  <ul class="pagination pagination-sm m-0 float-right">
+                    <li class="page-item"><a class="page-link" href="#">«</a></li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">»</a></li>
+                  </ul>
+                </div>
+              </div>
+              <!-- /.card -->
             </div>
+          </div>
         </div>
-    </div>
-</section>
+      </section>
       <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
@@ -246,6 +239,7 @@
       All rights reserved.
     </footer>
   </div>
+
 
   <!-- REQUIRED SCRIPTS -->
   <!-- jQuery -->

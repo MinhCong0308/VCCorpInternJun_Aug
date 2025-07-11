@@ -6,7 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- AdminLTE CSS + Font Awesome (CDN) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -21,7 +24,7 @@
         <a href="adminlte.html" class="nav-link">Home</a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="../index.html" class="nav-link">Back to Blog</a>
+        <a href="index.html" class="nav-link">Back to Blog</a>
       </li>
     </ul>
     <ul class="navbar-nav ml-auto">
@@ -36,7 +39,7 @@
   <!-- Main Sidebar -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="adminlte.html" class="brand-link">
-      <i class="fas fa-blog"></i>
+      <i class="fas fa-blog mr-2"></i>
       <span class="brand-text font-weight-light">Blog Admin</span>
     </a>
     <div class="sidebar">
@@ -83,6 +86,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6"><h1>Manage Languages</h1></div>
+          <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Languages</li>
+              </ol>
+          </div>
         </div>
       </div>
     </section>
@@ -121,53 +130,77 @@
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">Language List</h3>
+            <div class="card-tools">
+                <a href="#" class="btn btn-primary">
+                    <i class="fas fa-plus-circle mr-1"></i>
+                    Add New Language
+                </a>
+            </div>
           </div>
-          <div class="card-body">
-            <table class="table table-bordered table-hover" id="language-table">
+          <div class="card-body p-0">
+            <table class="table table-striped" id="language-table">
               <thead>
                 <tr>
-                  <th style="width: 5%;">#</th>
-                  <th style="width: 20%;">Name</th>
-                  <th style="width: 15%;">Locale Code</th>
-                  <th style="width: 15%;">Status</th>
-                  <th style="width: 15%;">Default</th>
-                  <th style="width: 20%;">Actions</th>
+                  <th style="width: 60px;">#</th>
+                  <th>Name</th>
+                  <th>Locale Code</th>
+                  <th style="width: 120px; text-align: center;">Status</th>
+                  <th style="width: 120px; text-align: center;">Default</th>
+                  <th style="width: 200px; text-align: center;">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <tr data-active="true" data-default="true">
-                  <td>1</td>
+                  <td>1.</td>
                   <td>English</td>
                   <td>en</td>
-                  <td class="lang-status"><span class="badge badge-success">Active</span></td>
-                  <td>
+                  <td style="text-align: center;" class="lang-status"><span class="badge badge-success">Active</span></td>
+                  <td style="text-align: center;">
                     <span class="badge badge-primary"><i class="fas fa-star"></i> Default</span>
                   </td>
-                  <td>
-                    <button class="btn btn-xs btn-info"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn btn-xs btn-warning btn-toggle-status"><i class="fas fa-ban"></i> Disable</button>
+                  <td style="text-align: center;">
+                      <a href="#" class="btn btn-sm btn-info" data-toggle="tooltip"
+                          title="Edit">
+                          <i class="fas fa-pencil-alt"></i>
+                      </a>
+                      <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip"
+                          title="Disable">
+                          <i class="fas fa-ban"></i>
+                      </a>
                   </td>
                 </tr>
                 <tr data-active="true" data-default="false">
-                  <td>2</td>
+                  <td>2.</td>
                   <td>Vietnamese</td>
                   <td>vi</td>
-                  <td class="lang-status"><span class="badge badge-success">Active</span></td>
-                  <td></td>
-                  <td>
-                    <button class="btn btn-xs btn-info"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn btn-xs btn-warning btn-toggle-status"><i class="fas fa-ban"></i> Disable</button>
+                  <td style="text-align: center;" class="lang-status"><span class="badge badge-success">Active</span></td>
+                  <td style="text-align: center;"></td>
+                  <td style="text-align: center;">
+                      <a href="#" class="btn btn-sm btn-info" data-toggle="tooltip"
+                          title="Edit">
+                          <i class="fas fa-pencil-alt"></i>
+                      </a>
+                      <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip"
+                          title="Disable">
+                          <i class="fas fa-ban"></i>
+                      </a>
                   </td>
                 </tr>
                 <tr data-active="false" data-default="false">
-                  <td>3</td>
+                  <td>3.</td>
                   <td>French</td>
                   <td>fr</td>
-                  <td class="lang-status"><span class="badge badge-secondary">Inactive</span></td>
-                  <td></td>
-                  <td>
-                    <button class="btn btn-xs btn-info"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn btn-xs btn-success btn-toggle-status"><i class="fas fa-check"></i> Enable</button>
+                  <td style="text-align: center;" class="lang-status"><span class="badge badge-secondary">Inactive</span></td>
+                  <td style="text-align: center;"></td>
+                  <td style="text-align: center;">
+                      <a href="#" class="btn btn-sm btn-info" data-toggle="tooltip"
+                          title="Edit User">
+                          <i class="fas fa-pencil-alt"></i>
+                      </a>
+                      <a href="#" class="btn btn-sm btn-success" data-toggle="tooltip"
+                          title="Enable">
+                          <i class="fas fa-check"></i>
+                      </a>
                   </td>
                 </tr>
                 <!-- Thêm dòng mới nếu cần -->
@@ -260,6 +293,12 @@ $(document).ready(function() {
     $pendingRow = null;
   });
 });
+</script>
+<!-- Script để kích hoạt Tooltip của Bootstrap -->
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
 </script>
 </body>
 </html>

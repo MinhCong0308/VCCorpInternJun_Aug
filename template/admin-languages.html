@@ -98,40 +98,13 @@
 
     <section class="content">
       <div class="container-fluid">
-
-        <!-- Add Language Form -->
-        <div class="card card-primary">
-          <div class="card-header"><h3 class="card-title">Add New Language</h3></div>
-          <form>
-            <div class="card-body">
-              <div class="form-group">
-                <label for="langName">Language name</label>
-                <input type="text" class="form-control" id="langName" placeholder="e.g. English, Vietnamese">
-              </div>
-              <div class="form-group">
-                <label for="langCode">Locale Code</label>
-                <input type="text" class="form-control" id="langCode" placeholder="e.g. en, vi">
-              </div>
-              <div class="form-group">
-                <label>Status</label>
-                <select class="form-control">
-                  <option value="active" selected>Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </div>
-            </div>
-            <div class="card-footer">
-              <button type="submit" class="btn btn-primary">Add Language</button>
-            </div>
-          </form>
-        </div>
-
+        
         <!-- Language Table -->
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">Language List</h3>
             <div class="card-tools">
-                <a href="#" class="btn btn-primary">
+                <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#addLanguageModal">
                     <i class="fas fa-plus-circle mr-1"></i>
                     Add New Language
                 </a>
@@ -240,6 +213,46 @@
     </div>
   </div>
 </div>
+
+<!-- Modal them language -->
+<div class="modal fade" id="addLanguageModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+          <h4 class="modal-title">Add New Language</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+          </button>
+      </div>
+      <div class="modal-body">
+          <!-- Form -->
+          <form id="formAddNewLanguage">
+              <div class="form-group">
+                <label for="languageName">Language Name</label>
+                <input type="text" class="form-control" id="languageName" placeholder="e.g. English, Vietnamese"
+                  required>
+              </div>
+              <div class="form-group">
+                <label for="languageLocaleCode">Locale Code</label>
+                <input type="text" class="form-control" id="languageLocaleCode" placeholder="e.g. en, vi"
+                  required>
+              </div>
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="languageStatus" checked>
+                <label class="form-check-label" for="languageStatus">Active</label>
+              </div>
+          </form>
+      </div>
+      <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="saveLanguageBtn">Save changes</button>
+      </div>
+    </div>
+        <!-- /.modal-content -->
+  </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 
 <!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>

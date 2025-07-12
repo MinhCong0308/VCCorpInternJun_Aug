@@ -99,28 +99,12 @@
     <section class="content">
       <div class="container-fluid">
 
-        <!-- Add Category Form -->
-        <div class="card card-primary">
-          <div class="card-header"><h3 class="card-title">Add New Category</h3></div>
-          <form>
-            <div class="card-body">
-              <div class="form-group">
-                <label for="categoryName">Category name</label>
-                <input type="text" class="form-control" id="categoryName" placeholder="Enter category name">
-              </div>
-            </div>
-            <div class="card-footer">
-              <button type="submit" class="btn btn-primary">Add Category</button>
-            </div>
-          </form>
-        </div>
-
         <!-- Category Table -->
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">Category List</h3>
             <div class="card-tools">
-              <a href="#" class="btn btn-primary">
+              <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#addCategoryModal">
                 <i class="fas fa-plus-circle mr-1"></i>
                 Add New Category
               </a>
@@ -189,7 +173,7 @@
           <div class="card-footer clearfix">
             <ul class="pagination pagination-sm m-0 float-right">
                 <li class="page-item"><a class="page-link" href="#">«</a></li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
                 <li class="page-item"><a class="page-link" href="#">2</a></li>
                 <li class="page-item"><a class="page-link" href="#">3</a></li>
                 <li class="page-item"><a class="page-link" href="#">»</a></li>
@@ -206,6 +190,36 @@
     All rights reserved.
   </footer>
 </div>
+
+<div class="modal fade" id="addCategoryModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add New Category</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Form -->
+                <form id="formAddNewCategory">
+                    <div class="form-group">
+                        <label for="categoryName">Category Name</label>
+                        <input type="text" class="form-control" id="categoryName" placeholder="Enter category name"
+                            required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveCategoryBtn">Save changes</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 
 <!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>

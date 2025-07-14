@@ -33,7 +33,7 @@ const authService = {
         if(!isMatch) {
             throw new Error("Email or password is not correct");
         }
-        const accessToken  = sign(user.userid, user.Role.rolename);
+        const accessToken  = sign(user.userid, user.Role.rolename); 
         const refreshToken = signRefreshToken(user.userid, user.Role.rolename);
         return {
             user: {
@@ -81,7 +81,7 @@ const authService = {
         };
     },
     async loginWithGoogle() {
-
+        
     },
     async genOTP() {
         const otp = Math.floor(100000 + Math.random() * 900000);
@@ -105,7 +105,7 @@ const authService = {
     },
     async requestOTP(email) {
         const user = await db.User.findOne({ where: { email } });
-        if (!user || user.status !== 2) {
+        if (!user || user.status !== config.config.statusenum.NON_AUTHENTICATED) {
             throw new Error("User not found or already verified.");
         }
         const otp = await this.genOTP();
@@ -123,7 +123,7 @@ const authService = {
             throw new Error("Invalid OTP.");
         }
         const user = await db.User.findOne({where: {email}});
-        user.status = config.config.statusenum.AUTHENTICATED;
+        user.status = config.config.statusenum.AUTHENTICATED; // update status of user to authenticated
         await user.save();
         await redis.del(email);
         return { message: "Email verified successfully." };

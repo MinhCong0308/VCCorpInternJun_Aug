@@ -506,10 +506,19 @@ aside {
     position: fixed;
     width: 100%;
 }
+#blogTitle {
+    overflow-y: auto;
+}
 #blogTitle::placeholder {
   color: #b3b3b1;
 }
 /* Outer editor box */
+.logo-img {
+    height: 35px;
+    width: 35px;
+    padding-bottom: 5px;
+}
+/* Outer box: Editor container */
 .editor-container {
   height: 400px;
   display: flex;
@@ -524,25 +533,25 @@ aside {
 #quill-toolbar {
   background-color: #f8f8f8;
   border-bottom: 1px solid var(--border-color);
+  height: 43.35px;
+  flex-shrink: 0;
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 11111;
 }
 
+/* Editor Scroll Container */
 #quill-editor {
-  flex: 1;
   overflow-y: auto;
-  padding: 16px;
-  padding-top: 43.35px; 
+  flex-grow: 1;
   box-sizing: border-box;
+  padding-top: 20px; /* use to fix the position compare to the toolbar*/
+  padding-bottom: 45px;
+  scroll-padding-top: 20px;
 }
-
 
 #quill-editor .ql-editor {
-  padding: 0;
-}
-.logo-img {
-    height: 35px;
-    width: 35px;
-    padding-bottom: 5px;
+  padding: 0 16px; 
+  min-height: 100%;
+  box-sizing: border-box;
 }

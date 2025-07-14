@@ -3,6 +3,8 @@ const express = require("express");
 const middlewares = require("kernels/middlewares");
 const { validate } = require("kernels/validations");
 const exampleController = require("modules/examples/controllers/exampleController");
+const authController = require("modules/auth/controllers/authController");
+const authValidation = require("modules/auth/validations/authValidation");
 const router = express.Router({ mergeParams: true });
 
 // ===== EXAMPLE Request, make this commented =====
@@ -16,5 +18,9 @@ const router = express.Router({ mergeParams: true });
 router.group("/example", validate([]), (router) => {
   router.get('/', exampleController.exampleRequest)
 })
-
+router.group("/auth", (router) => {
+  router.post("/login", validate([authValidation.logIn]), authController.logIn);
+  router.post("/signup", validate([authValidation.signUp]), authController.signUp);
+  router.post("/validate-otp", validate([authValidation.verifyOTP]), authController.verifyOTP);
+});
 module.exports = router;

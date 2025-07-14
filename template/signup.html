@@ -94,10 +94,10 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    function handleSignupSubmit(event) {
+    async function handleSignupSubmit(event) {
       event.preventDefault();
-      const firstName = document.getElementById("firstName").value.trim();
-      const lastName = document.getElementById("lastName").value.trim();
+      const firstname = document.getElementById("firstName").value.trim();
+      const lastname = document.getElementById("lastName").value.trim();
       const username = document.getElementById("username").value.trim();
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
@@ -106,10 +106,36 @@
         alert("Passwords do not match.");
         return;
       }
-      console.log("Signup Info:", { firstName, lastName, username, email });
-      alert("Signup successful! Redirecting to login...");
-      window.location.href = "login.html";
+      try {
+        const res = await fetch("http://localhost:3000/auth/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            firstname: firstname,
+            lastname: lastname,
+            username: username,
+            email: email,
+            password: password,
+            confirm_password: confirmPassword
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert("Signup successful! Please verify your email.");
+          localStorage.setItem("verifyEmail", email); // Store email temporarily
+          window.location.href = "verifyOTPforSignUp.html";
+        } else {
+          alert(data.message || "Signup failed!");
+        }
+      } catch (err) {
+        alert("An error occurred: " + err.message);
+      }
     }
+
 
     function handleGoogleSignup() {
       alert("Redirecting to Google signup...");

@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable('user', {
       userid: {
         allowNull: false,
         autoIncrement: true,
@@ -16,14 +16,28 @@ module.exports = {
         type: Sequelize.STRING
       },
       username: {
-        type: Sequelize.STRING, 
-        unique: true
+        type: Sequelize.STRING
       },
       hashed_password: {
         type: Sequelize.STRING
       },
       status: {
+        type: Sequelize.INTEGER
+      },
+      roleid: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "role",
+          key: "roleid"
+        },
+        onDelete: "SET NULL",
+        onUpdate: "CASCADE"
+      },
+      email: {
         type: Sequelize.STRING
+      },
+      last_login_at: {
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,
@@ -36,6 +50,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable('user');
   }
 };

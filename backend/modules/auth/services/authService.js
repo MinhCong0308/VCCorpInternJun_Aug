@@ -46,7 +46,7 @@ const authService = {
         
     },
     async signup(userInfo) {
-        const {firstname, lastname, username, email, password} = userInfo;
+        const {firstname, lastname, username, email, password, confirm_password} = userInfo;
         const existingUser = await db.User.findOne({
             where: {
                 [Op.or] : [
@@ -58,6 +58,9 @@ const authService = {
         if(existingUser) {
             throw new Error("Email or username is already registered.");
         }
+        if(password != confirm_password) {
+            throw new Error("Password and confirm password must be identical");
+        }
         // initialize a unauthenticated user
         const hashed_password = await bcrypt.hash(password, 10)
         const newUser = await db.User.create({
@@ -66,7 +69,7 @@ const authService = {
             username,
             email,
             hashed_password,
-            status: 2,
+            status: 1, // set it = 2, 1 just for testing for sign up functionality only
             roleid: 1,
             last_login_at: new Date()
         })

@@ -125,9 +125,9 @@
         const data = await res.json();
 
         if (res.ok) {
-          alert("Signup successful! Redirecting...");
-          localStorage.setItem("accessToken", data.accessToken);
-          window.location.href = "login.html";
+          alert("Signup successful! Please verify your email.");
+          localStorage.setItem("verifyEmail", email); // Store email temporarily
+          window.location.href = "verifyOTPforSignUp.html";
         } else {
           alert(data.message || "Signup failed!");
         }

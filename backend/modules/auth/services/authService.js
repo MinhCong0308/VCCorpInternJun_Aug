@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const db = require('models/index');
 const { Op } = require('sequelize');
 const nodemailer = require('nodemailer');
-// const redis = require('utils/redisClient');
+const redis = require('utils/redisClient');
 const express = require('express');
 require("dotenv").config();
 const config = require('configs/index');
@@ -25,7 +25,6 @@ const authService = {
                 }
             ]
         });
-        // console.log("User role: ", user.Role.roleid);
         if(!user) {
             throw new Error("Email or password is not correct");
         }
@@ -72,7 +71,7 @@ const authService = {
             username,
             email,
             hashed_password,
-            status: config.config.statusenum.AUTHENTICATED, // set it = NON_AUTHENTICATED, AUTHENTICATED just for testing for sign up functionality only
+            status: config.config.statusenum.NON_AUTHENTICATED, // set it = NON_AUTHENTICATED, AUTHENTICATED just for testing for sign up functionality only
             roleid: config.config.roleenum.USER,
             last_login_at: new Date()
         })
@@ -110,21 +109,23 @@ const authService = {
             throw new Error("User not found or already verified.");
         }
         const otp = await this.genOTP();
-        // await redis.set(email, otp, {EX: 300}); // 300s = 5 minitues
+        await redis.set(email, otp, {EX: 300}); // 300s = 5 minitues
         await this.sendOTP(email, otp);
     },
-    async verifyOTP(email, inputOTP, storedOTP) {
-        // const storedOTP = await redis.get(email);
+    async verifyOTP(email, inputOTP) {
+        const storedOTP = await redis.get(email);
         if(!storedOTP) {
             throw new Error("OTP expired");
         }
+        // console.log("Here is stored OTP: ", storedOTP);
+        // console.log("Here is input OTP: ", inputOTP);
         if(storedOTP != inputOTP) {
             throw new Error("Invalid OTP.");
         }
         const user = await db.User.findOne({where: {email}});
         user.status = config.config.statusenum.AUTHENTICATED;
         await user.save();
-        // await redis.del(email);
+        await redis.del(email);
         return { message: "Email verified successfully." };
     }
 };

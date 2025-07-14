@@ -19,7 +19,7 @@ const authController = {
             const userData = req.body;
             console.log(userData);
             const data = await authService.signup(userData); 
-            // await authService.requestOTP(userData.email);   
+            await authService.requestOTP(userData.email);   
             return responseUtils.ok(res, {
                 ...data,
                 message: "User created. OTP sent for verification."

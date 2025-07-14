@@ -14,7 +14,7 @@ const authValidation = {
         new BodyWithLocale("confirm_password").notEmpty().confirmed("password")
     ],
     verifyOTP: [
-        new BodyWithLocale("otp").notEmpty().isNumberic(),
+        new BodyWithLocale("inputOTP").notEmpty().isLength({ min: 6, max: 6 }),
         new BodyWithLocale("email").notEmpty().isEmail()
     ]
 };

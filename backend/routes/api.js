@@ -5,6 +5,10 @@ const { validate } = require("kernels/validations");
 const exampleController = require("modules/examples/controllers/exampleController");
 const authController = require("modules/auth/controllers/authController");
 const authValidation = require("modules/auth/validations/authValidation");
+const categoryValidation = require("modules/category/validations/categoryValidation");
+const categoryController = require("modules/category/controllers/categoryController");
+const languageController = require("modules/language/controllers/languageController");
+const languageValidation = require("modules/language/validations/languageValidation");
 const router = express.Router({ mergeParams: true });
 
 // ===== EXAMPLE Request, make this commented =====
@@ -23,4 +27,23 @@ router.group("/auth", (router) => {
   router.post("/signup", validate([authValidation.signUp]), authController.signUp);
   router.post("/validate-otp", validate([authValidation.verifyOTP]), authController.verifyOTP);
 });
+
+// ===== CATEGORY =====
+//middlewares([middlewares.authenticated, middlewares.role("admin")])
+router.group("/categories", (router) => {
+  router.get("/", categoryController.getAll);
+  router.post("/", validate([categoryValidation.create]), categoryController.create);
+  router.put("/:categoryId", validate([categoryValidation.update]), categoryController.update);
+  router.delete("/:categoryId", categoryController.delete);
+});
+
+// ===== LANGUAGE =====
+//middlewares([middlewares.authenticated, middlewares.role("admin")])
+router.group("/languages", (router) => {
+  router.get("/", languageController.getAll);
+  router.post("/", validate([languageValidation.create]), languageController.create);
+  router.put("/:languageId", validate([languageValidation.update]), languageController.update);
+  router.delete("/:languageId", languageController.delete);
+});
+
 module.exports = router;

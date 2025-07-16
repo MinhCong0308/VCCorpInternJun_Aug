@@ -26,7 +26,7 @@ const authController = {
             });
         } catch (error) {
             if (error.message === "Email or username is already registered.") {
-                return responseUtils.userError(res, error.message);
+                return responseUtils.error(res, error.message);
             }
             return responseUtils.error(res, error.message);
         }

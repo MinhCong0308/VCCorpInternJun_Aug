@@ -101,10 +101,7 @@
                   <div class="settings-section">
                     <div>
                       <div class="settings-label">Email address</div>
-                      <div id="email-display" class="settings-value" style="cursor: pointer;" onclick="toggleEdit('email')">congminhnguyen0308@gmail.com</div>
-                      <form id="email-form" class="d-none mt-2" onsubmit="return saveEdit('email')">
-                        <input type="email" class="form-control form-control-sm" id="email-input" value="congminhnguyen0308@gmail.com" />
-                      </form>
+                      <div id="email-display" class="settings-value">congminhnguyen0308@gmail.com</div>
                     </div>
                   </div>
                   <!-- Username and subdomain -->
@@ -122,10 +119,10 @@
                     <div>
                       <div class="settings-label">Profile information</div>
                       <div class="settings-description">Edit your photo, name, pronouns, short bio, etc.</div>
-                      <div id="profile-display" class="settings-value mt-1" style="cursor: pointer;" onclick="toggleEdit('profile')">Nguyen Cong Minh 
+                      <div id="fullname-display" class="settings-value mt-1" style="cursor: pointer;" onclick="toggleEdit('fullname')">Nguyen Cong Minh 
                       </div>
-                      <form id="profile-form" class="d-none mt-2" onsubmit="return saveEdit('profile')">
-                        <input type="text" class="form-control form-control-sm" id="profile-input" value="Nguyen Cong Minh" />
+                      <form id="fullname-form" class="d-none mt-2" onsubmit="return saveEdit('fullname')">
+                        <input type="text" class="form-control form-control-sm" id="fullname-input" value="Nguyen Cong Minh" />
                       </form>
                     </div>
                   </div>
@@ -147,7 +144,7 @@
                   <!-- Deactivate account -->
                   <div class="settings-section">
                     <div>
-                      <div class="settings-label danger-text">Deactivate account</div>
+                      <div class="settings-label danger-text" style="cursor: pointer;" onclick="deactivateAccount()">Deactivate account</div>
                       <div class="settings-description">Deactivating will suspend your account until you sign back in.</div>
                     </div>
                   </div>
@@ -156,7 +153,7 @@
                   <!-- <div class="settings-section">
                     <div>
                       <div class="settings-label danger-text">Delete account</div>
-                      <div class="settings-description">Permanently delete your account and all of your content.</div>
+                      <div class="settings-description">Perm anently delete your account and all of your content.</div>
                     </div>
                   </div> -->
                 </div>
@@ -197,27 +194,86 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    function toggleEdit(type) {
-      document.getElementById(`${type}-display`).classList.add("d-none");
-      document.getElementById(`${type}-form`).classList.remove("d-none");
-      document.getElementById(`${type}-input`).focus();
-    }
-    function saveEdit(type) {
-      const input = document.getElementById(`${type}-input`);
-      const display = document.getElementById(`${type}-display`);
-      const value = input.value.trim();
+      function toggleEdit(type) {
+        document.getElementById(`${type}-display`).classList.add("d-none");
+        document.getElementById(`${type}-form`).classList.remove("d-none");
+        document.getElementById(`${type}-input`).focus();
+      }
 
-      if (value !== '') {
-        if (type === 'username') {
-          display.textContent = '@' + value;
-        } else {
-          display.textContent = value;
+      async function saveEdit(type) {
+        const input = document.getElementById(`${type}-input`);
+        const display = document.getElementById(`${type}-display`);
+        const value = input.value.trim();
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          alert("You need to be logged in.");
+          return false;
+        }
+        if (!value) {
+          alert("Value cannot be empty.");
+          return false;
+        }
+        if(type === 'fullname') {
+          typeToInput = 'newFullname';
+        }
+        else {
+          typeToInput = type;
+        }
+        try {
+          const res = await fetch(`http://localhost:3000/account/update-${type}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ [typeToInput]: value })
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            display.textContent = value;
+            display.classList.remove("d-none");
+            input.value = "";
+            document.getElementById(`${type}-form`).classList.add("d-none");
+            alert(`${type.charAt(0).toUpperCase() + type.slice(1)} updated successfully!`);
+          } else {
+            alert(data.message || "Failed to update.");
+          }
+        } catch (err) {
+          alert("An error occurred: " + err.message);
         }
       }
-      display.classList.remove("d-none");
-      document.getElementById(`${type}-form`).classList.add("d-none");
-      return false; // Prevent form submission
-    }
-  </script>
+      async function deactivateAccount() {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          alert("You need to be logged in.");
+          return;
+        }
+        if (!confirm("Are you sure you want to deactivate your account?")) {
+          return;
+        }
+
+        try {
+          const res = await fetch("http://localhost:3000/account/deactivate-account", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            }
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            alert("Account deactivated successfully.");
+            localStorage.removeItem("accessToken");
+            window.location.href = "login.html";
+          } else {
+            alert(data.message || "Failed to deactivate account.");
+          }
+        } catch (err) {
+          alert("An error occurred: " + err.message);
+        }
+      }
+    </script>
 </body>
 </html>

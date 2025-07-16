@@ -2,10 +2,10 @@ const {BodyWithLocale} = require("kernels/rules");
 
 const categoryValidation = {
     create: [
-        new BodyWithLocale("name").notEmpty().isString()
+        new BodyWithLocale("categoryname").notEmpty().isString()
     ],
     update: [
-        new BodyWithLocale("name").notEmpty().isString()
+        new BodyWithLocale("categoryname").notEmpty().isString()
     ]
 };
 

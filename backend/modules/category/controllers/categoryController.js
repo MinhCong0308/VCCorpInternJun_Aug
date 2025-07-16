@@ -4,7 +4,9 @@ const categoryService = require("modules/category/services/categoryService");
 const categoryController = {
     getAll: async (req, res) => {
         try {
-            const categories = await categoryService.getAllCategories();
+            const { limit = 1, page = 5 } = req.query;
+            // Assuming getAllCategories accepts limit and page parameters
+            const categories = await categoryService.getAllCategories(+limit, +page);
             return responseUtils.ok(res, categories);
         } catch (error) {
             return responseUtils.error(res, error.message);
@@ -13,8 +15,8 @@ const categoryController = {
     },
     create: async (req, res) => {
         try {
-            const categories = req.body;
-            const newCategory = await categoryService.createCategory(categories);
+            const category = req.body;
+            const newCategory = await categoryService.createCategory(category);
             return responseUtils.ok(res, newCategory);
         } catch (error) {
             return responseUtils.error(res, error.message);
@@ -41,3 +43,5 @@ const categoryController = {
         }
     }
 }
+
+module.exports = categoryController;

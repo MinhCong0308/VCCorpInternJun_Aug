@@ -1,5 +1,4 @@
 const { BodyWithLocale } = require("kernels/rules");
-const db = require("models/index");
 
 const authValidation = {
     logIn: [

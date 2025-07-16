@@ -18,6 +18,15 @@ module.exports = {
       is_default: {
         type: Sequelize.BOOLEAN
       },
+      flag_image: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      status: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 1 // active
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

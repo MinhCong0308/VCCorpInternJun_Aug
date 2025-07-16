@@ -5,7 +5,7 @@ module.exports = {
   sign: (userId, userRole) => {
     const access_token = jwt.sign(
       {
-        userId: userId,
+        userId: userId, // based on this
         role: userRole,
       },
       config.jwt.secret,

@@ -39,6 +39,10 @@ module.exports = {
       last_login_at: {
         type: Sequelize.DATE
       },
+      avatar: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

@@ -147,13 +147,34 @@
         });
     </script>
     <script>
-        document.querySelector('[type="submitBlog"]').addEventListener('click', function() {
+        document.querySelector('[type="submitBlog"]').addEventListener('click', async function() {
                 const title = document.querySelector('.editor-title').value.trim();
                 const content = quill.root.innerHTML.trim();
-                console.log('Blog Title:', title);
-                console.log('Blog Content (HTML):', content);
-                alert('Your blog with title: ' + title +  ' and content: ' + content + ' will be processing. Redirecting...');
-                window.location.href = 'home.html';
+                const accessToken = localStorage.getItem('accessToken');
+                const languageid = 1;
+                if (!title || !content) {
+                    alert('Please enter both title and content.');
+                    return;
+                }
+                if (!accessToken) {
+                    alert('You need to be logged in to submit a blog.');
+                    return;
+                }
+                const res = await fetch('http://localhost:3000/post-owner/create-post', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + accessToken
+                    },
+                    body: JSON.stringify({ title, content, languageid })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert('Your blog with title: ' + title +  ' and content: ' + content + ' will be processing. Redirecting...');
+                    window.location.href = 'home.html';
+                } else {
+                    alert('Error: ' + data.message);
+                }
         });
     </script>
 </body>

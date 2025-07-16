@@ -9,12 +9,26 @@ const { swaggerUIServe,swaggerUISetup } = require("kernels/api-docs");
 const cors = require("cors");
 const app = express();
 app.disable("x-powered-by");
+// app.use(cors({
+//   origin: "*", 
+//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//   allowedHeaders: ["Content-Type", "Authorization"],
+//   credentials: false // true if using cookies
+// }));
+
 app.use(cors({
-  origin: "*", 
+  origin: function (origin, callback) {
+    if (!origin || origin === "null") {
+      callback(null, true); 
+    } else {
+      callback(null, true); 
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: false // true if using cookies
+  credentials: false
 }));
+
 
 app.options("*", cors());
 

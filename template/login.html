@@ -91,7 +91,7 @@
 
         if (res.ok) {
           alert("Login successful! Redirecting...");
-          localStorage.setItem("accessToken", data.accessToken);
+          localStorage.setItem("accessToken", data.data.accessToken);
           window.location.href = "home.html";
         } else {
           alert(data.message || "Login failed!");

@@ -1,9 +1,19 @@
 const db = require('models/index');
-const { getAll, create, update } = require('../controllers/languageController');
 
 const languageService = {
-    getAllLanguages: async () => {
-        return await db.Language.findAll();
+    getAllLanguages: async (limit, page) => {
+        const offset = (page - 1) * limit;
+        const { count, rows } = await db.Language.findAndCountAll({
+            limit,
+            offset,
+            order: [['createdAt', 'DESC']]
+        });
+        return {
+            languages: rows,
+            total: count,
+            page,
+            totalPages: Math.ceil(count / limit)
+        };
     },
     createLanguage: async (languageData) => {
         return await db.Language.create(languageData);
@@ -23,3 +33,5 @@ const languageService = {
         await language.destroy();
     }
 }
+
+module.exports = languageService;

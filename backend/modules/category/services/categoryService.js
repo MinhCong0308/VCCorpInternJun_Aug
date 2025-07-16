@@ -1,8 +1,20 @@
 const db = require('models/index');
 
 const categoryService = {
-    getAllCategories: async () => {
-        return await db.Category.findAll();
+    getAllCategories: async (limit = 1, page = 5) => {
+        const offset = (page - 1) * limit;
+        const{count, row} = await db.Category.findAndCountAll({
+            limit,
+            offset,
+            order: [['createdAt', 'DESC']]
+        })
+        return {
+            categories: row,
+            total: count,
+            page,
+            totalPages: Math.ceil(count / limit)
+        };
+
     },
     createCategory: async (categoryData) => {
         return await db.Category.create(categoryData);
@@ -22,3 +34,5 @@ const categoryService = {
         await category.destroy();
     }
 }
+
+module.exports = categoryService;

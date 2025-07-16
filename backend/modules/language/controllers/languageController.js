@@ -4,8 +4,9 @@ const languageService = require("modules/language/services/languageService");
 const languageController = {
     getAll: async (req, res) => {
         try {
-            const languages = await languageService.getAllLanguages();
-            return responseUtils.ok(res, languages);
+            const { page = 1, limit = 5 } = req.query;
+            const language = await languageService.getAllLanguages(+limit, +page);
+            return responseUtils.ok(res, language);
         } catch (error) {
             return responseUtils.error(res, error.message);
         }

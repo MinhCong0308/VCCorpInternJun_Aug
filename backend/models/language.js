@@ -22,7 +22,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     languagename: DataTypes.STRING,
     locale_code: DataTypes.STRING,
-    is_default: DataTypes.BOOLEAN
+    is_default: DataTypes.BOOLEAN,
+    flag_image: DataTypes.STRING,
+    status: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Language',

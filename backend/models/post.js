@@ -36,7 +36,9 @@ module.exports = (sequelize, DataTypes) => {
     original_postid: DataTypes.INTEGER,
     title: DataTypes.STRING,
     content: DataTypes.TEXT,
-    status: DataTypes.INTEGER
+    status: DataTypes.INTEGER,
+    like_cnt: DataTypes.INTEGER,
+    dislike_cnt: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Post',

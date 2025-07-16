@@ -109,7 +109,7 @@
                     <div>
                       <div class="settings-label">Username and subdomain</div>
                       <div id="username-display" class="settings-value" style="cursor: pointer;" onclick="toggleEdit('username')">@congminhnguyen0308</div>
-                      <form id="username-form" class="d-none mt-2" onsubmit="return saveEdit('username')">
+                      <form id="username-form" class="d-none mt-2" onsubmit="saveEdit('username'); return false;">
                         <input type="text" class="form-control form-control-sm" id="username-input" value="congminhnguyen0308" />
                       </form>
                     </div>
@@ -121,7 +121,7 @@
                       <div class="settings-description">Edit your photo, name, pronouns, short bio, etc.</div>
                       <div id="fullname-display" class="settings-value mt-1" style="cursor: pointer;" onclick="toggleEdit('fullname')">Nguyen Cong Minh 
                       </div>
-                      <form id="fullname-form" class="d-none mt-2" onsubmit="return saveEdit('fullname')">
+                      <form id="fullname-form" class="d-none mt-2" onsubmit="saveEdit('fullname'); return false;">
                         <input type="text" class="form-control form-control-sm" id="fullname-input" value="Nguyen Cong Minh" />
                       </form>
                     </div>
@@ -148,14 +148,6 @@
                       <div class="settings-description">Deactivating will suspend your account until you sign back in.</div>
                     </div>
                   </div>
-
-                  <!-- Delete account -->
-                  <!-- <div class="settings-section">
-                    <div>
-                      <div class="settings-label danger-text">Delete account</div>
-                      <div class="settings-description">Perm anently delete your account and all of your content.</div>
-                    </div>
-                  </div> -->
                 </div>
               </div>
             </main>
@@ -213,6 +205,7 @@
           alert("Value cannot be empty.");
           return false;
         }
+        let typeToInput;
         if(type === 'fullname') {
           typeToInput = 'newFullname';
         }

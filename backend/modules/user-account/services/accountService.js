@@ -5,7 +5,9 @@ const { Op } = require('sequelize');
 const accountService = {    
     async updateUsername(username, userid) {
         const user = await db.User.findOne({
-            where: { userid: userid }
+            where: {[Op.and]: [
+                {userid: userid}, {status: config.config.statusenum.AUTHENTICATED}
+            ]},
         });
         console.log("user: ", user);
         if (!user) throw new Error("User not found"); // ← maybe add this
@@ -16,17 +18,12 @@ const accountService = {
             console.log("Username has been used");
             throw new Error("Username has been used");
         }
-        console.log("Here, run this");
         user.username = username;
         await user.save();
         return {message: "Update username successfully"};
     },
     async updateFullname(newFullName, userid) {
-        // extract into firstname and lastname
-        // console.log("newFullName: ", newFullName);
         const {firstname, lastname} = await this.extractFullname(newFullName);
-        // console.log("firstname: ", firstname);
-        // console.log("lastname: ", lastname);
         const user = await db.User.findOne({
             where: {[Op.and]: [
                 {userid: userid}, {status: config.config.statusenum.AUTHENTICATED}

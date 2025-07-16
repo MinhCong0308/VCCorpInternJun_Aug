@@ -46,6 +46,16 @@ module.exports = {
       status: {
         type: Sequelize.INTEGER
       },
+      like_cnt: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
+      unlike_cnt: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

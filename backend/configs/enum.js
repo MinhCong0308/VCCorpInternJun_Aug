@@ -7,6 +7,11 @@ const statusenum = Object.freeze({
     AUTHENTICATED: 1,
     NON_AUTHENTICATED: 2
 });
+const statuspostenum = Object.freeze({
+    PENDING: 1,
+    APPROVED: 2,
+    REJECTED: 3,
+});
 // Optional: reverse mapping (id to name)
 const RoleNameById = Object.freeze({
   1: 'USER',
@@ -19,4 +24,5 @@ module.exports = {
   roleenum,
   statusenum,
   RoleNameById,
+  statuspostenum
 };

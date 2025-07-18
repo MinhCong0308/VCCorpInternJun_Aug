@@ -121,7 +121,7 @@
                   <div class="col-md-2">
                     <div class="form-group">
                       <button type="submit" class="btn btn-primary btn-block">
-                        Search
+                        <i class="fas fa-search"></i> Search
                       </button>
                     </div>
                   </div>
@@ -153,8 +153,8 @@
                         <th style="width: 150px; text-align: center;">Actions</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr>
+                    <tbody id="categoryTableBody">
+                      <!-- <tr>
                         <td>1.</td>
                         <td>Technology</td>
                         <td style="text-align: center;">152</td>
@@ -197,7 +197,8 @@
                           <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete"><i
                               class="fas fa-trash"></i></a>
                         </td>
-                      </tr>
+                      </tr> -->
+                      <!-- Các category sẽ được thêm vào đây thông qua JavaScript -->
                     </tbody>
                   </table>
                 </div>
@@ -330,6 +331,7 @@
         alert('There was an error creating the category.');
       });
     });
+    loadCategories();
 
     /* Sửa category
     document.getElementById('saveEditCategoryBtn').addEventListener('click', function () {
@@ -374,6 +376,34 @@
           });
       });
       */
+
+      // Lấy danh sách categories
+      function loadCategories() {
+        fetch('http://localhost:3000/categories')
+          .then(response => response.json())
+          .then(data => {
+            const categoryTableBody = document.getElementById('categoryTableBody');
+            categoryTableBody.innerHTML = ''; // Xóa nội dung cũ
+
+            data.forEach((category, index) => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td>${index + 1}.</td>
+                <td>${category.categoryname}</td>
+                <td style="text-align: center;">${category.postCount || 0}</td>
+                <td style="text-align: center;">
+                  <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editCategoryModal"
+                    data-id="${category.id}" data-name="${category.categoryname}" title="Edit"><i class="fas fa-edit"></i></a>
+                  <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete"><i
+                      class="fas fa-trash"></i></a>
+                </td>
+              `;
+              categoryTableBody.appendChild(row);
+            });
+          })
+          .catch(error => console.error('Error loading categories:', error));
+      }
+      loadCategories();
   </script>
 </body>
 

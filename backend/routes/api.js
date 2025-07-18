@@ -46,6 +46,7 @@ router.group("/post-owner", (router) => {
 //middlewares([middlewares.authenticated, middlewares.role("admin")])
 router.group("/categories", (router) => {
   router.get("/", categoryController.getAll);
+  router.get("/list-all", categoryController.getAllNoPaging);
   router.post("/", validate([categoryValidation.create]), categoryController.create);
   router.put("/:categoryId", validate([categoryValidation.update]), categoryController.update);
   router.delete("/:categoryId", categoryController.delete);

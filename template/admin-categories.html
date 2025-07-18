@@ -121,7 +121,7 @@
                   <div class="col-md-2">
                     <div class="form-group">
                       <button type="submit" class="btn btn-primary btn-block">
-                        Search
+                        <i class="fas fa-search"></i> Search
                       </button>
                     </div>
                   </div>
@@ -153,8 +153,8 @@
                         <th style="width: 150px; text-align: center;">Actions</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr>
+                    <tbody id="categoryTableBody">
+                      <!-- <tr>
                         <td>1.</td>
                         <td>Technology</td>
                         <td style="text-align: center;">152</td>
@@ -197,7 +197,8 @@
                           <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete"><i
                               class="fas fa-trash"></i></a>
                         </td>
-                      </tr>
+                      </tr> -->
+                      <!-- Các category sẽ được thêm vào đây thông qua JavaScript -->
                     </tbody>
                   </table>
                 </div>
@@ -283,7 +284,127 @@
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+  <script>
+    // Script để kích hoạt Tooltip của Bootstrap
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
 
+    // Thêm category
+    document.getElementById('saveCategoryBtn').addEventListener('click', function () {
+    const categoryName = document.getElementById('categoryName').value.trim();
+
+    if (!categoryName) {
+      alert('Please enter a category name.');
+      return;
+    }
+
+    fetch('http://localhost:3000/categories', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ categoryname: categoryName })
+    })
+      .then(async response => {
+        const data = await response.json();
+
+        if (!response.ok) {
+          // Nếu là lỗi 422 (trùng tên)
+          if (response.status === 422 && data?.data?.errors?.length) {
+            const errorMessage = data.data.errors[0].message || 'Validation error';
+            alert(`Error: ${errorMessage}`);
+            return;
+          } else {
+            alert('There was an error creating the category.');
+            return;
+          }
+        }
+        // Thành công
+        alert(`Category "${data.categoryname}" has been added successfully!`);
+        $('#addCategoryModal').modal('hide');
+        document.getElementById('formAddNewCategory').reset();
+        // loadCategories();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('There was an error creating the category.');
+      });
+    });
+    loadCategories();
+
+    /* Sửa category
+    document.getElementById('saveEditCategoryBtn').addEventListener('click', function () {
+        const categoryId = document.getElementById('editCategoryId').value;
+        const categoryName = document.getElementById('editCategoryName').value.trim();
+  
+        if (!categoryName) {
+          alert('Please enter a category name.');
+          return;
+        }
+  
+        fetch(`http://localhost:3000/categories/${categoryId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ categoryname: categoryName })
+        })
+          .then(async response => {
+            const data = await response.json();
+  
+            if (!response.ok) {
+              // Nếu là lỗi 422 (trùng tên)
+              if (response.status === 422 && data?.data?.errors?.length) {
+                const errorMessage = data.data.errors[0].message || 'Validation error';
+                alert(`Error: ${errorMessage}`);
+                return;
+              } else {
+                alert('There was an error updating the category.');
+                return;
+              }
+            }
+            // Thành công
+            alert(`Category "${data.categoryname}" has been updated successfully!`);
+            $('#editCategoryModal').modal('hide');
+            document.getElementById('formEditCategory').reset();
+            // loadCategories();
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('There was an error updating the category.');
+          });
+      });
+      */
+
+      // Lấy danh sách categories
+      function loadCategories() {
+        fetch('http://localhost:3000/categories')
+          .then(response => response.json())
+          .then(data => {
+            const categoryTableBody = document.getElementById('categoryTableBody');
+            categoryTableBody.innerHTML = ''; // Xóa nội dung cũ
+
+            data.forEach((category, index) => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td>${index + 1}.</td>
+                <td>${category.categoryname}</td>
+                <td style="text-align: center;">${category.postCount || 0}</td>
+                <td style="text-align: center;">
+                  <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editCategoryModal"
+                    data-id="${category.id}" data-name="${category.categoryname}" title="Edit"><i class="fas fa-edit"></i></a>
+                  <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete"><i
+                      class="fas fa-trash"></i></a>
+                </td>
+              `;
+              categoryTableBody.appendChild(row);
+            });
+          })
+          .catch(error => console.error('Error loading categories:', error));
+      }
+      loadCategories();
+  </script>
 </body>
 
 </html>

@@ -13,6 +13,14 @@ const categoryController = {
             
         }
     },
+    getAllNoPaging: async (req, res) => {
+        try {
+            const categories = await categoryService.getAllNoPaging();
+            return responseUtils.ok(res, categories);
+        } catch (error) {
+            return responseUtils.error(res, error.message);
+        }
+    },
     create: async (req, res) => {
         try {
             const category = req.body;

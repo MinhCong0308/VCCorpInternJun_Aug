@@ -123,7 +123,7 @@
                   <div class="col-md-2">
                     <div class="form-group">
                       <button type="submit" class="btn btn-primary btn-block">
-                        Search
+                        <i class="fas fa-search"></i> Search
                       </button>
                     </div>
                   </div>
@@ -288,7 +288,7 @@
     </div>
   </div>
 
-  <!-- ======================================================= -->
+  <!-- Modal Sửa Language -->
   <div class="modal fade" id="editLanguageModal">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -324,13 +324,61 @@
     </div>
   </div>
 
-
-
   <!-- JS -->
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+  <script>
+    //Thêm language
+    document.getElementById('saveLanguageBtn').addEventListener('click', function () {
+      const languagename = document.getElementById('languageName').value.trim();
+      const flag_image = document.getElementById('languageFlag').value.trim();
+      const locale_code = document.getElementById('languageLocaleCode').value.trim();
+      const status = document.getElementById('languageStatus').checked ? "1" : "0";
+      const is_default = "0"; // Mặc định là không phải ngôn ngữ mặc định
 
+      // Kiểm tra input bắt buộc
+      if (!languagename || !flag_image || !locale_code) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+
+      fetch('http://localhost:3000/languages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          languagename,
+          flag_image,
+          locale_code,
+          is_default,
+          status
+        })
+      })
+        .then(async response => {
+          const data = await response.json();
+
+          if (!response.ok) {
+            if (response.status === 422 && data?.data?.errors?.length) {
+              alert(`Error: ${data.data.errors[0].message}`);
+              return;
+            } else {
+              alert('There was an error creating the language.');
+              return;
+            }
+          }
+          // Thành công
+          alert(`Language has been added successfully!`);
+          $('#addLanguageModal').modal('hide');
+          document.getElementById('formAddNewLanguage').reset();
+          // loadLanguages(); // gọi lại danh sách nếu có
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An unexpected error occurred.');
+        });
+    });
+  </script>
 </body>
-
 </html>

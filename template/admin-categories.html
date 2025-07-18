@@ -283,7 +283,54 @@
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+  <script>
+    // Script để kích hoạt Tooltip của Bootstrap
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
 
+    // Thêm category
+    document.getElementById('saveCategoryBtn').addEventListener('click', function () {
+    const categoryName = document.getElementById('categoryName').value.trim();
+
+    if (!categoryName) {
+      alert('Please enter a category name.');
+      return;
+    }
+
+    fetch('http://localhost:3000/categories', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ categoryname: categoryName })
+    })
+      .then(async response => {
+        const data = await response.json();
+
+        if (!response.ok) {
+          // Nếu là lỗi 422 (trùng tên)
+          if (response.status === 422 && data?.data?.errors?.length) {
+            const errorMessage = data.data.errors[0].message || 'Validation error';
+            alert(`Error: ${errorMessage}`);
+            return;
+          } else {
+            alert('There was an error creating the category.');
+            return;
+          }
+        }
+        // Thành công
+        alert(`Category "${data.categoryname}" has been added successfully!`);
+        $('#addCategoryModal').modal('hide');
+        document.getElementById('formAddNewCategory').reset();
+        // loadCategories();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('There was an error creating the category.');
+      });
+  });
+  </script>
 </body>
 
 </html>

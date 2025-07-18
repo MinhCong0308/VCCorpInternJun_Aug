@@ -46,7 +46,7 @@ const categoryService = {
         if (!category) {
             throw new Error("Category not found");
         }
-        await category.destroy();
+        return await category.destroy();
     }
 }
 

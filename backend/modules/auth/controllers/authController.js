@@ -8,6 +8,7 @@ const authController = {
             const data = await authService.login(userData);
             return responseUtils.ok(res, data);
         } catch(error) {
+            console.error("Login error: ", error);
             if (error.message === "Email or password is not correct") {
                 return responseUtils.unauthorized(res, error.message);
             }

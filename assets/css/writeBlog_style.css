@@ -474,11 +474,11 @@ aside {
 }
 .editor-wrapper {
   max-width: 700px;
-  min-height: 400px;
+  min-height: 300px;
 }
 
 #quill-editor {
-  min-height: 400px;
+  min-height: 300px;
 }
 .google-btn {
     display: flex;
@@ -520,7 +520,7 @@ aside {
 }
 /* Outer box: Editor container */
 .editor-container {
-  height: 400px;
+  height: 300px;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border-color);
@@ -555,3 +555,14 @@ aside {
   min-height: 100%;
   box-sizing: border-box;
 }
+.checkbox-dropdown {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.checkbox-dropdown .checkbox-item {
+  display: block;
+  margin-bottom: 8px;
+}
+
+

@@ -94,88 +94,9 @@
                 </ul>
               </nav>
               <div id="home-content">
-                <!-- Blog Post 1 -->
-                <article class="blog-post">
-                  <div class="d-flex justify-content-between align-items-start">
-                    <div class="flex-grow-1">
-                      <h2><a href="post-detail.html" class="blog-title">Generating IELTS Writing Task 2 with GPT-2</a></h2>
-                      <p class="blog-subtitle">Step 1: Data Preprocessing for IELTS Essay Generation</p>
-                      <div class="blog-meta">
-                        <span class="blog-date">Just now</span>
-                        <span class="bookmark-icon ti-bookmark"></span>
-                        <div class="dropdown post-options">
-                          <span class="more-options dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">⋯</span>
-                          <ul class="dropdown-menu">
-                            <li><a class="dropdown-item edit-post-btn" href="#">Edit</a></li>
-                            <li><a class="dropdown-item delete-post-btn" href="#">Delete</a></li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </article>
-                <!-- Blog Post 2 -->
-                <article class="blog-post">
-                  <div class="d-flex justify-content-between align-items-start">
-                    <div class="flex-grow-1">
-                      <h2><a href="post-detail.html" class="blog-title">Understanding Machine Learning Fundamentals</a></h2>
-                      <p class="blog-subtitle">A comprehensive guide to getting started with ML concepts and practical applications</p>
-                      <div class="blog-meta">
-                        <span class="blog-date">2 days ago</span>
-                        <span class="bookmark-icon ti-bookmark"></span>
-                        <div class="dropdown post-options">
-                          <span class="more-options dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">⋯</span>
-                          <ul class="dropdown-menu">
-                            <li><a class="dropdown-item edit-post-btn" href="#">Edit</a></li>
-                            <li><a class="dropdown-item delete-post-btn" href="#">Delete</a></li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </article>
-
-                <!-- Blog Post 3 -->
-                <article class="blog-post">
-                  <div class="d-flex justify-content-between align-items-start">
-                    <div class="flex-grow-1">
-                      <h2><a href="post-detail.html" class="blog-title">The Future of Web Development</a></h2>
-                      <p class="blog-subtitle">Exploring emerging trends and technologies that will shape the next decade of web development</p>
-                      <div class="blog-meta">
-                        <span class="blog-date">1 week ago</span>
-                        <span class="bookmark-icon ti-bookmark"></span>
-                        <div class="dropdown post-options">
-                          <span class="more-options dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">⋯</span>
-                          <ul class="dropdown-menu">
-                            <li><a class="dropdown-item edit-post-btn" href="#">Edit</a></li>
-                            <li><a class="dropdown-item delete-post-btn" href="#">Delete</a></li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </article>
-
-                <!-- Blog Post 4 -->
-                <article class="blog-post">
-                  <div class="d-flex justify-content-between align-items-start">
-                    <div class="flex-grow-1">
-                      <h2><a href="post-detail.html" class="blog-title">Data Science Best Practices</a></h2>
-                      <p class="blog-subtitle">Essential techniques and methodologies for effective data analysis and visualization</p>
-                      <div class="blog-meta">
-                        <span class="blog-date">2 weeks ago</span>
-                        <span class="bookmark-icon ti-bookmark"></span>
-                        <div class="dropdown post-options">
-                          <span class="more-options dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">⋯</span>
-                          <ul class="dropdown-menu">
-                            <li><a class="dropdown-item edit-post-btn" href="#">Edit</a></li>
-                            <li><a class="dropdown-item delete-post-btn" href="#">Delete</a></li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </article>
+                <div class="text-center">
+                  <p class="text-muted">Loading posts...</p>
+                </div>
               </div>
               <!-- About Content (Hidden by default) -->
               <div id="about-content" style="display: none;">
@@ -232,6 +153,170 @@
         const tabType = this.getAttribute('data-tab');
         document.getElementById(tabType + '-content').style.display = 'block';
       });
+    });
+
+    // Function to format date
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffInSeconds = Math.floor((now - date) / 1000);
+      
+      if (diffInSeconds < 60) {
+        return 'Just now';
+      } else if (diffInSeconds < 3600) {
+        const minutes = Math.floor(diffInSeconds / 60);
+        return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+      } else if (diffInSeconds < 86400) {
+        const hours = Math.floor(diffInSeconds / 3600);
+        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      } else if (diffInSeconds < 2592000) {
+        const days = Math.floor(diffInSeconds / 86400);
+        return `${days} day${days > 1 ? 's' : ''} ago`;
+      } else {
+        const months = Math.floor(diffInSeconds / 2592000);
+        return `${months} month${months > 1 ? 's' : ''} ago`;
+      }
+    }
+
+    // Function to truncate content for subtitle
+    function truncateContent(content, maxLength = 20) {
+      if (content.length <= maxLength) {
+        return content;
+      }
+      return content.substring(0, maxLength) + '...';
+    }
+
+    // Function to fetch and display posts
+    async function loadPosts() {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          console.error('No access token found');
+          return;
+        }
+
+        const response = await fetch('http://localhost:3000/post-owner/get-all-posts', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        const responseData = await response.json();
+        // console.log('Response Data:', responseData);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${responseData.message}`);
+        }
+        console.log('Data:', responseData.data.posts);
+        // Check if response contains posts
+        if (responseData.data.posts && Array.isArray(responseData.data.posts)) {
+          displayPosts(responseData.data.posts);
+        } else {
+          if(!responseData.data.posts) {
+            const homeContent = document.getElementById('home-content');
+            homeContent.innerHTML = '<p class="text-center text-muted">No posts found.</p>';
+          } else {
+            console.error('data format is incorrect:', responseData.message || 'No posts found');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    }
+
+    // Function to display posts
+    function displayPosts(posts) {
+      const homeContent = document.getElementById('home-content');
+      console.log('Posts:', posts);
+      if (!posts || posts.length === 0) {
+        homeContent.innerHTML = '<p class="text-center text-muted">No posts found.</p>';
+        return;
+      }
+
+      homeContent.innerHTML = posts.map(post => `
+        <article class="blog-post">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              <h2><a href="post-detail.html?id=${post.postid}" class="blog-title">${post.title}</a></h2>
+              <p class="blog-subtitle">${truncateContent(post.content)}</p>
+              <div class="blog-meta">
+                <span class="blog-date">${formatDate(post.createdAt)}</span>
+                <div class="dropdown post-options">
+                  <span class="more-options" role="button" data-bs-toggle="dropdown" aria-expanded="false">⋯</span>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item edit-post-btn" href="#" data-post-id="${post.postid}">Edit</a></li>
+                    <li><a class="dropdown-item delete-post-btn" href="#" data-post-id="${post.postid}">Delete</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      `).join('');
+
+      // Add event listeners for edit and delete buttons
+      addPostActionListeners();
+    }
+
+    // Function to add event listeners for post actions
+    function addPostActionListeners() {
+      document.querySelectorAll('.edit-post-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          const postId = this.getAttribute('data-post-id');
+          // Redirect to edit page or open edit modal
+          window.location.href = `blogWriting.html?edit=${postId}`;
+        });
+      });
+
+      document.querySelectorAll('.delete-post-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          const postId = this.getAttribute('data-post-id');
+          deletePost(postId);
+        });
+      });
+    }
+
+    // Function to delete a post
+    async function deletePost(postId) {
+      if (!confirm('Are you sure you want to delete this post?')) {
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          alert('You need to be logged in to delete posts.');
+          return;
+        }
+
+        const response = await fetch('http://localhost:3000/post-owner/delete-post', {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ postid: parseInt(postId) })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          alert('Post deleted successfully!');
+          loadPosts(); // Reload posts
+        } else {
+          alert(data.message || 'Failed to delete post.');
+        }
+      } catch (error) {
+        console.error('Error deleting post:', error);
+        alert('An error occurred while deleting the post.');
+      }
+    }
+
+    // Load posts when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      loadPosts();
     });
   </script>
 </body>

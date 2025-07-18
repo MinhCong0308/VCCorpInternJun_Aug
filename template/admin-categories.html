@@ -329,7 +329,51 @@
         console.error('Error:', error);
         alert('There was an error creating the category.');
       });
-  });
+    });
+
+    /* Sửa category
+    document.getElementById('saveEditCategoryBtn').addEventListener('click', function () {
+        const categoryId = document.getElementById('editCategoryId').value;
+        const categoryName = document.getElementById('editCategoryName').value.trim();
+  
+        if (!categoryName) {
+          alert('Please enter a category name.');
+          return;
+        }
+  
+        fetch(`http://localhost:3000/categories/${categoryId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ categoryname: categoryName })
+        })
+          .then(async response => {
+            const data = await response.json();
+  
+            if (!response.ok) {
+              // Nếu là lỗi 422 (trùng tên)
+              if (response.status === 422 && data?.data?.errors?.length) {
+                const errorMessage = data.data.errors[0].message || 'Validation error';
+                alert(`Error: ${errorMessage}`);
+                return;
+              } else {
+                alert('There was an error updating the category.');
+                return;
+              }
+            }
+            // Thành công
+            alert(`Category "${data.categoryname}" has been updated successfully!`);
+            $('#editCategoryModal').modal('hide');
+            document.getElementById('formEditCategory').reset();
+            // loadCategories();
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('There was an error updating the category.');
+          });
+      });
+      */
   </script>
 </body>
 

@@ -1,20 +1,28 @@
 const db = require('models/index');
 
 const categoryService = {
-    getAllCategories: async (limit = 1, page = 5) => {
+    getAllCategories: async (limit = 5, page = 1, search='') => {
         const offset = (page - 1) * limit;
-        const{count, row} = await db.Category.findAndCountAll({
+        const options = {
             limit,
             offset,
             order: [['createdAt', 'DESC']]
-        })
+        }
+
+        if (search && search.trim() !== '') {
+            options.where = db.sequelize.literal(
+                `MATCH(categoryname) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`
+            );
+        }
+
+        const { count, rows } = await db.Category.findAndCountAll(options);
+
         return {
-            categories: row,
+            categories: rows,
             total: count,
             page,
             totalPages: Math.ceil(count / limit)
         };
-
     },
     getAllNoPaging: async () => {
         const categories = await db.Category.findAll({

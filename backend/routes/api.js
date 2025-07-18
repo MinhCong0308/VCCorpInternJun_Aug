@@ -13,6 +13,8 @@ const categoryValidation = require("modules/category/validations/categoryValidat
 const categoryController = require("modules/category/controllers/categoryController");
 const languageController = require("modules/language/controllers/languageController");
 const languageValidation = require("modules/language/validations/languageValidation");
+const commentController = require("modules/comment/controllers/commentController");
+const commentValidation = require("modules/comment/validations/commentValidation");
 const router = express.Router({ mergeParams: true });
 
 // ===== EXAMPLE Request, make this commented =====
@@ -62,5 +64,11 @@ router.group("/languages", (router) => {
   router.delete("/:languageId", languageController.delete);
 });
 
+// ===== COMMENT =====
+router.group("/comments", (router) => {
+  router.get("/", commentController.getAll);
+  router.post("/", validate(commentValidation.create), commentController.create);
+  router.put("/:commentId", validate(commentValidation.update), commentController.update);
+});
 
 module.exports = router;

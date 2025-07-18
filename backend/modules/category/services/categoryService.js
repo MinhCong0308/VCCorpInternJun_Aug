@@ -16,6 +16,13 @@ const categoryService = {
         };
 
     },
+    getAllNoPaging: async () => {
+        const categories = await db.Category.findAll({
+            attributes: ["categoryid", "categoryname"],
+            order: [["categoryname", "ASC"]]
+        });
+        return categories;
+    },
     createCategory: async (categoryData) => {
         return await db.Category.create(categoryData);
     },

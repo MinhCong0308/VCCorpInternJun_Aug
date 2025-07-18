@@ -26,26 +26,37 @@ const authService = {
             ]
         });
         if(!user) {
-            throw new Error("Email or password is not correct");
+            return {
+                status: config.config.statuscode.UNAUTHORIZED,
+                success: false
+            }
         }
         // check password
         let isMatch = await bcrypt.compare(password, user.hashed_password);
         if(!isMatch) {
-            throw new Error("Email or password is not correct");
+            return {
+                status: config.config.statuscode.UNAUTHORIZED,
+                success: false
+            }
         }
         const accessToken  = sign(user.userid, user.Role.rolename); 
         const refreshToken = signRefreshToken(user.userid, user.Role.rolename);
         return {
-            user: {
-                userid: user.userid,
-                email: user.email,
-                username: user.username,
-                role: user.Role.rolename
-            },
-            accessToken: accessToken,
-            refreshToken: refreshToken
+            status: config.config.statuscode.OK,
+            success: true,
+            data: {
+                user: {
+                    userid: user.userid,
+                    email: user.email,
+                    username: user.username,
+                    role: user.Role.rolename,
+                },
+                token: {
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
+                }
+            }
         }
-        
     },
     async signup(userInfo) { // tested
         const {firstname, lastname, username, email, password, confirm_password} = userInfo;

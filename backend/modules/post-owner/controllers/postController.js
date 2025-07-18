@@ -66,6 +66,21 @@ const postsController = {
         } catch(error) {
             return responseUtils.error(res, error.message);
         }
-    }
+    },
+    getAllPosts: async (req, res) => {
+        // get userid from token
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            return responseUtils.unauthorized(res, "Authorization token is missing");
+        }
+        const decoded = jwt.verify(token, config.config.jwt.secret);
+        const userid = decoded.userId;
+        try {
+            const data = await postService.getAllPosts(userid);
+            return responseUtils.ok(res, data);
+        } catch (error) {
+            return responseUtils.error(res, error.message);
+        }
+    },
 };
 module.exports = postsController;

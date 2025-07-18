@@ -40,6 +40,7 @@ router.group("/post-owner", (router) => {
   router.post("/create-post", validate([postValidation.createPost]), postController.createPost);
   router.delete("/delete-post", validate([postValidation.deletePost]), postController.deletePost);
   router.put("/update-post", validate([postValidation.updatePost]), postController.updatePost);
+  router.get("/get-all-posts", postController.getAllPosts);
 });
 
 // ===== CATEGORY =====

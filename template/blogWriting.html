@@ -75,6 +75,31 @@
             <!-- Main Section -->
              <main class="col-12 d-flex justify-content-center">
                 <div class="editor-wrapper mt-5 px-3 w-100" style="max-width: 1300px;">
+                    <div id="choosenLanguage" class="dropdown d-flex justify-content-end">
+                        <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
+                            type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span style="font-size: 1.0em;">English</span> <!-- This text will be dynamically updated -->
+                            <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="langDropdown">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-languageid="1">
+                                    <span style="font-size:0.8em;">English</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-languageid="2">
+                                    <span style="font-size:0.8em;">Vietnamese</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-languageid="3">
+                                    <span style="font-size:0.8em;">French</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
                     <!-- Blog Title -->
                     <textarea id="blogTitle" class="form-control editor-title mb-4"
                         placeholder="Enter Title" rows="1"
@@ -113,6 +138,24 @@
                         </div>
                         <div id="quill-editor"></div>
                     </div>
+                    <!-- Scrollable Checkbox Button Dropdown -->
+                    <div class="dropdown mt-3" id="tagSelector">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Select Tags
+                        </button>
+                        <div class="dropdown-menu p-3 checkbox-dropdown" style="width: 250px;">
+                            <label class="checkbox-item"><input type="checkbox" value="Tech"> Tech</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Travel"> Travel</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Food"> Food</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Education"> Education</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Health"> Health</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Science"> Science</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Art"> Art</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Finance"> Finance</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Music"> Music</label>
+                            <label class="checkbox-item"><input type="checkbox" value="Games"> Games</label>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>
@@ -135,31 +178,52 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
     <script>
+        // Initialize Quill editor
         const quill = new Quill('#quill-editor', {
             theme: 'snow',
             placeholder: 'Tell your story...',
             modules: {
-            toolbar: {
-                container: '#quill-toolbar'
-            }
+                toolbar: {
+                    container: '#quill-toolbar'
+                }
             }
         });
-    </script>
-    <script>
-        document.querySelector('[type="submitBlog"]').addEventListener('click', async function() {
-                const title = document.querySelector('.editor-title').value.trim();
-                const content = quill.root.innerHTML.trim();
-                const accessToken = localStorage.getItem('accessToken');
-                const languageid = 1;
-                if (!title || !content) {
-                    alert('Please enter both title and content.');
-                    return;
+
+        let languageid = 1;
+
+        document.querySelectorAll('#choosenLanguage .dropdown-item').forEach(item => {
+            item.addEventListener('click', function (e) {
+                e.preventDefault();
+                languageid = parseInt(this.dataset.languageid);
+
+                // Update the dropdown button label to show selected language
+                const selectedLang = this.textContent.trim();
+                const spanElement = document.querySelector('#choosenLanguage button span');
+                if (spanElement) {
+                    spanElement.textContent = selectedLang;
                 }
-                if (!accessToken) {
-                    alert('You need to be logged in to submit a blog.');
-                    return;
-                }
+            });
+        });
+
+        // Submit blog post
+        document.querySelector('[type="submitBlog"]').addEventListener('click', async function () {
+            const title = document.querySelector('.editor-title').value.trim();
+            const content = quill.root.innerHTML.trim();
+            const accessToken = localStorage.getItem('accessToken');
+
+            if (!title || !content) {
+                alert('Please enter both title and content.');
+                return;
+            }
+
+            if (!accessToken) {
+                alert('You need to be logged in to submit a blog.');
+                return;
+            }
+
+            try {
                 const res = await fetch('http://localhost:3000/post-owner/create-post', {
                     method: 'POST',
                     headers: {
@@ -168,14 +232,21 @@
                     },
                     body: JSON.stringify({ title, content, languageid })
                 });
+
                 const data = await res.json();
+
                 if (res.ok) {
-                    alert('Your blog with title: ' + title +  ' and content: ' + content + ' will be processing. Redirecting...');
+                    alert('Your blog with title: ' + title + ' will be processed. Redirecting...');
                     window.location.href = 'home.html';
                 } else {
                     alert('Error: ' + data.message);
                 }
+            } catch (err) {
+                console.error(err);
+                alert('Something went wrong while submitting the blog.');
+            }
         });
     </script>
+
 </body>
 </html>

@@ -33,7 +33,6 @@
       </ul>
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
-
         <li class="nav-item">
           <a class="nav-link" data-widget="fullscreen" href="#" role="button">
             <i class="fas fa-expand-arrows-alt"></i>
@@ -113,26 +112,68 @@
       <!-- Main content -->
       <section class="content">
         <div class="container-fluid">
+
+          <div class="card card-default">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="fas fa-filter"></i>
+                Filters
+              </h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+              <form action="" method="GET">
+                <div class="row">
+                  <!-- Search by Keyword -->
+                  <div class="col-md-5">
+                    <div class="form-group">
+                      <label>Search by Title:</label>
+                      <input type="text" name="keyword" class="form-control" placeholder="Enter post title...">
+                    </div>
+                  </div>
+
+                  <!-- Filter by Category -->
+                  <div class="col-md-5">
+                    <div class="form-group">
+                      <label>Category:</label>
+                      <select name="category" class="form-control">
+                        <option value="">-- All Categories --</option>
+                        <!-- Ví dụ dữ liệu, bạn sẽ load từ DB vào đây -->
+                        <option value="1">Technology</option>
+                        <option value="2">Lifestyle</option>
+                        <option value="3">Backend</option>
+                        <option value="4">Frontend</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Submit Button -->
+                  <div class="col-md-2">
+                    <div class="form-group">
+                      <label> </label> <!-- Giữ khoảng trống để căn chỉnh -->
+                      <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-search"></i> Search
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <!-- /.card-body -->
+          </div>
+          <!-- /.card -->
+
           <div class="row">
             <div class="col-12">
-              <!-- Bảng quản lý Posts với các nút hành động -->
               <div class="card">
                 <div class="card-header">
                   <h3 class="card-title">Post List</h3>
-                  <!-- <div class="card-tools">
-                            <a href="#" class="btn btn-primary" data-toggle="modal"
-                                            data-target="#addUserModal">
-                                <i class="fas fa-plus-circle mr-1"></i>
-                                Add New Post
-                            </a>
-                        </div> -->
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body p-0">
                   <table class="table table-striped">
                     <thead>
                       <tr>
-
                         <th style="width: 60px;">#</th>
                         <th>Post</th>
                         <th>Author</th>
@@ -197,7 +238,7 @@
                         <td style="text-align: center;">
                           <a href="#" class="btn btn-sm btn-primary" data-toggle="tooltip" title="View"><i
                               class="fas fa-eye"></i></a>
-                          <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Reject">
+                          <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Unpublish">
                             <i class="fas fa-ban"></i>
                           </a>
                         </td>
@@ -210,12 +251,11 @@
                         <td style="text-align: center;">
                           <a href="#" class="btn btn-sm btn-primary" data-toggle="tooltip" title="View"><i
                               class="fas fa-eye"></i></a>
-                          <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Reject">
+                          <a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Unpublish">
                             <i class="fas fa-ban"></i>
                           </a>
                         </td>
                       </tr>
-
                     </tbody>
                   </table>
                 </div>
@@ -246,7 +286,6 @@
   </div>
 
 
-  <!-- REQUIRED SCRIPTS -->
   <!-- jQuery -->
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
   <!-- Bootstrap 4 -->
@@ -254,12 +293,6 @@
   <!-- AdminLTE App -->
   <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
-  <!-- Script để kích hoạt Tooltip của Bootstrap -->
-  <script>
-    $(function () {
-      $('[data-toggle="tooltip"]').tooltip()
-    })
-  </script>
 
 </body>
 

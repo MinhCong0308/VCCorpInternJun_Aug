@@ -4,12 +4,14 @@ const categoryService = require("modules/category/services/categoryService");
 const categoryController = {
     getAll: async (req, res) => {
         try {
-            const { limit = 1, page = 5 } = req.query;
+            const { limit = 5, page = 1, search='' } = req.query;
             // Assuming getAllCategories accepts limit and page parameters
-            const categories = await categoryService.getAllCategories(+limit, +page);
+            const categories = await categoryService.getAllCategories(+limit, +page, search);
             return responseUtils.ok(res, categories);
         } catch (error) {
-            return responseUtils.error(res, error.message);
+            console.error("Error fetching categories:", error);
+            const message =  "An error occurred while fetching categories";
+            return responseUtils.error(res, message);
             
         }
     },

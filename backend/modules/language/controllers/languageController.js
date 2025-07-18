@@ -4,11 +4,13 @@ const languageService = require("modules/language/services/languageService");
 const languageController = {
     getAll: async (req, res) => {
         try {
-            const { page = 1, limit = 5 } = req.query;
-            const language = await languageService.getAllLanguages(+limit, +page);
+            const { limit = 5, page = 1, search=''} = req.query;
+            const language = await languageService.getAllLanguages(+limit, +page, search);
             return responseUtils.ok(res, language);
         } catch (error) {
-            return responseUtils.error(res, error.message);
+            console.error("Error fetching languages:", error);
+            const message = "An error occurred while fetching languages";
+            return responseUtils.error(res, message);
         }
     },
     create: async (req, res) => {

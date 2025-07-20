@@ -67,8 +67,8 @@ router.group("/languages", (router) => {
 // ===== COMMENT =====
 router.group("/comments", (router) => {
   router.get("/", commentController.getAll);
-  router.post("/", validate(commentValidation.create), commentController.create);
-  router.put("/:commentId", validate(commentValidation.update), commentController.update);
+  router.post("/", validate([commentValidation.create]), commentController.create);
+  router.put("/:commentId", validate([commentValidation.update]), commentController.update);
 });
 
 module.exports = router;

@@ -8,6 +8,7 @@ const router = require("routes/api");
 const { swaggerUIServe,swaggerUISetup } = require("kernels/api-docs");
 const cors = require("cors");
 const app = express();
+const path = require('path')
 app.disable("x-powered-by");
 // app.use(cors({
 //   origin: "*", 
@@ -31,6 +32,8 @@ app.use(cors({
 
 
 app.options("*", cors());
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(bodyParser.json());
 app.use("/", router);

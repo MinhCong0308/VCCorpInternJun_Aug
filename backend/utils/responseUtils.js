@@ -38,5 +38,12 @@ module.exports = {
       status: 422,
       data: errors
     })
+  },
+  badRequest: (res, message) => {
+    return res.status(400).send({
+      success: false,
+      status: 400,
+      message: message || "Bad request",
+    });
   }
 };

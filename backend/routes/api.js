@@ -16,6 +16,7 @@ const languageValidation = require("modules/language/validations/languageValidat
 const commentController = require("modules/comment/controllers/commentController");
 const commentValidation = require("modules/comment/validations/commentValidation");
 const postAdminController = require("modules/post-admin/controllers/postAdminController");
+const postController = require("modules/post/controllers/postController");
 const router = express.Router({ mergeParams: true });
 const oauthController = require("modules/oauth/controllers/oauthController");
 const passport = require("modules/oauth/passport");
@@ -88,5 +89,10 @@ router.group("/post-admin", (router) => {
   router.put("/:postId/reject", postAdminController.rejectPost);
 });
 
+// ===== POST =====
+router.group("/posts", (router) => {
+  router.get("/", postController.getPublishedPosts);
+  router.get("/:postId", postController.getPublishedPostDetail);
+});
 
 module.exports = router;

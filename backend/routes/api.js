@@ -16,7 +16,7 @@ const languageValidation = require("modules/language/validations/languageValidat
 const commentController = require("modules/comment/controllers/commentController");
 const commentValidation = require("modules/comment/validations/commentValidation");
 const postAdminController = require("modules/post-admin/controllers/postAdminController");
-const postController = require("modules/post/controllers/postController");
+const postsController = require("modules/post/controllers/postsController");
 const router = express.Router({ mergeParams: true });
 const {uploads} = require("kernels/middlewares/multer")
 
@@ -85,8 +85,8 @@ router.group("/post-admin", (router) => {
 
 // ===== POST =====
 router.group("/posts", (router) => {
-  router.get("/", postController.getPublishedPosts);
-  router.get("/:postId", postController.getPublishedPostDetail);
+  router.get("/", postsController.getPublishedPosts);
+  router.get("/:postId", postsController.getPublishedPostDetail);
 });
 
 module.exports = router;

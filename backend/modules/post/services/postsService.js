@@ -1,8 +1,8 @@
 const db = require('models/index');
 const { Sequelize } = require('sequelize');
 
-const postService = {
-    getPublishedPosts: async (categoryId, languageId, limit = 10, page = 1, search = '') => {
+const postsService = {
+    getPublishedPosts: async (categoryId, userId, languageId, limit = 5, page = 1, search = '') => {
         const offset = (page - 1) * limit;
 
         const options = {
@@ -13,16 +13,16 @@ const postService = {
         };
 
         if (search && search.trim() !== '') {
-            options.where = {
-                ...options.where,
-                title: {
-                    [Sequelize.Op.like]: `%${search.trim()}%`
-                }
-            };
-        }
+            options.where = Sequelize.literal(
+                `MATCH(title) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`
+            );
+        };
+        if (userId) {
+            options.where = { ...options.where, userId };
+        };
         if (languageId) {
-            options.where.languageId = languageId;
-        }
+            options.where = { ...options.where, languageId };
+        };
         let categoryInclude = {
             model: db.Category,
             as: 'Categories',
@@ -33,15 +33,17 @@ const postService = {
             categoryInclude.where = { categoryid: categoryId };
             categoryInclude.required = true;
         }
+
         const { count, rows } = await db.Post.findAndCountAll({
-            options,
+            ...options,
             include: [
-                { model: db.User, attributes: ['firstname', 'lastname', 'avatar'] },
-                { model: db.Language, attributes: ['languagename'] },
+                {model: db.User, attributes: ['firstname', 'lastname', 'avatar']},
+                {model: db.Language, attributes: ['languagename']},
                 categoryInclude
             ],
             distinct: true
         });
+
         return {
             posts: rows,
             total: count,
@@ -50,8 +52,8 @@ const postService = {
         };
     },
     getPublishedPostDetail: async (postId) => {
-        const post = await db.Post.findOne({
-            where: { postid: postId, status: 2 },
+        const post = await db.Post.findByPk(postId, {
+            where: { status: 2 },
             include: [
                 { model: db.User, attributes: ['firstname', 'lastname', 'avatar'] },
                 { model: db.Language, attributes: ['languagename'] },
@@ -65,4 +67,4 @@ const postService = {
     }
 };
 
-module.exports = postService;
+module.exports = postsService;

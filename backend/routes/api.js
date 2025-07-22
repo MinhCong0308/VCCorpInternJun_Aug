@@ -15,6 +15,8 @@ const languageController = require("modules/language/controllers/languageControl
 const languageValidation = require("modules/language/validations/languageValidation");
 const commentController = require("modules/comment/controllers/commentController");
 const commentValidation = require("modules/comment/validations/commentValidation");
+const postAdminController = require("modules/post-admin/controllers/postAdminController");
+const postsController = require("modules/post/controllers/postsController");
 const router = express.Router({ mergeParams: true });
 const {uploads} = require("kernels/middlewares/multer")
 
@@ -70,6 +72,21 @@ router.group("/comments", (router) => {
   router.get("/", commentController.getAll);
   router.post("/", validate([commentValidation.create]), commentController.create);
   router.put("/:commentId", validate([commentValidation.update]), commentController.update);
+});
+
+// ===== POST ADMIN =====
+//middlewares([middlewares.authenticated, middlewares.role("admin")])
+router.group("/post-admin", (router) => {
+  router.get("/", postAdminController.getPostList);
+  router.get("/:postId", postAdminController.getPostDetail);
+  router.put("/:postId/approve", postAdminController.approvePost);
+  router.put("/:postId/reject", postAdminController.rejectPost);
+});
+
+// ===== POST =====
+router.group("/posts", (router) => {
+  router.get("/", postsController.getPublishedPosts);
+  router.get("/:postId", postsController.getPublishedPostDetail);
 });
 
 module.exports = router;

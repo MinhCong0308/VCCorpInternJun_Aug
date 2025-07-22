@@ -1,0 +1,85 @@
+const db = require('models/index');
+const config = require('configs/index');
+const { Sequelize } = require('sequelize');
+
+const postAdminService = {
+    getPostList: async (categoryId, userId, languageId, limit = 5, page = 1, search = '') => {
+        const offset = (page - 1) * limit;
+
+        const options = {
+            limit,
+            offset,
+            order: [['createdAt', 'DESC']]
+        };
+
+        if (search && search.trim() !== '') {
+            options.where = Sequelize.literal(
+                `MATCH(title) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`
+            );
+        };
+        if (userId) {
+            options.where = { ...options.where, userId };
+        };
+        if (languageId) {
+            options.where = { ...options.where, languageId };
+        };
+        let categoryInclude = {
+            model: db.Category,
+            as: 'Categories',
+            attributes: ['categoryid', 'categoryname'],
+            through: { attributes: [] }
+        };
+        if (categoryId) {
+            categoryInclude.where = { categoryid: categoryId };
+            categoryInclude.required = true;
+        }
+
+        const { count, rows } = await db.Post.findAndCountAll({
+            ...options,
+            include: [
+                {model: db.User, attributes: ['firstname', 'lastname']},
+                {model: db.Language, attributes: ['languagename']},
+                categoryInclude
+            ],
+            distinct: true
+        });
+
+        return {
+            posts: rows,
+            total: count,
+            page,
+            totalPages: Math.ceil(count / limit)
+        };
+    },
+    getPostDetail: async (postId) => {
+        const post = await db.Post.findByPk(postId, {
+            include: [
+                { model: db.User, attributes: ['firstname', 'lastname', 'avatar'] },
+                { model: db.Language, attributes: ['languagename'] },
+                { model: db.Category, as: 'Categories', attributes: ['categoryid', 'categoryname'], through: { attributes: [] } }
+            ]
+        });
+        if (!post) {
+            throw new Error("Post not found");
+        }
+        return post;
+    },
+    approvePost: async (postId) => {
+        const post = await db.Post.findByPk(postId);
+        if (!post) {
+            throw new Error("Post not found");
+        }
+        post.status = config.config.statuspostenum.APPROVED;
+        return await post.save();
+    },
+    rejectPost: async (postId) => {
+        const post = await db.Post.findByPk(postId);
+        if (!post) {
+            throw new Error("Post not found");
+        }
+        post.status = config.config.statuspostenum.REJECTED;
+        return await post.save();
+    }
+}
+
+module.exports = postAdminService;

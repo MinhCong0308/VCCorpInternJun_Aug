@@ -1,11 +1,11 @@
 const responseUtils = require("utils/responseUtils");
-const postService = require("modules/post/services/postService");
+const postsService = require("modules/post/services/postsService");
 
-const postController = {
+const postsController = {
     getPublishedPosts: async (req, res) => {
         try {
             const { categoryId, userId, languageId, limit = 5, page = 1, search = '' } = req.query;
-            const posts = await postService.getPostList(categoryId, userId, languageId, +limit, +page, search);
+            const posts = await postsService.getPublishedPosts(categoryId, userId, languageId, +limit, +page, search);
             return responseUtils.ok(res, posts);
         } catch (error) {
             console.error("Error fetching posts:", error);
@@ -16,7 +16,7 @@ const postController = {
     getPublishedPostDetail: async (req, res) => {
         try {
             const { postId } = req.params;
-            const post = await postService.getPublishedPostDetail(postId);
+            const post = await postsService.getPublishedPostDetail(postId);
             return responseUtils.ok(res, post);
         } catch (error) {
             console.error("Error fetching post detail:", error);
@@ -25,4 +25,4 @@ const postController = {
     }
 }
 
-module.exports = postController;
+module.exports = postsController;

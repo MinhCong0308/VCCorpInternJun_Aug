@@ -16,13 +16,13 @@ const postAdminService = {
             options.where = Sequelize.literal(
                 `MATCH(title) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`
             );
-        }
+        };
         if (userId) {
             options.where = { ...options.where, userId };
-        }
+        };
         if (languageId) {
             options.where = { ...options.where, languageId };
-        }
+        };
         let categoryInclude = {
             model: db.Category,
             as: 'Categories',
@@ -35,7 +35,7 @@ const postAdminService = {
         }
 
         const { count, rows } = await db.Post.findAndCountAll({
-            options,
+            ...options,
             include: [
                 {model: db.User, attributes: ['firstname', 'lastname']},
                 {model: db.Language, attributes: ['languagename']},

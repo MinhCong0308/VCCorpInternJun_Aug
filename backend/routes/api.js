@@ -15,6 +15,7 @@ const languageController = require("modules/language/controllers/languageControl
 const languageValidation = require("modules/language/validations/languageValidation");
 const commentController = require("modules/comment/controllers/commentController");
 const commentValidation = require("modules/comment/validations/commentValidation");
+const postAdminController = require("modules/post-admin/controllers/postAdminController");
 const router = express.Router({ mergeParams: true });
 const oauthController = require("modules/oauth/controllers/oauthController");
 const passport = require("modules/oauth/passport");
@@ -77,5 +78,15 @@ router.group("/comments", (router) => {
   router.post("/", validate([commentValidation.create]), commentController.create);
   router.put("/:commentId", validate([commentValidation.update]), commentController.update);
 });
+
+// ===== POST ADMIN =====
+//middlewares([middlewares.authenticated, middlewares.role("admin")])
+router.group("/post-admin", (router) => {
+  router.get("/", postAdminController.getPostList);
+  router.get("/:postId", postAdminController.getPostDetail);
+  router.put("/:postId/approve", postAdminController.approvePost);
+  router.put("/:postId/reject", postAdminController.rejectPost);
+});
+
 
 module.exports = router;

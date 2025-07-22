@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Category.belongsToMany(models.Post, {through: 'category_post'});
+      Category.belongsToMany(models.Post, {through: 'category_post', foreignKey: 'categoryid', otherKey: 'postid', as: 'Posts'});
     }
   }
   Category.init({

@@ -9,7 +9,7 @@ const accountService = {
                 {userid: userid}, {status: config.config.statusenum.AUTHENTICATED}
             ]},
         });
-        console.log("user: ", user);
+        // console.log("user: ", user);
         if (!user) throw new Error("User not found"); // ← maybe add this
         const userWithUsername = await db.User.findOne({
             where: { username: username }
@@ -54,6 +54,17 @@ const accountService = {
         user.status = config.config.statusenum.NON_AUTHENTICATED;
         await user.save();
         return {message: "Deactivate successfully"};
+    },
+    async updateAvatar(avatarUrl, userid) {
+        const user = await db.User.findOne({
+            where: {[Op.and]: [
+                {userid: userid}, {status: config.config.statusenum.AUTHENTICATED}
+            ]},
+        });
+        if (!user) throw new Error("User not found");
+        user.avatar = avatarUrl;
+        await user.save();
+        return {message: "Update avatar successfully", avatarUrl: user.avatar};
     }
 };
 module.exports = accountService;

@@ -7,7 +7,7 @@ const storage = multer.diskStorage({
 
     if (req.originalUrl.includes("/languages")) {
       destPath = path.join(__dirname, "../../uploads/flags");
-    } else if (req.originalUrl.includes("/users")) {
+    } else if (req.originalUrl.includes("/users") || req.originalUrl.includes("/update-avatar")) {
       destPath = path.join(__dirname, "../../uploads/avatars");
     } else {
       destPath = path.join(__dirname, "../../uploads/others");

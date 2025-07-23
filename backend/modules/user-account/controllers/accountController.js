@@ -2,6 +2,7 @@ const responseUtils = require("utils/responseUtils");
 const accountService = require("modules/user-account/services/accountService");
 const jwt = require("jsonwebtoken");
 const config = require("configs/index");
+const { update } = require("modules/category/validations/categoryValidation");
 
 const accountController = {
     updateUsername: async(req, res) => {
@@ -31,6 +32,23 @@ const accountController = {
         try {
             const userid = jwt.verify(req.headers.authorization.split(" ")[1], config.config.jwt.secret).userId;
             const data = await accountService.deactivateAccount(userid);
+            return responseUtils.ok(res, data);
+        } catch(error) {
+            return responseUtils.unauthorized(res, error.message);
+        }
+    },
+    updateAvatar: async(req, res) => {
+        try {
+            if(!req.file) {
+                return responseUtils.error(res, "No file uploaded");
+            }
+            const avatarUrl = `${req.protocol}://${req.get("host")}/uploads/avatars/${req.file.filename}`;
+            console.log("Avatar URL: ", avatarUrl);
+            if (!avatarUrl) {
+                return responseUtils.error(res, "Avatar URL is required");
+            }
+            const userid = jwt.verify(req.headers.authorization.split(" ")[1], config.config.jwt.secret).userId;
+            const data = await accountService.updateAvatar(avatarUrl, userid);
             return responseUtils.ok(res, data);
         } catch(error) {
             return responseUtils.unauthorized(res, error.message);

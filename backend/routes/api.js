@@ -18,6 +18,7 @@ const commentValidation = require("modules/comment/validations/commentValidation
 const router = express.Router({ mergeParams: true });
 const oauthController = require("modules/oauth/controllers/oauthController");
 const passport = require("modules/oauth/passport");
+const {uploads} = require("kernels/middlewares/multer")
 
 // ===== EXAMPLE Request, make this commented =====
 // router.group("/posts",middlewares([authenticated, role("owner")]),(router) => {
@@ -65,8 +66,8 @@ router.group("/categories", (router) => {
 //middlewares([middlewares.authenticated, middlewares.role("admin")])
 router.group("/languages", (router) => {
   router.get("/", languageController.getAll);
-  router.post("/", validate([languageValidation.create]), languageController.create);
-  router.put("/:languageId", validate([languageValidation.update]), languageController.update);
+  router.post("/",uploads.single('flag_image'), validate([languageValidation.create]), languageController.create);
+  router.put("/:languageId",uploads.single('flag_image'), validate([languageValidation.update]), languageController.update);
   router.delete("/:languageId", languageController.delete);
 });
 

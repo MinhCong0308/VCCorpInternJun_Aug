@@ -1,3 +1,4 @@
+const e = require('express');
 const db = require('models/index');
 const { Sequelize } = require('sequelize');
 
@@ -10,11 +11,11 @@ const languageService = {
             offset,
             order: [['createdAt', 'DESC']]
         };
-        
+
         if (search && search.trim() !== '') {
-                options.where = Sequelize.literal(
-                    `MATCH(languagename) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`
-                );
+            options.where = Sequelize.literal(
+                `MATCH(languagename) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`
+            );
         }
 
         const { count, rows } = await db.Language.findAndCountAll(options);
@@ -26,15 +27,12 @@ const languageService = {
             totalPages: Math.ceil(count / limit)
         };
     },
-    
+
     createLanguage: async (languageData) => {
         return await db.Language.create(languageData);
     },
     updateLanguage: async (languageId, languageData) => {
         const language = await db.Language.findByPk(languageId);
-        if (!language) {
-            throw new Error("Language not found");
-        }
         return await language.update(languageData);
     },
     deleteLanguage: async (languageId) => {

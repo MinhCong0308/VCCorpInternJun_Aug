@@ -149,17 +149,22 @@
                   <tr>
                     <th style="width: 60px;">#</th>
                     <th>Name</th>
-                    <th>Locale Code</th>
-                    <th style="width: 120px; text-align: center;">Status</th>
+                    <th style="width: 80;">Locale Code</th>
+                    <th style="width: 150px; text-align: center;">Flag</th>
+                    <th style="width: 150px; text-align: center;">Status</th>
                     <th style="width: 120px; text-align: center;">Default</th>
                     <th style="width: 150px; text-align: center;">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr data-active="true" data-default="true">
+                  <tr data-active="true" data-default="true" data-flag="../uploads/flags/en.png">
                     <td>1.</td>
                     <td>English</td>
                     <td>en</td>
+                    <td style="text-align: center;">
+                      <img src="http://localhost:3000/uploads/flags/en.png" alt="English Flag"
+                        style="width: 40px; height: auto;">
+                    </td>
                     <td style="text-align: center;" class="lang-status"><span class="badge badge-success">Active</span>
                     </td>
                     <td style="text-align: center;">
@@ -175,10 +180,14 @@
                       </a>
                     </td>
                   </tr>
-                  <tr data-active="true" data-default="false">
+                  <tr data-active="true" data-default="false" data-flag="../uploads/flags/vi.png">
                     <td>2.</td>
                     <td>Vietnamese</td>
                     <td>vi</td>
+                    <td style="text-align: center;">
+                      <img src="http://localhost:3000/uploads/flags/vi.png" alt="Vietnamese Flag"
+                        style="width: 40px; height: auto;">
+                    </td>
                     <td style="text-align: center;" class="lang-status"><span class="badge badge-success">Active</span>
                     </td>
                     <td style="text-align: center;"></td>
@@ -192,10 +201,14 @@
                       </a>
                     </td>
                   </tr>
-                  <tr data-active="false" data-default="false">
+                  <tr data-active="false" data-default="false" data-flag="../uploads/flags/fr.png">
                     <td>3.</td>
                     <td>French</td>
                     <td>fr</td>
+                    <td style="text-align: center;">
+                      <img src="http://localhost:3000/uploads/flags/fr.png" alt="French Flag"
+                        style="width: 40px; height: auto;">
+                    </td>
                     <td style="text-align: center;" class="lang-status"><span
                         class="badge badge-secondary">Inactive</span></td>
                     <td style="text-align: center;"></td>
@@ -259,25 +272,22 @@
         </div>
         <div class="modal-body">
           <form id="formAddNewLanguage">
-              <div class="form-group">
-                <label for="languageName">Language Name</label>
-                <input type="text" class="form-control" id="languageName" placeholder="e.g. English, Vietnamese"
-                  required>
-              </div>
-              <div class="form-group">
-                <label for="languageName">URL Flag Image</label>
-                <input type="text" class="form-control" id="languageFlag" placeholder="Enter URL of flag image"
-                  required>
-              </div>
-              <div class="form-group">
-                <label for="languageLocaleCode">Locale Code</label>
-                <input type="text" class="form-control" id="languageLocaleCode" placeholder="e.g. en, vi"
-                  required>
-              </div>
-              <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="languageStatus" checked>
-                <label class="form-check-label" for="languageStatus">Active</label>
-              </div>
+            <div class="form-group">
+              <label for="languageName">Language Name</label>
+              <input type="text" class="form-control" id="languageName" placeholder="e.g. English, Vietnamese" required>
+            </div>
+            <div class="form-group">
+              <label for="languageFlag">Flag Image</label>
+              <input type="file" class="form-control-file" id="languageFlag" accept="image/*" required>
+            </div>
+            <div class="form-group">
+              <label for="languageLocaleCode">Locale Code</label>
+              <input type="text" class="form-control" id="languageLocaleCode" placeholder="e.g. en, vi" required>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="languageStatus" checked>
+              <label class="form-check-label" for="languageStatus">Active</label>
+            </div>
           </form>
         </div>
         <div class="modal-footer justify-content-between">
@@ -307,6 +317,11 @@
                 required>
             </div>
             <div class="form-group">
+              <label for="editLanguageFlag">New Flag Image (optional)</label>
+              <input type="file" class="form-control-file" id="editLanguageFlag" accept="image/*">
+              <small class="form-text text-muted">Leave blank to keep the current flag.</small>
+            </div>
+            <div class="form-group">
               <label for="editLanguageLocaleCode">Locale Code</label>
               <input type="text" class="form-control" id="editLanguageLocaleCode" placeholder="e.g. en, vi" required>
             </div>
@@ -332,47 +347,43 @@
     //Thêm language
     document.getElementById('saveLanguageBtn').addEventListener('click', function () {
       const languagename = document.getElementById('languageName').value.trim();
-      const flag_image = document.getElementById('languageFlag').value.trim();
       const locale_code = document.getElementById('languageLocaleCode').value.trim();
       const status = document.getElementById('languageStatus').checked ? "1" : "0";
-      const is_default = "0"; // Mặc định là không phải ngôn ngữ mặc định
+
+      // Lấy file từ input
+      const flagInput = document.getElementById('languageFlag');
+      const flag_image_file = flagInput.files[0]; // Lấy file đầu tiên người dùng chọn
 
       // Kiểm tra input bắt buộc
-      if (!languagename || !flag_image || !locale_code) {
-        alert('Please fill in all required fields.');
+      if (!languagename || !locale_code || !flag_image_file) {
+        alert('Please fill in all required fields and select a flag image.');
         return;
       }
 
+      // Tạo đối tượng FormData
+      const formData = new FormData();
+      formData.append('languagename', languagename);
+      formData.append('locale_code', locale_code);
+      formData.append('status', status);
+      formData.append('is_default', "0");
+      formData.append('flag_image', flag_image_file); // Gắn file vào formData
+
+      // Gửi request với FormData
       fetch('http://localhost:3000/languages', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          languagename,
-          flag_image,
-          locale_code,
-          is_default,
-          status
-        })
+        // KHÔNG CẦN 'Content-Type', trình duyệt sẽ tự động đặt đúng
+        body: formData
       })
         .then(async response => {
           const data = await response.json();
-
           if (!response.ok) {
-            if (response.status === 422 && data?.data?.errors?.length) {
-              alert(`Error: ${data.data.errors[0].message}`);
-              return;
-            } else {
-              alert('There was an error creating the language.');
-              return;
-            }
+            // ... xử lý lỗi như cũ ...
+            alert('Error creating language.');
+            return;
           }
-          // Thành công
           alert(`Language has been added successfully!`);
           $('#addLanguageModal').modal('hide');
           document.getElementById('formAddNewLanguage').reset();
-          // loadLanguages(); // gọi lại danh sách nếu có
         })
         .catch(error => {
           console.error('Error:', error);
@@ -381,4 +392,5 @@
     });
   </script>
 </body>
+
 </html>

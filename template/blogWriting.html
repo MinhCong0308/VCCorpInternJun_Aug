@@ -75,10 +75,10 @@
             <!-- Main Section -->
              <main class="col-12 d-flex justify-content-center">
                 <div class="editor-wrapper mt-5 px-3 w-100" style="max-width: 1300px;">
-                    <div id="choosenLanguage" class="dropdown d-flex justify-content-end">
+                    <div id="choosenLanguage" class="dropdown d-flex justify-content-end mb-3">
                         <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
                             type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span style="font-size: 1.0em;">English</span> <!-- This text will be dynamically updated -->
+                            <span style="font-size: 0.8em;">English</span> <!-- This text will be dynamically updated -->
                             <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="langDropdown">
@@ -104,6 +104,68 @@
                     <textarea id="blogTitle" class="form-control editor-title mb-4"
                         placeholder="Enter Title" rows="1"
                         style="font-size: 2.8rem; font-weight: lighter; border: none; outline: none; resize: none; font-family: 'Playfair Display', serif;"></textarea>
+                    
+                    <!-- Tag Selection Section -->
+                    <div class="tag-selection-wrapper mb-4">
+                        <div class="d-flex align-items-start gap-3">
+                            <!-- Tag Dropdown -->
+                            <div class="dropdown" id="tagSelector">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="tagDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Select Tags
+                                </button>
+                                <div class="dropdown-menu p-3 checkbox-dropdown" style="width: 250px; max-height: 300px; overflow-y: auto;">
+                                    <label class="checkbox-item d-block mb-2">
+                                        <input type="checkbox" value="Tech" class="me-2"> 
+                                        <span>Tech</span>
+                                    </label>
+                                    <label class="checkbox-item d-block mb-2">
+                                        <input type="checkbox" value="Travel" class="me-2"> 
+                                        <span>Travel</span>
+                                    </label>
+                                    <label class="checkbox-item d-block mb-2">
+                                        <input type="checkbox" value="Food" class="me-2"> 
+                                        <span>Food</span>
+                                    </label>
+                                    <label class="checkbox-item d-block mb-2">
+                                        <input type="checkbox" value="Education" class="me-2"> 
+                                        <span>Education</span>
+                                    </label>
+                                    <label class="checkbox-item d-block mb-2">
+                                        <input type="checkbox" value="Health" class="me-2"> 
+                                        <span>Health</span>
+                                    </label>
+                                    <label class="checkbox-item d-block mb-2">
+                                        <input type="checkbox" value="Science" class="me-2"> 
+                                        <span>Science</span>
+                                    </label>
+                                    <label class="checkbox-item d-block mb-2">
+                                        <input type="checkbox" value="Art" class="me-2"> 
+                                        <span>Art</span>
+                                    </label>
+                                    <label class="checkbox-item d-block mb-2">
+                                        <input type="checkbox" value="Finance" class="me-2"> 
+                                        <span>Finance</span>
+                                    </label>
+                                    <label class="checkbox-item d-block mb-2">
+                                        <input type="checkbox" value="Music" class="me-2"> 
+                                        <span>Music</span>
+                                    </label>
+                                    <label class="checkbox-item d-block mb-2">
+                                        <input type="checkbox" value="Games" class="me-2"> 
+                                        <span>Games</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Selected Tags Display -->
+                            <div class="selected-tags-container flex-grow-1">
+                                <div id="selectedTags" class="d-flex flex-wrap gap-2">
+                                    <!-- Selected tags will be dynamically added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Quill Editor -->
                     <div class="editor-container">
                         <div id="quill-toolbar">
                             <span class="ql-formats">
@@ -137,24 +199,6 @@
                             </span>
                         </div>
                         <div id="quill-editor"></div>
-                    </div>
-                    <!-- Scrollable Checkbox Button Dropdown -->
-                    <div class="dropdown mt-3" id="tagSelector">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Select Tags
-                        </button>
-                        <div class="dropdown-menu p-3 checkbox-dropdown" style="width: 250px;">
-                            <label class="checkbox-item"><input type="checkbox" value="Tech"> Tech</label>
-                            <label class="checkbox-item"><input type="checkbox" value="Travel"> Travel</label>
-                            <label class="checkbox-item"><input type="checkbox" value="Food"> Food</label>
-                            <label class="checkbox-item"><input type="checkbox" value="Education"> Education</label>
-                            <label class="checkbox-item"><input type="checkbox" value="Health"> Health</label>
-                            <label class="checkbox-item"><input type="checkbox" value="Science"> Science</label>
-                            <label class="checkbox-item"><input type="checkbox" value="Art"> Art</label>
-                            <label class="checkbox-item"><input type="checkbox" value="Finance"> Finance</label>
-                            <label class="checkbox-item"><input type="checkbox" value="Music"> Music</label>
-                            <label class="checkbox-item"><input type="checkbox" value="Games"> Games</label>
-                        </div>
                     </div>
                 </div>
             </main>
@@ -192,7 +236,9 @@
         });
 
         let languageid = 1;
+        let selectedTags = new Set();
 
+        // Language dropdown functionality
         document.querySelectorAll('#choosenLanguage .dropdown-item').forEach(item => {
             item.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -207,11 +253,80 @@
             });
         });
 
+        // Tag selection functionality - Make entire label clickable
+        document.querySelectorAll('.checkbox-item').forEach(label => {
+            const checkbox = label.querySelector('input[type="checkbox"]');
+            
+            label.addEventListener('click', function(e) {
+                // If the click is directly on the checkbox, let it handle naturally
+                if (e.target === checkbox) return;
+                
+                // Otherwise, toggle the checkbox
+                e.preventDefault();
+                checkbox.checked = !checkbox.checked;
+                
+                // Trigger the change event
+                const event = new Event('change', { bubbles: true });
+                checkbox.dispatchEvent(event);
+            });
+
+            checkbox.addEventListener('change', function() {
+                const tagValue = this.value;
+                const selectedTagsContainer = document.getElementById('selectedTags');
+                
+                if (this.checked) {
+                    // Add tag
+                    selectedTags.add(tagValue);
+                    
+                    // Create tag chip
+                    const tagChip = document.createElement('div');
+                    tagChip.className = 'tag-chip';
+                    tagChip.setAttribute('data-tag', tagValue);
+                    tagChip.innerHTML = `
+                        <span>${tagValue}</span>
+                        <button type="button" class="remove-tag" onclick="removeTag('${tagValue}')">&times;</button>
+                    `;
+                    
+                    selectedTagsContainer.appendChild(tagChip);
+                } else {
+                    // Remove tag
+                    selectedTags.delete(tagValue);
+                    const tagChip = selectedTagsContainer.querySelector(`[data-tag="${tagValue}"]`);
+                    if (tagChip) {
+                        tagChip.remove();
+                    }
+                }
+            });
+        });
+
+        // Function to remove tag
+        function removeTag(tagValue) {
+            selectedTags.delete(tagValue);
+            
+            // Remove from display
+            const tagChip = document.querySelector(`[data-tag="${tagValue}"]`);
+            if (tagChip) {
+                tagChip.remove();
+            }
+            
+            // Uncheck the checkbox
+            const checkbox = document.querySelector(`input[value="${tagValue}"]`);
+            if (checkbox) {
+                checkbox.checked = false;
+            }
+        }
+
+        // Prevent dropdown from closing when clicking inside
+        document.querySelector('.checkbox-dropdown').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
         // Submit blog post
         document.querySelector('[type="submitBlog"]').addEventListener('click', async function () {
             const title = document.querySelector('.editor-title').value.trim();
             const content = quill.root.innerHTML.trim();
             const accessToken = localStorage.getItem('accessToken');
+            const tags = Array.from(selectedTags);
 
             if (!title || !content) {
                 alert('Please enter both title and content.');
@@ -230,7 +345,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + accessToken
                     },
-                    body: JSON.stringify({ title, content, languageid })
+                    body: JSON.stringify({ title, content, languageid, tags })
                 });
 
                 const data = await res.json();

@@ -1,6 +1,6 @@
 const db = require('models/index');
 const config = require('configs/index');
-const { Sequelize } = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 
 const postAdminService = {
     getPostList: async (categoryId, status, userId, languageId, limit = 5, page = 1, search = '') => {
@@ -13,12 +13,16 @@ const postAdminService = {
         };
 
         if (search && search.trim() !== '') {
-            options.where = Sequelize.literal(
-                `MATCH(title, content) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`
-            );
+            options.where = {
+                [Sequelize.Op.and]: [
+                    Sequelize.literal(`MATCH(title, content) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`)
+                ]
+            };
         };
         if (status) {
-            options.where = { ...options.where, status };
+            options.where = options.where ? 
+                { ...options.where, status } : 
+                { status };
         };
         if (userId) {
             options.where = { ...options.where, userId };

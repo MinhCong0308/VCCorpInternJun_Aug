@@ -1,6 +1,7 @@
 require("express-router-group");
 const express = require("express");
 const middlewares = require("kernels/middlewares");
+const { authenticated, checkRole } = require("kernels/middlewares/authMiddleware");
 const { validate } = require("kernels/validations");
 const exampleController = require("modules/examples/controllers/exampleController");
 const authController = require("modules/auth/controllers/authController");
@@ -42,12 +43,12 @@ router.group("/auth", (router) => {
     router.get("/google/callback", passport.authenticate("google", {failureRedirect: "auth/login", session: false}), oauthController.googleCallback);
   });
 });
-router.group("/account", (router) => {
+router.group("/account", middlewares([authenticated]), (router) => {
   router.post("/update-username", validate([accountValidation.updateUsername]), accountController.updateUsername);
   router.post("/update-fullname", validate([accountValidation.updateFullname]), accountController.updateFullname);
   router.post("/deactivate-account", accountController.deactivateAccount);
 });
-router.group("/post-owner", (router) => {
+router.group("/post-owner", middlewares([authenticated, checkRole(["user"])]), (router) => {
   router.post("/create-post", validate([postValidation.createPost]), postController.createPost);
   router.delete("/delete-post", validate([postValidation.deletePost]), postController.deletePost);
   router.put("/update-post", validate([postValidation.updatePost]), postController.updatePost);
@@ -55,8 +56,7 @@ router.group("/post-owner", (router) => {
 });
 
 // ===== CATEGORY =====
-//middlewares([middlewares.authenticated, middlewares.role("admin")])
-router.group("/categories", (router) => {
+router.group("/categories", middlewares([authenticated, checkRole(["admin"])]), (router) => {
   router.get("/", categoryController.getAll);
   router.get("/list-all", categoryController.getAllNoPaging);
   router.post("/", validate([categoryValidation.create]), categoryController.create);
@@ -65,8 +65,7 @@ router.group("/categories", (router) => {
 });
 
 // ===== LANGUAGE =====
-//middlewares([middlewares.authenticated, middlewares.role("admin")])
-router.group("/languages", (router) => {
+router.group("/languages", middlewares([authenticated, checkRole(["admin"])]), (router) => {
   router.get("/", languageController.getAll);
   router.post("/",uploads.single('flag_image'), validate([languageValidation.create]), languageController.create);
   router.put("/:languageId",uploads.single('flag_image'), validate([languageValidation.update]), languageController.update);
@@ -81,8 +80,7 @@ router.group("/comments", (router) => {
 });
 
 // ===== POST ADMIN =====
-//middlewares([middlewares.authenticated, middlewares.role("admin")])
-router.group("/post-admin", (router) => {
+router.group("/post-admin", middlewares([authenticated, checkRole(["admin"])]), (router) => {
   router.get("/", postAdminController.getPostList);
   router.get("/:postId", postAdminController.getPostDetail);
   router.put("/:postId/approve", postAdminController.approvePost);

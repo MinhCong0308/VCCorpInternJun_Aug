@@ -22,6 +22,8 @@ const router = express.Router({ mergeParams: true });
 const oauthController = require("modules/oauth/controllers/oauthController");
 const passport = require("modules/oauth/passport");
 const {uploads} = require("kernels/middlewares/multer")
+const oauthController = require("modules/oauth/controllers/oauthController");
+const passport = require("modules/oauth/passport");
 
 // ===== EXAMPLE Request, make this commented =====
 // router.group("/posts",middlewares([authenticated, role("owner")]),(router) => {

@@ -4,14 +4,6 @@ const { Op } = require('sequelize');
 
 const postService = {
     createPost: async (title, content, userid, languageid, tags) => {
-        const user = await db.User.findOne({
-            where: {[Op.and]: [
-                {userid: userid}, {status: config.config.statusenum.AUTHENTICATED}
-            ]},
-        });
-        if (!user) {
-            throw new Error("User not found or not authorized");
-        }
         try {
             const post = await db.Post.create({
                 userid,
@@ -32,15 +24,6 @@ const postService = {
         }
     },
     deletePost: async (postid, userid) => {
-        // check for valid user
-        const user = await db.User.findOne({
-            where: {[Op.and]: [
-                {userid: userid}, {status: config.config.statusenum.AUTHENTICATED}
-            ]},
-        });
-        if (!user) {
-            throw new Error("User not found or not authorized");
-        }
         const post = await db.Post.findByPk(postid);
         if (!post) {
             throw new Error("Post not found");
@@ -52,7 +35,7 @@ const postService = {
         return { message: "Post deleted successfully" };
     },
     updatePost: async (postid, newTitle, newContent) => {
-        const post = db.Post.findByPk(postid);
+        const post = await db.Post.findByPk(postid);
         post.title = newTitle;
         post.content = newContent;
         // post.status = config.config.statuspostenum.PENDING; 
@@ -60,14 +43,6 @@ const postService = {
         return {message: "Update post successfully"};
     },
     getAllPosts: async (userid) => {
-        const user = await db.User.findOne({
-            where: {[Op.and]: [
-                {userid: userid}, {status: config.config.statusenum.AUTHENTICATED}
-            ]},
-        });
-        if (!user) {
-            throw new Error("User not found or not authorized");
-        }
         try {
             const posts = await db.Post.findAll({
                 where: { userid: userid }

@@ -9,10 +9,7 @@ const authController = {
             return responseUtils.ok(res, data);
         } catch(error) {
             console.error("Login error: ", error);
-            if (error.message === "Email or password is not correct") {
-                return responseUtils.unauthorized(res, error.message);
-            }
-            return responseUtils.error(res, error.message);
+            return responseUtils.unauthorized(res, error.message);
         }
     },
     signUp: async (req, res) => {
@@ -26,10 +23,7 @@ const authController = {
                 message: "User created. OTP sent for verification."
             });
         } catch (error) {
-            if (error.message === "Email or username is already registered.") {
-                return responseUtils.error(res, error.message);
-            }
-            return responseUtils.error(res, error.message);
+            return responseUtils.unauthorized(res, error.message);
         }
     },
     verifyOTP: async (req, res) => {

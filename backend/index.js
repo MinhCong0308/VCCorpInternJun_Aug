@@ -5,6 +5,7 @@ require("rootpath")();
 const express = require("express");
 const bodyParser = require("body-parser");
 const router = require("routes/api");
+const passport = require("modules/oauth/passport");
 const { swaggerUIServe,swaggerUISetup } = require("kernels/api-docs");
 const cors = require("cors");
 const app = express();
@@ -37,6 +38,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(bodyParser.json());
 app.use("/", router);
+app.use(passport.initialize());
 app.use(express.json());
 
 app.use("/api-docs", swaggerUIServe, swaggerUISetup);

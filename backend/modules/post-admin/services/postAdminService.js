@@ -3,7 +3,7 @@ const config = require('configs/index');
 const { Sequelize } = require('sequelize');
 
 const postAdminService = {
-    getPostList: async (categoryId, userId, languageId, limit = 5, page = 1, search = '') => {
+    getPostList: async (categoryId, status, userId, languageId, limit = 5, page = 1, search = '') => {
         const offset = (page - 1) * limit;
 
         const options = {
@@ -14,8 +14,11 @@ const postAdminService = {
 
         if (search && search.trim() !== '') {
             options.where = Sequelize.literal(
-                `MATCH(title) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`
+                `MATCH(title, content) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`
             );
+        };
+        if (status) {
+            options.where = { ...options.where, status };
         };
         if (userId) {
             options.where = { ...options.where, userId };

@@ -1,5 +1,6 @@
 const db = require('models/index');
-const { Sequelize } = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
+
 
 const postsService = {
     getPublishedPosts: async (categoryId, userId, languageId, limit = 5, page = 1, search = '') => {
@@ -13,9 +14,12 @@ const postsService = {
         };
 
         if (search && search.trim() !== '') {
-            options.where = Sequelize.literal(
-                `MATCH(title) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`
-            );
+            options.where = {
+                [Sequelize.Op.and]: [
+                    { status: 2 },
+                    Sequelize.literal(`MATCH(title, content) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`)
+                ]
+            };
         };
         if (userId) {
             options.where = { ...options.where, userId };
@@ -52,8 +56,11 @@ const postsService = {
         };
     },
     getPublishedPostDetail: async (postId) => {
-        const post = await db.Post.findByPk(postId, {
-            where: { status: 2 },
+        const post = await db.Post.findOne({
+            where: { 
+                postid: postId,
+                status: 2 
+            },
             include: [
                 { model: db.User, attributes: ['firstname', 'lastname', 'avatar'] },
                 { model: db.Language, attributes: ['languagename'] },

@@ -4,8 +4,8 @@ const postAdminService = require("modules/post-admin/services/postAdminService")
 const postAdminController = {
     getPostList: async (req, res) => {
         try {
-            const { categoryId, userId, languageId, limit = 5, page = 1, search = '' } = req.query;
-            const posts = await postAdminService.getPostList(categoryId, userId, languageId, +limit, +page, search);
+            const { categoryId, status, userId, languageId, limit = 5, page = 1, search = '' } = req.query;
+            const posts = await postAdminService.getPostList(categoryId, status, userId, languageId, +limit, +page, search);
             return responseUtils.ok(res, posts);
         } catch (error) {
             console.error("Error fetching posts:", error);

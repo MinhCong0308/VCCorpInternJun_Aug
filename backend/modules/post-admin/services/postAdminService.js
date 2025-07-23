@@ -1,9 +1,9 @@
 const db = require('models/index');
 const config = require('configs/index');
-const { Sequelize } = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 
 const postAdminService = {
-    getPostList: async (categoryId, userId, languageId, limit = 5, page = 1, search = '') => {
+    getPostList: async (categoryId, status, userId, languageId, limit = 5, page = 1, search = '') => {
         const offset = (page - 1) * limit;
 
         const options = {
@@ -13,9 +13,16 @@ const postAdminService = {
         };
 
         if (search && search.trim() !== '') {
-            options.where = Sequelize.literal(
-                `MATCH(title) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`
-            );
+            options.where = {
+                [Sequelize.Op.and]: [
+                    Sequelize.literal(`MATCH(title, content) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`)
+                ]
+            };
+        };
+        if (status) {
+            options.where = options.where ? 
+                { ...options.where, status } : 
+                { status };
         };
         if (userId) {
             options.where = { ...options.where, userId };
@@ -69,6 +76,9 @@ const postAdminService = {
         if (!post) {
             throw new Error("Post not found");
         }
+        if (post.status === config.config.statuspostenum.APPROVED) {
+            throw new Error("Post is already approved");
+        }
         post.status = config.config.statuspostenum.APPROVED;
         return await post.save();
     },
@@ -76,6 +86,9 @@ const postAdminService = {
         const post = await db.Post.findByPk(postId);
         if (!post) {
             throw new Error("Post not found");
+        }
+        if (post.status === config.config.statuspostenum.REJECTED) {
+            throw new Error("Post is already rejected");
         }
         post.status = config.config.statuspostenum.REJECTED;
         return await post.save();

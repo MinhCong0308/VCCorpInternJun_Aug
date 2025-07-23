@@ -473,7 +473,8 @@ aside {
   overflow: hidden;
 }
 .editor-wrapper {
-  max-width: 700px;
+  max-width: 1300px; /* Set a maximum width */
+  width: 100%; /* Full width */
   min-height: auto; /* Remove fixed height */
   margin-bottom: 2rem; /* Add space before footer */
 }
@@ -508,6 +509,9 @@ aside {
     width: 100%;
 }
 #blogTitle {
+    border: 1px solid #e0e0e0 !important; /* Xám nhạt */
+    border-radius: 4px;
+    padding: 12px 16px;
     overflow-y: auto;
 }
 #blogTitle::placeholder {
@@ -552,7 +556,7 @@ aside {
   padding-top: 20px; /* use to fix the position compare to the toolbar*/
   padding-bottom: 20px; /* Reduce bottom padding */
   scroll-padding-top: 20px;
-  min-height: 350px; /* Set minimum height */
+  min-height: 200px; /* Set minimum height */
 }
 
 #quill-editor .ql-editor {

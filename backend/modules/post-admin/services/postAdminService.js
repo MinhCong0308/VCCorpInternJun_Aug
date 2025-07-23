@@ -76,6 +76,9 @@ const postAdminService = {
         if (!post) {
             throw new Error("Post not found");
         }
+        if (post.status === config.config.statuspostenum.APPROVED) {
+            throw new Error("Post is already approved");
+        }
         post.status = config.config.statuspostenum.APPROVED;
         return await post.save();
     },
@@ -83,6 +86,9 @@ const postAdminService = {
         const post = await db.Post.findByPk(postId);
         if (!post) {
             throw new Error("Post not found");
+        }
+        if (post.status === config.config.statuspostenum.REJECTED) {
+            throw new Error("Post is already rejected");
         }
         post.status = config.config.statuspostenum.REJECTED;
         return await post.save();

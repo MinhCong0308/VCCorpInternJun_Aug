@@ -8,18 +8,6 @@ const db = require('models/index');
 const postsController = {   
     createPost: async (req, res) => {
         try {
-            const token = req.headers.authorization?.split(" ")[1];
-            if (!token) {
-                return responseUtils.unauthorized(res, "Authorization token is missing");
-            }
-            const decoded = jwt.verify(token, config.config.jwt.secret);
-            const userid = decoded.userId;
-            if (!userid) {
-                return responseUtils.unauthorized(res, "User ID is missing in token");
-            }
-            if (!token) {
-                return responseUtils.unauthorized(res, "Authorization token is missing");
-            }
             const {title, content, languageid} = req.body;
             const data = await postService.createPost(title, content, userid, languageid);
             return responseUtils.ok(res, data);
@@ -29,15 +17,6 @@ const postsController = {
     },
     deletePost: async (req, res) => {
         try {
-            const token = req.headers.authorization?.split(" ")[1];
-            if (!token) {
-                return responseUtils.unauthorized(res, "Authorization token is missing");
-            }
-            const decoded = jwt.verify(token, config.config.jwt.secret);
-            const userid = decoded.userId;
-            if (!userid) {
-                return responseUtils.unauthorized(res, "User ID is missing in token");
-            }
             const {postid} = req.body;
             const data = await postService.deletePost(postid, userid);
             return responseUtils.ok(res, data);

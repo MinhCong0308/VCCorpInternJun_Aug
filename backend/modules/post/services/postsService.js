@@ -13,9 +13,12 @@ const postsService = {
         };
 
         if (search && search.trim() !== '') {
-            options.where = Sequelize.literal(
-                `MATCH(title) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`
-            );
+            options.where = {
+                [Sequelize.Op.and]: [
+                    { status: 2 },
+                    Sequelize.literal(`MATCH(title, content) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`)
+                ]
+            };
         };
         if (userId) {
             options.where = { ...options.where, userId };

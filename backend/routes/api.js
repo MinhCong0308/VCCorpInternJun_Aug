@@ -27,9 +27,7 @@ const router = express.Router({ mergeParams: true });
 const oauthController = require("modules/oauth/controllers/oauthController");
 const passport = require("modules/oauth/passport");
 const { uploads } = require("kernels/middlewares/multer");
-const oauthController = require("modules/oauth/controllers/oauthController");
-const passport = require("modules/oauth/passport");
-const { uploads } = require("kernels/middlewares/multer");
+const multer = require("multer");
 
 // ===== EXAMPLE Request, make this commented =====
 // router.group("/posts",middlewares([authenticated, role("owner")]),(router) => {
@@ -67,17 +65,10 @@ router.group("/auth", (router) => {
   });
 });
 router.group("/account", middlewares([authenticated]), (router) => {
-  router.post(
-    "/update-username",
-    validate([accountValidation.updateUsername]),
-    accountController.updateUsername
-  );
-  router.post(
-    "/update-fullname",
-    validate([accountValidation.updateFullname]),
-    accountController.updateFullname
-  );
+  router.post("/update-username",validate([accountValidation.updateUsername]),accountController.updateUsername);
+  router.post("/update-fullname",validate([accountValidation.updateFullname]),accountController.updateFullname);
   router.post("/deactivate-account", accountController.deactivateAccount);
+  router.post("/update-avatar", uploads.single("avatar"), accountController.updateAvatar);
 });
 router.group(
   "/post-owner",

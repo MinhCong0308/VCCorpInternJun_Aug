@@ -17,6 +17,9 @@ const postsController = {
     },
     deletePost: async (req, res) => {
         try {
+            const token = req.headers.authorization?.split(" ")[1];
+            const decoded = jwt.verify(token, config.config.jwt.secret);
+            const userid = decoded.userId;
             const {postid} = req.body;
             const data = await postService.deletePost(postid, userid);
             return responseUtils.ok(res, data);
@@ -27,14 +30,8 @@ const postsController = {
     updatePost: async (req, res) => {
         try {
             const token = req.headers.authorization?.split(" ")[1];
-            if(!token) {
-                return responseUtils.unauthorized(res, "Authorization token is missing");
-            }
             const decoded = jwt.verify(token, config.config.jwt.secret);
             const userid = decoded.userId;
-            if(!userid) {
-                return responseUtils.unauthorized(res, "User ID is missing in token");
-            }
             const {postid, newTitle, newContent} = req.body;
             const post = db.Post.findByPk(postid);
             if(post.userid != userid) {
@@ -49,9 +46,6 @@ const postsController = {
     getAllPosts: async (req, res) => {
         // get userid from token
         const token = req.headers.authorization?.split(" ")[1];
-        if (!token) {
-            return responseUtils.unauthorized(res, "Authorization token is missing");
-        }
         const decoded = jwt.verify(token, config.config.jwt.secret);
         const userid = decoded.userId;
         try {

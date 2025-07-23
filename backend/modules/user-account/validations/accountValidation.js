@@ -6,6 +6,9 @@ const accountValidation = {
     ],
     updateFullname: [
         new BodyWithLocale("newFullname").notEmpty(),
+    ],
+    updateAvatar: [
+        new BodyWithLocale("avatarUrl").notEmpty()
     ]
-}
+};
 module.exports = accountValidation;

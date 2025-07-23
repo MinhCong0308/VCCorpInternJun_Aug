@@ -114,6 +114,27 @@
                       </form>
                     </div>
                   </div>
+                    <div class="settings-section">
+                      <div>
+                          <div class="settings-label">Profile photo</div>
+                          <div class="settings-description">Upload your profile picture</div>
+                          
+                          <!-- Profile Image Section -->
+                          <div class="profile-image-section mt-3">
+                              <div class="d-flex align-items-center gap-3">
+                                  <img id="profile-avatar" src="https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg" 
+                                      class="rounded-circle" width="80" height="80" alt="Profile Avatar" style="object-fit: cover;" />
+                                  <div>
+                                      <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('avatar-input').click()">
+                                          Change Photo
+                                      </button>
+                                      <input type="file" id="avatar-input" accept="image/*" style="display: none;" onchange="handleAvatarChange(event)" />
+                                      <div class="small text-muted mt-1">JPG, PNG or GIF. Max 2MB.</div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
                   <!-- Profile information -->
                   <div class="settings-section">
                     <div>
@@ -126,21 +147,6 @@
                       </form>
                     </div>
                   </div>
-                  <!-- Muted writers and publications -->
-                  <!-- <div class="settings-section">
-                    <div class="d-flex justify-content-between align-items-start">
-                      <div>
-                        <div class="settings-label">Muted writers and publications</div>
-                      </div>
-                      <button class="btn btn-link p-0 text-decoration-none"></button>
-                    </div>
-                  </div> -->
-
-                  <!-- Blocked users -->
-                  <!-- <div class="settings-section">
-                    <div class="settings-label danger-text">Blocked users</div>
-                  </div> -->
-
                   <!-- Deactivate account -->
                   <div class="settings-section">
                     <div>
@@ -186,6 +192,80 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+       async function handleAvatarChange(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+
+          // Validate file type
+          const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+          if (!allowedTypes.includes(file.type)) {
+              alert('Please select a valid image file (JPG, PNG, or GIF)');
+              return;
+          }
+
+          // Validate file size (2MB max)
+          const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+          if (file.size > maxSize) {
+              alert('File size must be less than 2MB');
+              return;
+          }
+
+          // Show loading state
+          const changeButton = document.querySelector('button[onclick*="avatar-input"]');
+          const originalText = changeButton.textContent;
+          changeButton.textContent = 'Uploading...';
+          changeButton.disabled = true;
+
+          try {
+              // Create FormData for file upload
+              const formData = new FormData();
+              formData.append('avatar', file);
+              console.log("formData: ", formData);
+
+              const token = localStorage.getItem("accessToken");
+              if (!token) {
+                  alert("You need to be logged in.");
+                  return;
+              }
+
+              // Upload to server
+              const res = await fetch('http://localhost:3000/account/update-avatar', {
+                  method: 'POST',
+                  headers: {
+                      'Authorization': `Bearer ${token}`
+                  },
+                  body: formData
+              });
+
+              const data = await res.json();
+              console.log("data: ", data);
+
+              if (res.ok) {
+                  // Update avatar display
+                  document.getElementById('profile-avatar').src = data.data.avatarUrl;
+                  
+                  // Update navbar avatar if exists
+                  const navbarAvatar = document.querySelector('.navbar img[alt="Profile"]');
+                  if (navbarAvatar) {
+                      navbarAvatar.src = data.data.avatarUrl;
+                  }
+                  
+                  alert('Profile photo updated successfully!');
+              } else {
+                  alert(data.message);
+              }
+          } catch (err) {
+              console.error('Error uploading avatar:', err);
+              alert('An error occurred while uploading the image');
+          } finally {
+              // Reset button state
+              changeButton.textContent = originalText;
+              changeButton.disabled = false;
+              
+              // Clear file input
+              event.target.value = '';
+          }
+      }
       function toggleEdit(type) {
         document.getElementById(`${type}-display`).classList.add("d-none");
         document.getElementById(`${type}-form`).classList.remove("d-none");

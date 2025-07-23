@@ -102,7 +102,8 @@
     }
 
     function handleGoogleLogin() {
-      alert("Redirecting to Google login...");
+      const authurl = "http://localhost:3000/auth/oauth/google";
+      window.location.href = authurl;
     }
   </script>
 </body>

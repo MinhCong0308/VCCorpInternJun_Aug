@@ -14,6 +14,8 @@ const categoryController = require("modules/category/controllers/categoryControl
 const languageController = require("modules/language/controllers/languageController");
 const languageValidation = require("modules/language/validations/languageValidation");
 const router = express.Router({ mergeParams: true });
+const oauthController = require("modules/oauth/controllers/oauthController");
+const passport = require("modules/oauth/passport");
 
 // ===== EXAMPLE Request, make this commented =====
 // router.group("/posts",middlewares([authenticated, role("owner")]),(router) => {
@@ -30,6 +32,10 @@ router.group("/auth", (router) => {
   router.post("/login", validate([authValidation.logIn]), authController.logIn);
   router.post("/signup", validate([authValidation.signUp]), authController.signUp);
   router.post("/validate-otp", validate([authValidation.verifyOTP]), authController.verifyOTP);
+  router.group("/oauth", (router) => {
+    router.get("/google", oauthController.loginWithGoogle);
+    router.get("/google/callback", passport.authenticate("google", {failureRedirect: "auth/login", session: false}), oauthController.googleCallback);
+  });
 });
 router.group("/account", (router) => {
   router.post("/update-username", validate([accountValidation.updateUsername]), accountController.updateUsername);

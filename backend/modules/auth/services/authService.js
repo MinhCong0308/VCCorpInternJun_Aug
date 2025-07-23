@@ -42,21 +42,15 @@ const authService = {
         const accessToken  = sign(user.userid, user.Role.rolename); 
         const refreshToken = signRefreshToken(user.userid, user.Role.rolename);
         return {
-            status: config.config.statuscode.OK,
-            success: true,
-            data: {
-                user: {
-                    userid: user.userid,
-                    email: user.email,
-                    username: user.username,
-                    role: user.Role.rolename,
-                },
-                token: {
-                    accessToken: accessToken,
-                    refreshToken: refreshToken
-                }
-            }
-        }
+            user: {
+                userid: user.userid,
+                email: user.email,
+                username: user.username,
+                role: user.Role.rolename,
+            },
+            accessToken: accessToken,
+            refreshToken: refreshToken
+        };
     },
     async signup(userInfo) { // tested
         const {firstname, lastname, username, email, password, confirm_password} = userInfo;
@@ -90,9 +84,6 @@ const authService = {
             message: "User created. Please verify your email with OTP.",
             email: email
         };
-    },
-    async loginWithGoogle() {
-        
     },
     async genOTP() {
         const otp = Math.floor(100000 + Math.random() * 900000);

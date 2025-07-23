@@ -1,7 +1,10 @@
 require("express-router-group");
 const express = require("express");
 const middlewares = require("kernels/middlewares");
-const { authenticated, checkRole } = require("kernels/middlewares/authMiddleware");
+const {
+  authenticated,
+  checkRole,
+} = require("kernels/middlewares/authMiddleware");
 const { validate } = require("kernels/validations");
 const exampleController = require("modules/examples/controllers/exampleController");
 const authController = require("modules/auth/controllers/authController");
@@ -17,14 +20,16 @@ const languageValidation = require("modules/language/validations/languageValidat
 const commentController = require("modules/comment/controllers/commentController");
 const commentValidation = require("modules/comment/validations/commentValidation");
 const postAdminController = require("modules/post-admin/controllers/postAdminController");
+const userController = require("modules/user/controllers/userController");
+const userValidation = require("modules/user/validations/userValidation");
 const postsController = require("modules/post/controllers/postsController");
 const router = express.Router({ mergeParams: true });
 const oauthController = require("modules/oauth/controllers/oauthController");
 const passport = require("modules/oauth/passport");
-const {uploads} = require("kernels/middlewares/multer")
+const { uploads } = require("kernels/middlewares/multer");
 const oauthController = require("modules/oauth/controllers/oauthController");
 const passport = require("modules/oauth/passport");
-const {uploads} = require("kernels/middlewares/multer")
+const { uploads } = require("kernels/middlewares/multer");
 
 // ===== EXAMPLE Request, make this commented =====
 // router.group("/posts",middlewares([authenticated, role("owner")]),(router) => {
@@ -35,65 +40,161 @@ const {uploads} = require("kernels/middlewares/multer")
 // );
 
 router.group("/example", validate([]), (router) => {
-  router.get('/', exampleController.exampleRequest)
-})
+  router.get("/", exampleController.exampleRequest);
+});
 router.group("/auth", (router) => {
   router.post("/login", validate([authValidation.logIn]), authController.logIn);
-  router.post("/signup", validate([authValidation.signUp]), authController.signUp);
-  router.post("/validate-otp", validate([authValidation.verifyOTP]), authController.verifyOTP);
+  router.post(
+    "/signup",
+    validate([authValidation.signUp]),
+    authController.signUp
+  );
+  router.post(
+    "/validate-otp",
+    validate([authValidation.verifyOTP]),
+    authController.verifyOTP
+  );
   router.group("/oauth", (router) => {
     router.get("/google", oauthController.loginWithGoogle);
-    router.get("/google/callback", passport.authenticate("google", {failureRedirect: "auth/login", session: false}), oauthController.googleCallback);
+    router.get(
+      "/google/callback",
+      passport.authenticate("google", {
+        failureRedirect: "auth/login",
+        session: false,
+      }),
+      oauthController.googleCallback
+    );
   });
 });
 router.group("/account", middlewares([authenticated]), (router) => {
-  router.post("/update-username", validate([accountValidation.updateUsername]), accountController.updateUsername);
-  router.post("/update-fullname", validate([accountValidation.updateFullname]), accountController.updateFullname);
+  router.post(
+    "/update-username",
+    validate([accountValidation.updateUsername]),
+    accountController.updateUsername
+  );
+  router.post(
+    "/update-fullname",
+    validate([accountValidation.updateFullname]),
+    accountController.updateFullname
+  );
   router.post("/deactivate-account", accountController.deactivateAccount);
 });
-router.group("/post-owner", middlewares([authenticated, checkRole(["user"])]), (router) => {
-  router.post("/create-post", validate([postValidation.createPost]), postController.createPost);
-  router.delete("/delete-post", validate([postValidation.deletePost]), postController.deletePost);
-  router.put("/update-post", validate([postValidation.updatePost]), postController.updatePost);
-  router.get("/get-all-posts", postController.getAllPosts);
-});
+router.group(
+  "/post-owner",
+  middlewares([authenticated, checkRole(["user"])]),
+  (router) => {
+    router.post(
+      "/create-post",
+      validate([postValidation.createPost]),
+      postController.createPost
+    );
+    router.delete(
+      "/delete-post",
+      validate([postValidation.deletePost]),
+      postController.deletePost
+    );
+    router.put(
+      "/update-post",
+      validate([postValidation.updatePost]),
+      postController.updatePost
+    );
+    router.get("/get-all-posts", postController.getAllPosts);
+  }
+);
 
 // ===== CATEGORY =====
-router.group("/categories", middlewares([authenticated, checkRole(["admin"])]), (router) => {
-  router.get("/", categoryController.getAll);
-  router.get("/list-all", categoryController.getAllNoPaging);
-  router.post("/", validate([categoryValidation.create]), categoryController.create);
-  router.put("/:categoryId", validate([categoryValidation.update]), categoryController.update);
-  router.delete("/:categoryId", categoryController.delete);
-});
+router.group(
+  "/categories",
+  middlewares([authenticated, checkRole(["admin"])]),
+  (router) => {
+    router.get("/", categoryController.getAll);
+    router.get("/list-all", categoryController.getAllNoPaging);
+    router.post(
+      "/",
+      validate([categoryValidation.create]),
+      categoryController.create
+    );
+    router.put(
+      "/:categoryId",
+      validate([categoryValidation.update]),
+      categoryController.update
+    );
+    router.delete("/:categoryId", categoryController.delete);
+  }
+);
 
 // ===== LANGUAGE =====
-router.group("/languages", middlewares([authenticated, checkRole(["admin"])]), (router) => {
-  router.get("/", languageController.getAll);
-  router.post("/",uploads.single('flag_image'), validate([languageValidation.create]), languageController.create);
-  router.put("/:languageId",uploads.single('flag_image'), validate([languageValidation.update]), languageController.update);
-  router.delete("/:languageId", languageController.delete);
-});
+router.group(
+  "/languages",
+  middlewares([authenticated, checkRole(["admin"])]),
+  (router) => {
+    router.get("/", languageController.getAll);
+    router.post(
+      "/",
+      uploads.single("flag_image"),
+      validate([languageValidation.create]),
+      languageController.create
+    );
+    router.put(
+      "/:languageId",
+      uploads.single("flag_image"),
+      validate([languageValidation.update]),
+      languageController.update
+    );
+    router.delete("/:languageId", languageController.delete);
+  }
+);
 
 // ===== COMMENT =====
 router.group("/comments", (router) => {
   router.get("/", commentController.getAll);
-  router.post("/", validate([commentValidation.create]), commentController.create);
-  router.put("/:commentId", validate([commentValidation.update]), commentController.update);
+  router.post(
+    "/",
+    validate([commentValidation.create]),
+    commentController.create
+  );
+  router.put(
+    "/:commentId",
+    validate([commentValidation.update]),
+    commentController.update
+  );
 });
 
 // ===== POST ADMIN =====
-router.group("/post-admin", middlewares([authenticated, checkRole(["admin"])]), (router) => {
-  router.get("/", postAdminController.getPostList);
-  router.get("/:postId", postAdminController.getPostDetail);
-  router.put("/:postId/approve", postAdminController.approvePost);
-  router.put("/:postId/reject", postAdminController.rejectPost);
-});
+router.group(
+  "/post-admin",
+  middlewares([authenticated, checkRole(["admin"])]),
+  (router) => {
+    router.get("/", postAdminController.getPostList);
+    router.get("/:postId", postAdminController.getPostDetail);
+    router.put("/:postId/approve", postAdminController.approvePost);
+    router.put("/:postId/reject", postAdminController.rejectPost);
+  }
+);
 
 // ===== POST =====
 router.group("/posts", (router) => {
   router.get("/", postsController.getPublishedPosts);
   router.get("/:postId", postsController.getPublishedPostDetail);
+});
+
+// ===== USER =====
+router.group("/users", (router) => {
+  router.get("/", userController.getAll);
+  router.post(
+    "/",
+    uploads.single("avatar"),
+    validate([userValidation.create]),
+    userController.create
+  );
+  router.put(
+    "/:userId",
+    uploads.single("avatar"),
+    validate([userValidation.update]),
+    userController.update
+  );
+  router.put("/:userId/disable", userController.disable);
+  router.put("/:userId/enable", userController.enabel);
 });
 
 module.exports = router;

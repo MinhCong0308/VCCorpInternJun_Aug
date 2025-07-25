@@ -1,0 +1,107 @@
+<div class="d-flex flex-column min-vh-100">
+  <!-- <app-navbar></app-navbar> -->
+  <div class="container-fluid px-4 main-content">
+    <div class="row">
+      <main class="col-12 d-flex justify-content-center">
+        <div class="editor-wrapper mt-5 w-100 px-0">
+          <!-- Language selection -->
+          <div class="dropdown d-flex justify-content-end mb-3">
+            <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
+              type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <span style="font-size: 0.8em;">{{ selectedLanguageName }}</span>
+              <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+            </button>
+            <ul class="dropdown-menu">
+              <li *ngFor="let lang of languages">
+                <a class="dropdown-item d-flex align-items-center gap-2" href="#"
+                   (click)="selectLanguage(lang.id, lang.name, $event)">
+                  <span style="font-size:0.8em;">{{ lang.name }}</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Blog Title -->
+          <textarea
+            [(ngModel)]="blogForm.title"
+            class="form-control editor-title mb-4"
+            placeholder="Enter Title"
+            rows="1"
+            (input)="autoResizeTitle($event)"
+            id="blogTitle">
+          </textarea>
+
+          <!-- Tag selection -->
+          <div class="tag-selection-wrapper mb-4">
+            <div class="d-flex align-items-start gap-3">
+              <div class="dropdown" id="tagSelector">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                  Select Tags
+                </button>
+                <div class="dropdown-menu p-3 checkbox-dropdown">
+                  <label *ngFor="let tag of availableTags" class="checkbox-item d-block mb-2" (click)="toggleTag(tag, $event)">
+                    <input type="checkbox" [value]="tag" [checked]="selectedTags.has(tag)" class="me-2">
+                    <span>{{ tag }}</span>
+                  </label>
+                </div>
+              </div>
+              <div class="selected-tags-container flex-grow-1">
+                <div id="selectedTags" class="d-flex flex-wrap gap-2">
+                  <div *ngFor="let tag of getSelectedTagsArray()" class="tag-chip" [attr.data-tag]="tag">
+                    <span>{{ tag }}</span>
+                    <button type="button" class="remove-tag" (click)="removeTag(tag)">&times;</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quill Editor -->
+          <div class="editor-container">
+            <div id="quill-toolbar">
+              <span class="ql-formats">
+                <button class="ql-bold"></button>
+                <button class="ql-italic"></button>
+                <button class="ql-underline"></button>
+                <button class="ql-strike"></button>
+              </span>
+              <span class="ql-formats">
+                <button class="ql-blockquote"></button>
+                <button class="ql-code-block"></button>
+              </span>
+              <span class="ql-formats">
+                <select class="ql-header">
+                  <option value="1"></option>
+                  <option value="2"></option>
+                  <option value="3"></option>
+                  <option selected></option>
+                </select>
+              </span>
+              <span class="ql-formats">
+                <button class="ql-list" value="ordered"></button>
+                <button class="ql-list" value="bullet"></button>
+              </span>
+              <span class="ql-formats">
+                <button class="ql-link"></button>
+                <button class="ql-image"></button>
+              </span>
+              <span class="ql-formats">
+                <button class="ql-clean"></button>
+              </span>
+            </div>
+            <div id="quill-editor"></div>
+          </div>
+
+          <!-- Alerts -->
+          <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+            {{ errorMessage }}
+          </div>
+          <div *ngIf="successMessage" class="alert alert-success mt-3">
+            {{ successMessage }}
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <!-- <app-footer></app-footer> -->
+</div>

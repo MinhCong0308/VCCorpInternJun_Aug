@@ -1,0 +1,117 @@
+<div class="d-flex flex-column min-vh-100">
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand logo" routerLink="/">
+        <img src="assets/img/logo.png" class="logo-img" alt="logo-image">
+        BlogBlogBlog
+      </a>
+      <div class="ms-auto">
+        <a routerLink="/auth/signup" class="btn btn-primary">Sign up</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container my-5 flex-grow-1">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <h2 class="mb-4 text-center">Welcome back</h2>
+        
+        <!-- Google Login Button -->
+        <button 
+          class="google-btn mb-3" 
+          type="button"
+          (click)="handleGoogleLogin()"
+          [disabled]="isLoading">
+          <img 
+            src="https://www.svgrepo.com/show/475656/google-color.svg" 
+            alt="Google icon" 
+            class="google-icon" />
+          {{isLoading ? 'Logging in...' : 'Log in with Google'}}
+        </button>
+        
+        <div class="text-center mb-3 text-muted">or</div>
+        
+        <!-- Login Form -->
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <!-- Email Field -->
+          <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input 
+              type="email" 
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('email')"
+              id="email" 
+              formControlName="email"
+              placeholder="name@example.com" />
+            <div *ngIf="isFieldInvalid('email')" class="invalid-feedback">
+              <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</span>
+              <span *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+            </div>
+          </div>
+          
+          <!-- Password Field -->
+          <div class="mb-3">
+            <label for="password" class="form-label d-flex justify-content-between">
+              Password
+              <a href="#" class="small text-decoration-none">Forgot password?</a>
+            </label>
+            <input 
+              type="password" 
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('password')"
+              id="password" 
+              formControlName="password"
+              placeholder="••••••••" />
+            <div *ngIf="isFieldInvalid('password')" class="invalid-feedback">
+              <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</span>
+              <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</span>
+            </div>
+          </div>
+          
+          <!-- Error Message -->
+          <div *ngIf="errorMessage" class="alert alert-danger mb-3">
+            {{ errorMessage }}
+          </div>
+          
+          <!-- Success Message -->
+          <div *ngIf="successMessage" class="alert alert-success mb-3">
+            {{ successMessage }}
+          </div>
+          
+          <!-- Submit Button -->
+          <div class="d-grid gap-2">
+            <button 
+              type="submit" 
+              class="btn btn-dark"
+              [disabled]="loginForm.invalid || isLoading">
+              {{isLoading ? 'Logging in...' : 'Log in'}}
+            </button>
+          </div>
+          
+          <p class="text-center mt-3">
+            Don't have an account? <a routerLink="/auth/signup">Sign up</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="main-footer mt-1">
+    <hr class="footer-divider mb-4" />
+    <div class="footer-links">
+      <a href="#">Help</a>
+      <a href="#">Status</a>
+      <a href="#">About</a>
+      <a href="#">Careers</a>
+      <a href="#">Press</a>
+      <a href="#">Blog</a>
+      <a href="#">Privacy</a>
+      <a href="#">Rules</a>
+      <a href="#">Terms</a>
+      <a href="#">Text to speech</a>
+    </div>
+  </footer>
+</div>

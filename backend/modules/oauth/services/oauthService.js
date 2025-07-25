@@ -32,7 +32,6 @@ const oauthService = {
                 last_login_at: new Date(),
             });
             console.log("New user created:", newUser);
-            // Optionally send welcome email with random password
             await this.sendWelcomeEmail(newUser.email, password);
         }
         user = await db.User.findOne({

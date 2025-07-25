@@ -1,0 +1,174 @@
+<div class="d-flex flex-column min-vh-100">
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand logo" routerLink="/">
+        <img src="assets/img/logo.png" class="logo-img" alt="logo-image">
+        BlogBlogBlog
+      </a>
+      <div class="ms-auto">
+        <a routerLink="/auth/login" class="btn btn-outline-dark">Log in</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Signup Form -->
+  <main class="container my-5 flex-grow-1">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <h2 class="mb-4 text-center">Create your account</h2>
+        
+        <!-- Google Signup Button -->
+        <button 
+          class="google-btn mb-3 w-100 btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2" 
+          type="button"
+          (click)="handleGoogleSignup()"
+          [disabled]="isLoading">
+          <img 
+            src="https://www.svgrepo.com/show/475656/google-color.svg" 
+            alt="Google icon" 
+            width="20" 
+            height="20" />
+          {{isLoading ? 'Signing up...' : 'Sign up with Google'}}
+        </button>
+        
+        <div class="text-center mb-3 text-muted">or</div>
+        
+        <!-- Signup Form -->
+        <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+          <!-- Name Fields -->
+          <div class="row mb-3">
+            <div class="col">
+              <label for="firstName" class="form-label">First name</label>
+              <input 
+                type="text" 
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('firstName')"
+                id="firstName" 
+                formControlName="firstName" />
+              <div *ngIf="isFieldInvalid('firstName')" class="invalid-feedback">
+                <span *ngIf="signupForm.get('firstName')?.errors?.['required']">First name is required</span>
+              </div>
+            </div>
+            <div class="col">
+              <label for="lastName" class="form-label">Last name</label>
+              <input 
+                type="text" 
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('lastName')"
+                id="lastName" 
+                formControlName="lastName" />
+              <div *ngIf="isFieldInvalid('lastName')" class="invalid-feedback">
+                <span *ngIf="signupForm.get('lastName')?.errors?.['required']">Last name is required</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Username Field -->
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input 
+              type="text" 
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('username')"
+              id="username" 
+              formControlName="username" />
+            <div *ngIf="isFieldInvalid('username')" class="invalid-feedback">
+              <span *ngIf="signupForm.get('username')?.errors?.['required']">Username is required</span>
+              <span *ngIf="signupForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</span>
+            </div>
+          </div>
+
+          <!-- Email Field -->
+          <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input 
+              type="email" 
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('email')"
+              id="email" 
+              formControlName="email"
+              placeholder="name@example.com" />
+            <div *ngIf="isFieldInvalid('email')" class="invalid-feedback">
+              <span *ngIf="signupForm.get('email')?.errors?.['required']">Email is required</span>
+              <span *ngIf="signupForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input 
+              type="password" 
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('password')"
+              id="password" 
+              formControlName="password"
+              placeholder="••••••••" />
+            <div *ngIf="isFieldInvalid('password')" class="invalid-feedback">
+              <span *ngIf="signupForm.get('password')?.errors?.['required']">Password is required</span>
+              <span *ngIf="signupForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</span>
+            </div>
+          </div>
+
+          <!-- Confirm Password Field -->
+          <div class="mb-3">
+            <label for="confirmPassword" class="form-label">Confirm password</label>
+            <input 
+              type="password" 
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('confirmPassword') || hasPasswordMismatch()"
+              id="confirmPassword" 
+              formControlName="confirmPassword"
+              placeholder="••••••••" />
+            <div *ngIf="isFieldInvalid('confirmPassword') || hasPasswordMismatch()" class="invalid-feedback">
+              <span *ngIf="signupForm.get('confirmPassword')?.errors?.['required']">Please confirm your password</span>
+              <span *ngIf="hasPasswordMismatch()">Passwords do not match</span>
+            </div>
+          </div>
+
+          <!-- Error Message -->
+          <div *ngIf="errorMessage" class="alert alert-danger mb-3">
+            {{ errorMessage }}
+          </div>
+
+          <!-- Success Message -->
+          <div *ngIf="successMessage" class="alert alert-success mb-3">
+            {{ successMessage }}
+          </div>
+
+          <!-- Submit Button -->
+          <div class="d-grid gap-2">
+            <button 
+              type="submit" 
+              class="btn btn-dark"
+              [disabled]="signupForm.invalid || isLoading">
+              {{isLoading ? 'Creating account...' : 'Sign up'}}
+            </button>
+          </div>
+
+          <p class="text-center mt-3">
+            Already have an account? <a routerLink="/auth/login">Log in</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="main-footer mt-1">
+    <hr class="footer-divider mb-4" />
+    <div class="footer-links">
+      <a href="#">Help</a>
+      <a href="#">Status</a>
+      <a href="#">About</a>
+      <a href="#">Careers</a>
+      <a href="#">Press</a>
+      <a href="#">Blog</a>
+      <a href="#">Privacy</a>
+      <a href="#">Rules</a>
+      <a href="#">Terms</a>
+      <a href="#">Text to speech</a>
+    </div>
+  </footer>
+</div>

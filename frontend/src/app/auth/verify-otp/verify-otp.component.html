@@ -1,0 +1,107 @@
+<div class="d-flex flex-column min-vh-100">
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand logo" routerLink="/">
+        <img src="assets/img/logo.png" class="logo-img" alt="logo-image">
+        BlogBlogBlog
+      </a>
+      <div class="ms-auto">
+        <a routerLink="/auth/login" class="btn btn-outline-dark">Log in</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Verify OTP Form -->
+  <main class="container my-5 flex-grow-1">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="text-center">
+          <h2 class="mb-3">Check your email</h2>
+          <p class="text-muted mb-4">
+            We've sent a 6-digit code to 
+            <strong>{{ userEmail }}</strong>. 
+            Please enter it below.
+          </p>
+        </div>
+
+        <form [formGroup]="otpForm" (ngSubmit)="onSubmit()">
+          <!-- OTP Input Group -->
+          <div class="mb-4 otp-input-group">
+            <input 
+              *ngFor="let digit of otpDigits; let i = index"
+              type="text" 
+              class="form-control otp-input"
+              [class.is-invalid]="isOtpInvalid"
+              maxlength="1" 
+              [formControlName]="'digit' + i"
+              (input)="onDigitInput($event, i)"
+              (keydown)="onKeyDown($event, i)"
+              (paste)="onPaste($event)"
+              #otpInput />
+          </div>
+
+          <!-- Error Message -->
+          <div *ngIf="errorMessage" class="alert alert-danger mb-3">
+            {{ errorMessage }}
+          </div>
+
+          <!-- Success Message -->
+          <div *ngIf="successMessage" class="alert alert-success mb-3">
+            {{ successMessage }}
+          </div>
+
+          <!-- Submit Button -->
+          <div class="d-grid gap-2">
+            <button 
+              type="submit" 
+              class="btn btn-dark"
+              [disabled]="otpForm.invalid || isLoading">
+              {{ isLoading ? 'Verifying...' : 'Verify Code' }}
+            </button>
+          </div>
+
+          <!-- Resend Section -->
+          <div class="text-center mt-3">
+            <p class="small mb-2">
+              Didn't receive the code?
+            </p>
+            <button 
+              *ngIf="!isResendCooldown"
+              type="button" 
+              class="btn btn-link p-0 small"
+              (click)="resendOtp()"
+              [disabled]="isResending">
+              {{ isResending ? 'Sending...' : 'Resend Code' }}
+            </button>
+            <span *ngIf="isResendCooldown" class="small text-muted">
+              Resend available in {{ resendCountdown }}s
+            </span>
+          </div>
+
+          <!-- Back to Signup -->
+          <p class="text-center mt-3 small">
+            Wrong email? <a routerLink="/auth/signup">Go back to signup</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="main-footer mt-1">
+    <hr class="footer-divider mb-4" />
+    <div class="footer-links">
+      <a href="#">Help</a>
+      <a href="#">Status</a>
+      <a href="#">About</a>
+      <a href="#">Careers</a>
+      <a href="#">Press</a>
+      <a href="#">Blog</a>
+      <a href="#">Privacy</a>
+      <a href="#">Rules</a>
+      <a href="#">Terms</a>
+      <a href="#">Text to speech</a>
+    </div>
+  </footer>
+</div>

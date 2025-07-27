@@ -32,18 +32,18 @@ const userService = {
     userData.hashed_password = hashPassWord;
     return await db.User.create(userData);
   },
-  updateUser: async (userId, userData) => {
+  updateUser: async (userid, userData) => {
     const hashPassWord = await bcrypt.hash(userData.hashed_password, 10);
     userData.hashed_password = hashPassWord;
-    const user = await db.User.findByPk(userId);
+    const user = await db.User.findByPk(userid);
     return user.update(userData);
   },
-  disableUser: async (userId) => {
-    const user = await db.User.findByPk(userId);
+  disableUser: async (userid) => {
+    const user = await db.User.findByPk(userid);
     return await user.update({ status: config.config.statusUser.DISABLED });
   },
-  enableUser: async (userId) => {
-    const user = await db.User.findByPk(userId);
+  enableUser: async (userid) => {
+    const user = await db.User.findByPk(userid);
     return await user.update({ status: config.config.statusUser.ACTIVE });
   },
 };

@@ -34,7 +34,7 @@ const userController = {
   },
   update: async (req, res) => {
     try {
-      const { userId } = req.params;
+      const { userid } = req.params;
       const userData = req.body;
 
       if (req.file) {
@@ -44,7 +44,7 @@ const userController = {
         userData.avatar = avatarImagePath;
       }
 
-      const updateUser = await userService.updateUser(userId, userData);
+      const updateUser = await userService.updateUser(userid, userData);
       return responseUtils.ok(res, updateUser);
     } catch (error) {
       return responseUtils.error(res, error.message);
@@ -52,8 +52,8 @@ const userController = {
   },
   disable: async (req, res) => {
     try {
-      const { userId } = req.params;
-      await userService.disableUser(userId);
+      const { userid } = req.params;
+      await userService.disableUser(userid);
       return responseUtils.ok(res, {
         message: "User disable",
       });
@@ -63,8 +63,8 @@ const userController = {
   },
   enabel: async (req, res) => {
     try {
-      const { userId } = req.params;
-      await userService.enableUser(userId);
+      const { userid } = req.params;
+      await userService.enableUser(userid);
       return responseUtils.ok(res, {
         message: "User enable",
       });

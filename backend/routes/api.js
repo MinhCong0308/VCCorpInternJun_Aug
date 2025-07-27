@@ -43,6 +43,11 @@ router.group("/example", validate([]), (router) => {
 router.group("/auth", (router) => {
   router.post("/login", validate([authValidation.logIn]), authController.logIn);
   router.post(
+    "/admin/login",
+    validate([authValidation.logIn]),
+    authController.logInAdmin
+  );
+  router.post(
     "/signup",
     validate([authValidation.signUp]),
     authController.signUp
@@ -65,10 +70,22 @@ router.group("/auth", (router) => {
   });
 });
 router.group("/account", middlewares([authenticated]), (router) => {
-  router.post("/update-username",validate([accountValidation.updateUsername]),accountController.updateUsername);
-  router.post("/update-fullname",validate([accountValidation.updateFullname]),accountController.updateFullname);
+  router.post(
+    "/update-username",
+    validate([accountValidation.updateUsername]),
+    accountController.updateUsername
+  );
+  router.post(
+    "/update-fullname",
+    validate([accountValidation.updateFullname]),
+    accountController.updateFullname
+  );
   router.post("/deactivate-account", accountController.deactivateAccount);
-  router.post("/update-avatar", uploads.single("avatar"), accountController.updateAvatar);
+  router.post(
+    "/update-avatar",
+    uploads.single("avatar"),
+    accountController.updateAvatar
+  );
 });
 router.group(
   "/post-owner",
@@ -170,22 +187,26 @@ router.group("/posts", (router) => {
 });
 
 // ===== USER =====
-router.group("/users", (router) => {
-  router.get("/", userController.getAll);
-  router.post(
-    "/",
-    uploads.single("avatar"),
-    validate([userValidation.create]),
-    userController.create
-  );
-  router.put(
-    "/:userId",
-    uploads.single("avatar"),
-    validate([userValidation.update]),
-    userController.update
-  );
-  router.put("/:userId/disable", userController.disable);
-  router.put("/:userId/enable", userController.enabel);
-});
+router.group(
+  "/users",
+  middlewares([authenticated, checkRole(["admin"])]),
+  (router) => {
+    router.get("/", userController.getAll);
+    router.post(
+      "/",
+      uploads.single("avatar"),
+      validate([userValidation.create]),
+      userController.create
+    );
+    router.put(
+      "/:userid",
+      uploads.single("avatar"),
+      validate([userValidation.update]),
+      userController.update
+    );
+    router.put("/:userid/disable", userController.disable);
+    router.put("/:userid/enable", userController.enabel);
+  }
+);
 
 module.exports = router;

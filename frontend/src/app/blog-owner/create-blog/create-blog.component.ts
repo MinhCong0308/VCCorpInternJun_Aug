@@ -1,6 +1,6 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
-
-declare var Quill: any; // ✅ Declare outside the class
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-create-blog',
@@ -8,49 +8,50 @@ declare var Quill: any; // ✅ Declare outside the class
   styleUrls: ['./create-blog.component.css'],
   standalone: false,
 })
-export class CreateBlogComponent implements OnInit, AfterViewInit {
-  blogForm = {
-    title: '',
-    content: ''
-  };
+export class CreateBlogComponent implements OnInit {
+  blogForm!: FormGroup;
 
-  selectedLanguageId = 1;
-  selectedLanguageName = 'English';
-  languages = [
-    { id: 1, name: 'English' },
-    { id: 2, name: 'Vietnamese' },
-    { id: 3, name: 'French' }
-  ];
-
+  selectedTags: Set<string> = new Set();
   availableTags: string[] = [
     'Tech', 'Travel', 'Food', 'Education', 'Health',
     'Science', 'Art', 'Finance', 'Music', 'Games'
   ];
-  selectedTags = new Set<string>();
 
-  errorMessage = '';
-  successMessage = '';
+  languages = [
+    { id: 1, name: 'English', flag: '🇺🇸' },
+    { id: 2, name: 'Vietnamese', flag: '🇻🇳' },
+    { id: 3, name: 'French', flag: '🇫🇷' }
+  ];
+  selectedLanguageName: string = 'English';
+  selectedLanguageFlag: string = '🇺🇸';
 
-  ngOnInit(): void {}
+  quillModules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'],
+      [{ header: [1, 2, 3, false] }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      ['link', 'image'],
+      ['clean']
+    ]
+  };
 
-  ngAfterViewInit(): void {
-    const quill = new Quill('#quill-editor', {
-      theme: 'snow',
-      placeholder: 'Tell your story...',
-      modules: {
-        toolbar: { container: '#quill-toolbar' }
-      }
-    });
+  constructor(private fb: FormBuilder, private http: HttpClient) {}
 
-    quill.on('text-change', () => {
-      this.blogForm.content = quill.root.innerHTML;
+  ngOnInit(): void {
+    this.blogForm = this.fb.group({
+      title: ['', Validators.required],
+      content: ['', Validators.required],
+      languageId: [1, Validators.required],
+      tags: [[]]
     });
   }
 
-  selectLanguage(id: number, name: string, event: Event): void {
+  selectLanguage(lang: { id: number; name: string; flag: string }, event: Event): void {
     event.preventDefault();
-    this.selectedLanguageId = id;
-    this.selectedLanguageName = name;
+    this.blogForm.patchValue({ languageId: lang.id });
+    this.selectedLanguageName = lang.name;
+    this.selectedLanguageFlag = lang.flag;
   }
 
   toggleTag(tag: string, event: Event): void {
@@ -60,6 +61,7 @@ export class CreateBlogComponent implements OnInit, AfterViewInit {
     } else {
       this.selectedTags.add(tag);
     }
+    this.blogForm.patchValue({ tags: Array.from(this.selectedTags) });
   }
 
   getSelectedTagsArray(): string[] {
@@ -68,51 +70,33 @@ export class CreateBlogComponent implements OnInit, AfterViewInit {
 
   removeTag(tag: string): void {
     this.selectedTags.delete(tag);
+    this.blogForm.patchValue({ tags: Array.from(this.selectedTags) });
   }
 
-  autoResizeTitle(event: Event): void {
-    const el = event.target as HTMLTextAreaElement;
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-  }
-
-  async submitBlog(): Promise<void> {
-    if (!this.blogForm.title || !this.blogForm.content) {
-      this.errorMessage = 'Please enter both title and content.';
+  submitBlog(): void {
+    if (this.blogForm.invalid) {
+      alert('Please fill in all required fields.');
       return;
     }
 
     const accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
-      this.errorMessage = 'You need to be logged in to submit a blog.';
+      alert('You need to be logged in to submit.');
       return;
     }
 
-    try {
-      const res = await fetch('http://localhost:3000/post-owner/create-post', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + accessToken
-        },
-        body: JSON.stringify({
-          title: this.blogForm.title,
-          content: this.blogForm.content,
-          languageid: this.selectedLanguageId,
-          tags: this.getSelectedTagsArray()
-        })
-      });
+    const payload = this.blogForm.value;
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${accessToken}`);
 
-      const data = await res.json();
-      if (res.ok) {
-        this.successMessage = `Blog titled '${this.blogForm.title}' submitted successfully.`;
-        setTimeout(() => location.href = '/home', 2000);
-      } else {
-        this.errorMessage = data.message || 'Failed to submit blog.';
+    this.http.post('http://localhost:3000/post-owner/create-post', payload, { headers }).subscribe({
+      next: () => {
+        alert(`Your blog "${payload.title}" was submitted successfully.`);
+        window.location.href = 'home.html';
+      },
+      error: err => {
+        console.error(err);
+        alert('Failed to submit blog.');
       }
-    } catch (err) {
-      console.error(err);
-      this.errorMessage = 'Something went wrong.';
-    }
+    });
   }
 }

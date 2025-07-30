@@ -1,6 +1,6 @@
 const db = require('models/index');
 const { Sequelize, Op } = require('sequelize');
-
+const { extractCoverImage } = require('utils/postUtils');
 
 const postsService = {
     getPublishedPosts: async (categoryId, userId, languageId, limit = 5, page = 1, search = '') => {
@@ -49,7 +49,11 @@ const postsService = {
         });
 
         return {
-            posts: rows,
+            posts: rows.map(post => {
+                const postJSON = post.toJSON();
+                postJSON.coverImage = extractCoverImage(postJSON.content);
+                return postJSON;
+            }),
             total: count,
             page,
             totalPages: Math.ceil(count / limit)
@@ -70,7 +74,9 @@ const postsService = {
         if (!post) {
             throw new Error("Post not found or not published");
         }
-        return post;
+        const postJSON = post.toJSON();
+        postJSON.coverImage = extractCoverImage(postJSON.content);
+        return postJSON;
     }
 };
 

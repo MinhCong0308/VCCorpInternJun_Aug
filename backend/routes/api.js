@@ -25,6 +25,7 @@ const userValidation = require("modules/user/validations/userValidation");
 const postsController = require("modules/post/controllers/postsController");
 const router = express.Router({ mergeParams: true });
 const oauthController = require("modules/oauth/controllers/oauthController");
+const dashboardController = require("modules/dashboard/controllers/dashboardController");
 const passport = require("modules/oauth/passport");
 const { uploads } = require("kernels/middlewares/multer");
 const multer = require("multer");
@@ -206,6 +207,14 @@ router.group(
     );
     router.put("/:userid/disable", userController.disable);
     router.put("/:userid/enable", userController.enabel);
+  }
+);
+
+router.group(
+  "/dashboard",
+  middlewares([authenticated, checkRole(["admin"])]),
+  (router) => {
+    router.get("/", dashboardController.getDashboardData);
   }
 );
 

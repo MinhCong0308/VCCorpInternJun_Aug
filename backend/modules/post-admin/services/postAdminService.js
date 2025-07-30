@@ -1,6 +1,7 @@
 const db = require('models/index');
 const config = require('configs/index');
 const { Sequelize, Op } = require('sequelize');
+const { extractCoverImage } = require('utils/postUtils');
 
 const postAdminService = {
     getPostList: async (categoryId, status, userId, languageId, limit = 5, page = 1, search = '') => {
@@ -69,7 +70,9 @@ const postAdminService = {
         if (!post) {
             throw new Error("Post not found");
         }
-        return post;
+        const postJSON = post.toJSON();
+        postJSON.coverImage = extractCoverImage(postJSON.content);
+        return postJSON;
     },
     approvePost: async (postId) => {
         const post = await db.Post.findByPk(postId);

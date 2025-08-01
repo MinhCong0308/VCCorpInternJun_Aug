@@ -194,7 +194,7 @@ export class AccountComponent implements OnInit {
       if (response.ok) {
         this.userProfile.avatarUrl = data.data.avatarUrl;
         this.successMessage = 'Profile photo updated successfully!';
-        
+      
         setTimeout(() => {
           this.successMessage = '';
         }, 3000);

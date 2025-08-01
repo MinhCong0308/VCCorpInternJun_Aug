@@ -39,7 +39,11 @@ const categoryService = {
         if (!category) {
             throw new Error("Category not found");
         }
-        return await category.update(categoryData);
+        try {
+            return await category.update(categoryData);
+        } catch (error) {
+            throw new Error("Failed to update category: " + error.message);
+        }
     },
     deleteCategory: async (categoryId) => {
         const category = await db.Category.findByPk(categoryId);

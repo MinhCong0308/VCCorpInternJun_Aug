@@ -114,48 +114,51 @@ router.group(
 // ===== CATEGORY =====
 router.group(
   "/categories",
-  middlewares([authenticated, checkRole(["admin"])]),
   (router) => {
     router.get("/", categoryController.getAll);
     router.get("/list-all", categoryController.getAllNoPaging);
     router.post(
       "/",
+      middlewares([authenticated, checkRole(["admin"])]),
       validate([categoryValidation.create]),
       categoryController.create
     );
     router.put(
       "/:categoryId",
+      middlewares([authenticated, checkRole(["admin"])]),
       validate([categoryValidation.update]),
       categoryController.update
     );
-    router.delete("/:categoryId", categoryController.delete);
+    router.delete("/:categoryId", middlewares([authenticated, checkRole(["admin"])]), categoryController.delete);
   }
 );
 
 // ===== LANGUAGE =====
 router.group(
   "/languages",
-  middlewares([authenticated, checkRole(["admin"])]),
   (router) => {
     router.get("/", languageController.getAll);
     router.post(
       "/",
+      middlewares([authenticated, checkRole(["admin"])]),
       uploads.single("flag_image"),
       validate([languageValidation.create]),
       languageController.create
     );
     router.put(
       "/:languageId",
+      middlewares([authenticated, checkRole(["admin"])]),
       uploads.single("flag_image"),
       validate([languageValidation.update]),
       languageController.update
     );
-    router.delete("/:languageId", languageController.delete);
+    router.delete("/:languageId", middlewares([authenticated, checkRole(["admin"])]), languageController.delete);
   }
 );
 
 // ===== COMMENT =====
-router.group("/comments", (router) => {
+router.group("/comments", middlewares([authenticated, checkRole(["user"])]), (router) => {
+
   router.get("/", commentController.getAll);
   router.post(
     "/",

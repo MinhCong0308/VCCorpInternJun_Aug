@@ -7,7 +7,7 @@ const categoryValidation = {
         new BodyWithLocale("categoryname").notEmpty().isString().unique(category, "categoryname")
     ],
     update: [
-        new BodyWithLocale("categoryname").notEmpty().isString().unique(category, "categoryname")
+        new BodyWithLocale("categoryname").notEmpty().isString()
     ]
 };
 

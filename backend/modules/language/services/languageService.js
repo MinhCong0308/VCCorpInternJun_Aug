@@ -32,7 +32,11 @@ const languageService = {
   },
   updateLanguage: async (languageId, languageData) => {
     const language = await db.Language.findByPk(languageId);
-    return await language.update(languageData);
+    try {
+        return await language.update(languageData);
+    } catch (error) {
+      throw new Error("Failed to update language: " + error.message);
+    }
   },
   deleteLanguage: async (languageId) => {
     const language = await db.Language.findByPk(languageId);

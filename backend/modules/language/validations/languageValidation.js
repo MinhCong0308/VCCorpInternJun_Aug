@@ -16,12 +16,10 @@ const languageValidation = {
   update: [
     new BodyWithLocale("languagename")
       .notEmpty()
-      .isString()
-      .unique(language, "languagename"),
+      .isString(),
     new BodyWithLocale("locale_code")
       .notEmpty()
-      .isString()
-      .unique(language, "locale_code"),
+      .isString(),
   ],
 };
 module.exports = languageValidation;

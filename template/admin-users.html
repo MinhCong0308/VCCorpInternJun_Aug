@@ -203,6 +203,10 @@
                           <th style="width: 150px; text-align: center">
                             Status
                           </th>
+
+                          <th style="width: 150px; text-align: center">
+                            Role
+                          </th>
                           <th style="width: 150px; text-align: center">
                             Actions
                           </th>
@@ -224,14 +228,15 @@
                             <span class="badge bg-success">Active</span>
                           </td>
                           <td style="text-align: center">
+                            <span class="badge bg-primary">Admin</span>
+                          </td>
+                          <td style="text-align: center">
                             <a
                               href="#"
-                              class="btn btn-sm btn-primary"
-                              data-toggle="modal"
-                              data-target="#editUserModal"
-                              title="Edit User"
+                              class="btn btn-sm btn-secondary"
+                              title="Change Role User"
                             >
-                              <i class="fas fa-edit"></i>
+                              <i class="fas fa-user"></i>
                             </a>
                             <a
                               href="#"
@@ -258,14 +263,15 @@
                             <span class="badge bg-success">Active</span>
                           </td>
                           <td style="text-align: center">
+                            <span class="badge bg-secondary">User</span>
+                          </td>
+                          <td style="text-align: center">
                             <a
                               href="#"
                               class="btn btn-sm btn-primary"
-                              data-toggle="modal"
-                              data-target="#editUserModal"
-                              title="Edit User"
+                              title="Change Role User"
                             >
-                              <i class="fas fa-edit"></i>
+                              <i class="fas fa-user"></i>
                             </a>
                             <a
                               href="#"
@@ -292,14 +298,15 @@
                             <span class="badge bg-danger">Disabled</span>
                           </td>
                           <td style="text-align: center">
+                            <span class="badge bg-secondary">User</span>
+                          </td>
+                          <td style="text-align: center">
                             <a
                               href="#"
                               class="btn btn-sm btn-primary"
-                              data-toggle="modal"
-                              data-target="#editUserModal"
-                              title="Edit User"
+                              title="Change Role User"
                             >
-                              <i class="fas fa-edit"></i>
+                              <i class="fas fa-user"></i>
                             </a>
                             <a
                               href="#"
@@ -326,14 +333,15 @@
                             <span class="badge bg-success">Active</span>
                           </td>
                           <td style="text-align: center">
+                            <span class="badge bg-secondary">User</span>
+                          </td>
+                          <td style="text-align: center">
                             <a
                               href="#"
                               class="btn btn-sm btn-primary"
-                              data-toggle="modal"
-                              data-target="#editUserModal"
-                              title="Edit User"
+                              title="Change Role User"
                             >
-                              <i class="fas fa-edit"></i>
+                              <i class="fas fa-user"></i>
                             </a>
                             <a
                               href="#"
@@ -506,129 +514,6 @@
               Close
             </button>
             <button type="button" class="btn btn-primary" id="saveUserBtn">
-              Save changes
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- /.modal -->
-
-    <!-- Modal Sửa User -->
-    <div class="modal fade" id="editUserModal">
-      <div class="modal-dialog modal-lg">
-        <!-- Thêm modal-lg để form rộng hơn -->
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">Edit User</h4>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form id="formEditUser">
-              <input type="hidden" id="editUserId" />
-
-              <!-- Hàng chứa First Name và Last Name -->
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="editUserFirstName">First Name</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="editUserFirstName"
-                      placeholder="Enter first name"
-                      required
-                    />
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="editUserLastName">Last Name</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="editUserLastName"
-                      placeholder="Enter last name"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <!-- User Name -->
-              <div class="form-group">
-                <label for="editUserName">User Name</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="editUserName"
-                  placeholder="Enter username"
-                  required
-                />
-              </div>
-
-              <!-- Email -->
-              <div class="form-group">
-                <label for="editUserEmail">Email address</label>
-                <input
-                  type="email"
-                  class="form-control"
-                  id="editUserEmail"
-                  placeholder="Enter email"
-                  required
-                />
-              </div>
-
-              <!-- Avatar -->
-              <div class="form-group">
-                <label for="editUserAvatar">New Avatar (optional)</label>
-                <input
-                  type="file"
-                  class="form-control-file"
-                  id="editUserAvatar"
-                  accept="image/*"
-                />
-                <small class="form-text text-muted"
-                  >Leave blank to keep the current avatar.</small
-                >
-              </div>
-
-              <!-- New Password -->
-              <div class="form-group">
-                <label for="editUserPassword">New Password (optional)</label>
-                <input
-                  type="password"
-                  class="form-control"
-                  id="editUserPassword"
-                  placeholder="Leave blank to keep current password"
-                />
-              </div>
-
-              <!-- Status -->
-              <div class="form-check">
-                <input
-                  type="checkbox"
-                  class="form-check-input"
-                  id="editUserStatus"
-                />
-                <label class="form-check-label" for="editUserStatus"
-                  >Active</label
-                >
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-default" data-dismiss="modal">
-              Close
-            </button>
-            <button type="button" class="btn btn-primary" id="saveEditUserBtn">
               Save changes
             </button>
           </div>

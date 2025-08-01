@@ -25,6 +25,7 @@ const authenticated = async (req, res, next) => {
             }]
         });
         if (!user) {
+            console.log("User not found or not authenticated");
             return responseUtils.unauthorized(res, 'User not found or not authenticated');
         }
         req.user = user;

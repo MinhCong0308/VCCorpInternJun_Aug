@@ -1,0 +1,219 @@
+<div class="d-flex flex-column min-vh-100">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand logo" routerLink="/home">
+        <img src="assets/img/logo.png" class="logo-img" alt="logo-image">
+        BlogBlogBlog
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="flex-grow-1 mx-4 d-none d-md-block">
+          <div class="search-bar-group input-group" style="margin-left: -16px;">
+            <span class="input-group-text bg-transparent border-0">
+              <i class="ti-search"></i>
+            </span>
+            <input type="text" class="form-control bg-transparent border-0" 
+                   placeholder="Search" style="box-shadow: none;" />
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-3 ms-auto">
+          <a routerLink="/blog-editor" class="btn btn-write">
+            <i class="ti-pencil-alt"></i> Write
+          </a>
+          <!-- Language Dropdown -->
+          <div class="dropdown">
+            <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
+                    type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <span style="font-size: 1.2em;">🇺🇸</span>
+              <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="langDropdown">
+              <li>
+                <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                  <span style="font-size:1.2em;">🇻🇳</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                  <span style="font-size:1.2em;">🇫🇷</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <a href="#" class="text-secondary text-decoration-none ms-2 me-1">
+            <i class="ti-bell fs-5"></i>
+          </a>
+          <div class="dropdown">
+            <a href="#" class="d-block" data-bs-toggle="dropdown" aria-expanded="false">
+              <img [src]="userProfile.avatarUrl" class="rounded-circle" 
+                   width="32" height="32" alt="Profile" />
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end mt-2">
+              <li><a class="dropdown-item" routerLink="/profile">Profile</a></li>
+              <li><hr class="dropdown-divider" /></li>
+              <li><a class="dropdown-item" (click)="logout()">Sign out</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container main-content">
+    <div class="row">
+      <!-- Main Section -->
+      <main class="col-lg-9 col-md-9">
+        <div class="bg-white rounded shadow-sm p-4">
+          <h2 class="mb-4">Settings</h2>
+          <!-- Settings Tabs -->
+          <ul class="nav settings-tabs">
+            <li class="nav-item">
+              <a class="nav-link active" routerLink="/account" data-tab="account">Account</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/publishing" data-tab="publishing">Publishing</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/notification" data-tab="notifications">Notifications</a>
+            </li>
+          </ul>
+          
+          <!--Setting contents-->
+          <div id="account-content">
+            <!-- Email address -->
+            <div class="settings-section">
+              <div>
+                <div class="settings-label">Email address</div>
+                <div id="email-display" class="settings-value">{{ userProfile.email }}</div>
+              </div>
+            </div>
+            
+            <!-- Username and subdomain -->
+            <div class="settings-section">
+              <div>
+                <div class="settings-label">Username and subdomain</div>
+                <div id="username-display" class="settings-value" style="cursor: pointer;" (click)="toggleEdit('username')">
+                    {{ '@' + userProfile.username }}
+                </div>
+                <form id="username-form" [class.d-none]="!editMode.username" class="mt-2" 
+                      (ngSubmit)="saveEdit('username', $event)">
+                  <input type="text" class="form-control form-control-sm" 
+                         id="username-input" [(ngModel)]="editValues.username" name="username" />
+                  <div class="mt-2">
+                    <button type="submit" class="btn btn-primary btn-sm" [disabled]="isLoading">
+                      {{ isLoading ? 'Saving...' : 'Save' }}
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm ms-2" 
+                            (click)="cancelEdit('username')">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            
+            <!-- Profile photo -->
+            <div class="settings-section">
+              <div>
+                <div class="settings-label">Profile photo</div>
+                <div class="settings-description">Upload your profile picture</div>
+                
+                <!-- Profile Image Section -->
+                <div class="profile-image-section mt-3">
+                  <div class="d-flex align-items-center gap-3">
+                    <img id="profile-avatar" [src]="userProfile.avatarUrl" 
+                         class="rounded-circle" width="80" height="80" 
+                         alt="Profile Avatar" style="object-fit: cover;" />
+                    <div>
+                      <button type="button" class="btn btn-outline-primary btn-sm" 
+                              (click)="avatarInput.click()" [disabled]="isUploading">
+                        {{ isUploading ? 'Uploading...' : 'Change Photo' }}
+                      </button>
+                      <input type="file" #avatarInput accept="image/*" 
+                             style="display: none;" (change)="handleAvatarChange($event)" />
+                      <div class="small text-muted mt-1">JPG, PNG or GIF. Max 2MB.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Profile information -->
+            <div class="settings-section">
+              <div>
+                <div class="settings-label">Full name</div>
+                <div class="settings-description">Edit your display name</div>
+                <div id="fullname-display" class="settings-value mt-1" style="cursor: pointer;" (click)="toggleEdit('fullname')">
+                    {{ userProfile.fullname }}
+                </div>
+                <form id="fullname-form" [class.d-none]="!editMode.fullname" class="mt-2" 
+                      (ngSubmit)="saveEdit('fullname', $event)">
+                  <input type="text" class="form-control form-control-sm" 
+                         id="fullname-input" [(ngModel)]="editValues.fullname" name="fullname" />
+                  <div class="mt-2">
+                    <button type="submit" class="btn btn-primary btn-sm" [disabled]="isLoading">
+                      {{ isLoading ? 'Saving...' : 'Save' }}
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm ms-2" 
+                            (click)="cancelEdit('fullname')">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            
+            <!-- Deactivate account -->
+            <div class="settings-section">
+              <div>
+                <div class="settings-label danger-text" style="cursor: pointer;" 
+                     (click)="deactivateAccount()">Deactivate account</div>
+                <div class="settings-description">
+                  Deactivating will suspend your account until you sign back in.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error/Success Messages -->
+          <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+            {{ errorMessage }}
+          </div>
+          <div *ngIf="successMessage" class="alert alert-success mt-3">
+            {{ successMessage }}
+          </div>
+        </div>
+      </main>
+      
+      <!-- Sidebar -->
+      <aside class="col-lg-3 col-md-3 d-none d-md-block border-start bg-white pt-4">
+        <div class="help-articles">
+          <h6>Suggested help articles</h6>
+          <ul>
+            <li><a href="#">Sign in or sign up to Medium</a></li>
+            <li><a href="#">Your profile page</a></li>
+            <li><a href="#">Writing and publishing your first story</a></li>
+            <li><a href="#">About Medium's distribution system</a></li>
+            <li><a href="#">Get started with the Partner Program</a></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <!-- Footer -->
+  <footer class="main-footer mt-1">
+    <hr class="footer-divider mb-4" />
+    <div class="footer-links">
+      <a href="#">Help</a>
+      <a href="#">Status</a>
+      <a href="#">About</a>
+      <a href="#">Careers</a>
+      <a href="#">Press</a>
+      <a href="#">Blog</a>
+      <a href="#">Privacy</a>
+      <a href="#">Rules</a>
+      <a href="#">Terms</a>
+      <a href="#">Text to speech</a>
+    </div>
+  </footer>
+</div>

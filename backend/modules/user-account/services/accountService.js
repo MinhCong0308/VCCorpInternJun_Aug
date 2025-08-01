@@ -30,6 +30,7 @@ const accountService = {
             ]},
         });
         if(!user) {
+            console.log("User does not exist or not authenticated");
             throw new Error("User does not exist or not authenticated");
         }
         user.firstname = firstname;

@@ -13,6 +13,17 @@ const postsController = {
             return responseUtils.error(res, message);
         }
     },
+    getPublishedPostsTrending: async (req, res) => {
+        try {
+            const { categoryId, userId, languageId, limit = 5, page = 1, search = '' } = req.query;
+            const posts = await postsService.getPublishedPostsTrending(categoryId, userId, languageId, +limit, +page, search);
+            return responseUtils.ok(res, posts);
+        } catch (error) {
+            console.error("Error fetching trending posts:", error);
+            const message = "An error occurred while fetching trending posts";
+            return responseUtils.error(res, message);
+        }
+    },
     getPublishedPostDetail: async (req, res) => {
         try {
             const { postId } = req.params;
@@ -20,6 +31,26 @@ const postsController = {
             return responseUtils.ok(res, post);
         } catch (error) {
             console.error("Error fetching post detail:", error);
+            return responseUtils.error(res, error.message);
+        }
+    },
+    likePost: async (req, res) => {
+        try {
+            const { postId } = req.params;
+            const updatedPost = await postsService.likePost(postId);
+            return responseUtils.ok(res, updatedPost);
+        } catch (error) {
+            console.error("Error liking post:", error);
+            return responseUtils.error(res, error.message);
+        }
+    },
+    unlikePost: async (req, res) => {
+        try {
+            const { postId } = req.params;
+            const updatedPost = await postsService.unlikePost(postId);
+            return responseUtils.ok(res, updatedPost);
+        } catch (error) {
+            console.error("Error unliking post:", error);
             return responseUtils.error(res, error.message);
         }
     }

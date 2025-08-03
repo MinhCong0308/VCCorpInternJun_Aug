@@ -187,7 +187,10 @@ router.group(
 // ===== POST =====
 router.group("/posts", (router) => {
   router.get("/", postsController.getPublishedPosts);
+  router.get("/trending", postsController.getPublishedPostsTrending);
   router.get("/:postId", postsController.getPublishedPostDetail);
+  router.put("/:postId/like", middlewares([authenticated, checkRole(["user"])]), postsController.likePost);
+  router.put("/:postId/unlike", middlewares([authenticated, checkRole(["user"])]), postsController.unlikePost);
 });
 
 // ===== USER =====

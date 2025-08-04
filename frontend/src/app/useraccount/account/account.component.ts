@@ -113,7 +113,7 @@ export class AccountComponent implements OnInit {
       this.errorMessage = 'Value cannot be empty.';
       return;
     }
-    console.log('Token:', token);
+    // console.log('Token:', token);
     this.isLoading = true;
     this.clearMessages();
 

@@ -8,10 +8,13 @@ const db = require('models/index');
 const postsController = {   
     createPost: async (req, res) => {
         try {
-            const {title, content, languageid} = req.body;
-            const data = await postService.createPost(title, content, userid, languageid);
+            const {title, content, languageid, tags} = req.body;
+            const userid = req.user.userid; // Get userid from authenticated user
+            // console.log("Create post with title: ", title, " and content: ", content, " and languageid: ", languageid, " and tags: ", tags);
+            const data = await postService.createPost(title, content, userid, languageid, tags);
             return responseUtils.ok(res, data);
         } catch (error) {
+            console.error("Error creating post:", error);
             return responseUtils.error(res, error.message);
         }
     },

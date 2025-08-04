@@ -4,7 +4,7 @@ const postValidation = {
     createPost: [
         new BodyWithLocale("title").notEmpty().isString(),
         new BodyWithLocale("content").notEmpty(),
-        new BodyWithLocale("languageid").notEmpty().isNumberic()
+        new BodyWithLocale("languageid").notEmpty()
     ],
     deletePost: [
         new BodyWithLocale("postid").notEmpty().isNumberic()

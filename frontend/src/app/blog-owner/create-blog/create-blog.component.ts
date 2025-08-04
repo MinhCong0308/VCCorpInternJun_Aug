@@ -12,10 +12,7 @@ export class CreateBlogComponent implements OnInit {
   blogForm!: FormGroup;
 
   selectedTags: Set<string> = new Set();
-  availableTags: string[] = [
-    'Tech', 'Travel', 'Food', 'Education', 'Health',
-    'Science', 'Art', 'Finance', 'Music', 'Games'
-  ];
+  availableTags: string[] = [];
 
   languages = [
     { id: 1, name: 'English', flag: '🇺🇸' },
@@ -42,14 +39,15 @@ export class CreateBlogComponent implements OnInit {
     this.blogForm = this.fb.group({
       title: ['', Validators.required],
       content: ['', Validators.required],
-      languageId: [1, Validators.required],
+      languageid: [1, Validators.required],
       tags: [[]]
     });
+
   }
 
   selectLanguage(lang: { id: number; name: string; flag: string }, event: Event): void {
     event.preventDefault();
-    this.blogForm.patchValue({ languageId: lang.id });
+    this.blogForm.patchValue({ languageid: lang.id });
     this.selectedLanguageName = lang.name;
     this.selectedLanguageFlag = lang.flag;
   }
@@ -72,7 +70,10 @@ export class CreateBlogComponent implements OnInit {
     this.selectedTags.delete(tag);
     this.blogForm.patchValue({ tags: Array.from(this.selectedTags) });
   }
-
+  getAllTagsFromDB(): string[] {
+    //
+    return ['Technology', 'Health', 'Travel', 'Food', 'Lifestyle', 'Education'];
+  }
   submitBlog(): void {
     if (this.blogForm.invalid) {
       alert('Please fill in all required fields.');
@@ -87,7 +88,7 @@ export class CreateBlogComponent implements OnInit {
 
     const payload = this.blogForm.value;
     const headers = new HttpHeaders().set('Authorization', `Bearer ${accessToken}`);
-
+    // console.log('Here is a payload:', payload);
     this.http.post('http://localhost:3000/post-owner/create-post', payload, { headers }).subscribe({
       next: () => {
         alert(`Your blog "${payload.title}" was submitted successfully.`);

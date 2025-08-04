@@ -3,8 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 
-
-
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -68,7 +66,7 @@ export class LoginComponent implements OnInit {
         const data = await response.json();
 
         if (this.isBrowser) {
-          localStorage.setItem('accessToken', data.accessToken);
+          localStorage.setItem('accessToken', data.data.accessToken);
         }
 
         this.successMessage = 'Login successful! Redirecting...';

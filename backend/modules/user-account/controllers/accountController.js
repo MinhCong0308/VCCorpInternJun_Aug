@@ -53,6 +53,11 @@ const accountController = {
         } catch(error) {
             return responseUtils.unauthorized(res, error.message);
         }
+    },
+    getProfile: async(req, res) => {
+        const user = req.user;
+        const data = await accountService.getProfile(user);
+        return responseUtils.ok(res, data);
     }
 };
 module.exports = accountController;

@@ -66,6 +66,14 @@ const accountService = {
         user.avatar = avatarUrl;
         await user.save();
         return {message: "Update avatar successfully", avatarUrl: user.avatar};
+    },
+    async getProfile(user) {
+        return {
+            email: user.email,
+            username: user.username,
+            fullname: `${user.firstname} ${user.lastname}`,
+            avatarUrl: user.avatar
+        };
     }
 };
 module.exports = accountService;

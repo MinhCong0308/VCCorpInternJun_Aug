@@ -10,7 +10,6 @@ const postsController = {
         try {
             const {title, content, languageid, tags} = req.body;
             const userid = req.user.userid; // Get userid from authenticated user
-            // console.log("Create post with title: ", title, " and content: ", content, " and languageid: ", languageid, " and tags: ", tags);
             const data = await postService.createPost(title, content, userid, languageid, tags);
             return responseUtils.ok(res, data);
         } catch (error) {
@@ -20,9 +19,7 @@ const postsController = {
     },
     deletePost: async (req, res) => {
         try {
-            const token = req.headers.authorization?.split(" ")[1];
-            const decoded = jwt.verify(token, config.config.jwt.secret);
-            const userid = decoded.userId;
+            const userid = req.user.userid; // Get userid from authenticated user
             const {postid} = req.body;
             const data = await postService.deletePost(postid, userid);
             return responseUtils.ok(res, data);
@@ -32,9 +29,7 @@ const postsController = {
     },
     updatePost: async (req, res) => {
         try {
-            const token = req.headers.authorization?.split(" ")[1];
-            const decoded = jwt.verify(token, config.config.jwt.secret);
-            const userid = decoded.userId;
+            const userid = req.user.userid; // Get userid from authenticated user
             const {postid, newTitle, newContent} = req.body;
             const post = db.Post.findByPk(postid);
             if(post.userid != userid) {
@@ -48,9 +43,7 @@ const postsController = {
     },
     getAllPosts: async (req, res) => {
         // get userid from token
-        const token = req.headers.authorization?.split(" ")[1];
-        const decoded = jwt.verify(token, config.config.jwt.secret);
-        const userid = decoded.userId;
+        const userid = req.user.userid; // Get userid from authenticated user
         try {
             const data = await postService.getAllPosts(userid);
             return responseUtils.ok(res, data);
@@ -58,5 +51,20 @@ const postsController = {
             return responseUtils.error(res, error.message);
         }
     },
+    getSpecificPost: async (req, res) => {
+        const userid = req.user.userid;
+        console.log("req.params: ", req.params); 
+        const { postid } = req.params;
+        console.log("postid: ", postid);
+        try {
+            const data = await postService.getSpecificPost(postid, userid);
+            console.log("Data retrieved successfully:", data);
+            return responseUtils.ok(res, data);
+        }
+        catch (error) {
+            console.error("Error retrieving specific post:", error);
+            return responseUtils.error(res, error.message);
+        }
+    }
 };
 module.exports = postsController;

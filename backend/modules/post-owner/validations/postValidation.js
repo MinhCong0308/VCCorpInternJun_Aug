@@ -13,6 +13,9 @@ const postValidation = {
         new BodyWithLocale("postid").notEmpty().isNumberic(),
         new BodyWithLocale("title").notEmpty(),
         new BodyWithLocale("content").notEmpty()
-    ]
+    ],
+    // getSpecificPost: [
+    //     new BodyWithLocale("postid").notEmpty().isNumberic()
+    // ]
 };
 module.exports = postValidation;

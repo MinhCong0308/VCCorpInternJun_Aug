@@ -19,10 +19,10 @@ export class AccountComponent implements OnInit {
   @ViewChild('avatarInput') avatarInput!: ElementRef<HTMLInputElement>;
 
   userProfile: UserProfile = {
-    email: 'congminhnguyen0308@gmail.com',
-    username: 'congminhnguyen0308',
-    fullname: 'Nguyen Cong Minh',
-    avatarUrl: 'https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg'
+    email: '',
+    username: '',
+    fullname: '',
+    avatarUrl: ''
   };
 
   editMode = {
@@ -67,14 +67,13 @@ export class AccountComponent implements OnInit {
           'Authorization': `Bearer ${token}`
         }
       });
-
       if (response.ok) {
-        const data = await response.json();
+        const responseJson = await response.json();
         this.userProfile = {
-          email: data.email || this.userProfile.email,
-          username: data.username || this.userProfile.username,
-          fullname: data.fullname || this.userProfile.fullname,
-          avatarUrl: data.avatarUrl || this.userProfile.avatarUrl
+          email: responseJson.data.email || this.userProfile.email,
+          username: responseJson.data.username || this.userProfile.username,
+          fullname: responseJson.data.fullname || this.userProfile.fullname,
+          avatarUrl: responseJson.data.avatarUrl || this.userProfile.avatarUrl
         };
       }
     } catch (error) {
@@ -113,7 +112,6 @@ export class AccountComponent implements OnInit {
       this.errorMessage = 'Value cannot be empty.';
       return;
     }
-    // console.log('Token:', token);
     this.isLoading = true;
     this.clearMessages();
 
@@ -197,7 +195,6 @@ export class AccountComponent implements OnInit {
         this.userProfile.avatarUrl = data.data.avatarUrl;
         this.successMessage = 'Profile photo updated successfully!';
         
-        // Clear success message after 3 seconds
         setTimeout(() => {
           this.successMessage = '';
         }, 3000);

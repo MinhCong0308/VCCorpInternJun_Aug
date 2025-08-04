@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-create-blog',
@@ -33,7 +34,7 @@ export class CreateBlogComponent implements OnInit {
     ]
   };
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {}
+  constructor(private fb: FormBuilder, private http: HttpClient, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.blogForm = this.fb.group({
@@ -42,7 +43,39 @@ export class CreateBlogComponent implements OnInit {
       languageid: [1, Validators.required],
       tags: [[]]
     });
-
+    this.availableTags = this.getAllTagsFromDB();
+    this.route.queryParams.subscribe(params => {
+      const editPostId = params['edit'];
+      if (editPostId) {
+        this.loadPostForEditing(editPostId);
+      }
+    });
+  }
+  loadPostForEditing(postId: number): void {
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      alert('You need to be logged in to edit a post.');
+      return;
+    }
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${accessToken}`);
+    this.http.get<any>(`http://localhost:3000/post-owner/get-specific-post/${postId}`, { headers }).subscribe({
+      next: (data) => {
+        console.log('Post data:', data.data);
+        this.blogForm.patchValue({
+          title: data.data.title,
+          content: data.data.content,
+          languageid: data.data.languageid,
+          tags: data.data.tags || []
+        });
+        this.selectedTags = new Set(data.data.tags || []);
+        this.selectedLanguageName = this.languages.find(lang => lang.id === data.data.languageid)?.name || 'English';
+        this.selectedLanguageFlag = this.languages.find(lang => lang.id === data.data.languageid)?.flag || '🇺🇸';
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Failed to load post for editing.');
+      }
+    });
   }
 
   selectLanguage(lang: { id: number; name: string; flag: string }, event: Event): void {

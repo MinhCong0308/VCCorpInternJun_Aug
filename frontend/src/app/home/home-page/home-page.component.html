@@ -1,0 +1,248 @@
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand logo" routerLink="/">
+            <img src="./assets/img/logo.png" class="logo-img" alt="logo-image">
+            BlogBlogBlog
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="flex-grow-1 mx-4 d-none d-md-block">
+                <form (submit)="onSearch()" class="search-bar-group input-group" style="margin-left: -16px;">
+                    <span class="input-group-text bg-transparent border-0">
+                        <i class="ti-search"></i>
+                    </span>
+                    <input
+                        type="text"
+                        class="form-control bg-transparent border-0"
+                        placeholder="Search"
+                        style="box-shadow: none;"
+                        [(ngModel)]="searchQuery"
+                        name="search"
+                    />
+                </form>
+            </div>
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <a routerLink="login.html"><button class="btn btn-login">Log in</button></a>
+                <a routerLink="signup.html"><button class="btn btn-signup">Sign up</button></a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="container main-content">
+    <div class="row">
+        <!-- Main List -->
+        <main class="col-lg-9 col-md-9">
+
+            <div class="center">
+                <!-- Search Result Display -->
+                <div *ngIf="searchTermDisplay" class="search-result-title">
+                    <span class="search-prefix">Results for </span>
+                    <span class="search-term">{{ searchTermDisplay }}</span>
+                </div>
+
+                <!-- Sticky Category Tabs -->
+                <div class="nav-category-bar">
+                    <div class="container-fluid px-0 nav-category-scroll">
+                        <nav id="nav-category-list">
+                            <a *ngFor="let cat of categories"
+                                class="nav-link"
+                                routerLink="#"
+                                [class.active]="cat.categoryid === selectedCategory"
+                                (click)="selectCategory(cat.categoryid)">
+                                {{ cat.categoryname }}
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Danh sách bài viết động -->
+                <div class="post-item" *ngFor="let post of posts">
+                    <div class="post-info">
+                        <div class="d-flex align-items-center mb-1">
+                            <a routerLink="#"><img [src]="post.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'" class="author-avatar" alt="Author"></a>
+                            <span class="author-name">
+                                <a routerLink="#">{{ post.User?.firstname }} {{ post.User?.lastname }}</a>
+                            </span>
+                        </div>
+                        <div class="post-title">
+                            <a [routerLink]="['/post-detail', post.postid]">{{ post.title }}</a>
+                        </div>
+                        <div class="post-sneak" [innerHTML]="post.content | slice:0:100"></div>
+                        <div class="post-meta">
+                            <span>{{ post.createdAt | date: 'MMM d' }}</span>
+                            <span><i class="ti-thumb-up"></i> {{ post.like_cnt }}</span>
+                            <span><i class="ti-comment"></i> {{post.commentCount }}</span>
+                        </div>
+                    </div>
+                    <a [routerLink]="['/post-detail', post.postid]">
+                        <img [src]="post.coverImage || 'https://via.placeholder.com/150'" class="post-img-thumb" alt="Preview">
+                    </a>
+                </div>
+                <!-- Cần sửa thêm để có thể ấn vào bất kỳ chỗ nào ngoài ảnh và tên author cũng có thể routerLink tới post detail -->
+
+                <!-- Post 1 -->
+                <div class="post-item">
+                    <div class="post-info">
+                        <div class="d-flex align-items-center mb-1">
+                            <img src="https://randomuser.me/api/portraits/men/11.jpg" class="author-avatar" alt="Author">
+                            <span class="author-name"><a routerLink="#">Olly J</a></span>
+                        </div>
+                        <div class="post-title"><a routerLink="post-detail.html">18 Cheat Codes to Life, to Put You 10 Years Ahead of 90% Of People</a></div>
+                        <div class="post-sneak">(You have the power to change your life. Take small steps every day, and soon you’ll be unstoppable)</div>
+                        <div class="post-meta">
+                            <span>Mar 5</span>
+                            <span><i class="ti-thumb-up"></i> 13.9K</span>
+                            <span><i class="ti-comment"></i> 306</span>
+                        </div>
+                    </div>
+                    <a routerLink="post-detail.html"><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/0*C2djSCTm4cYUb1md" class="post-img-thumb" alt="Preview"></a>
+                </div>
+                <!-- Post 2 -->
+                <div class="post-item">
+                    <div class="post-info">
+                        <div class="d-flex align-items-center mb-1">
+                            <img src="https://randomuser.me/api/portraits/men/35.jpg" class="author-avatar" alt="Author">
+                            <span class="author-name"><a routerLink="#">Usman</a></span>
+                        </div>
+                        <div class="post-title"><a routerLink="#">These Phrases Prove You Used ChatGPT</a></div>
+                        <div class="post-sneak">If your writing sounds like this, people will know you used AI.</div>
+                        <div class="post-meta">
+                            <span>Apr 16</span>
+                            <span><i class="ti-thumb-up"></i> 8.1K</span>
+                            <span><i class="ti-comment"></i> 494</span>
+                        </div>
+                    </div>
+                    <a routerLink="#"><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*PRemC14VUV5tkK0rQh58YQ.jpeg" class="post-img-thumb" alt="Preview"></a>
+                </div>
+                <!-- Post 3 -->
+                <div class="post-item">
+                    <div class="post-info">
+                        <div class="d-flex align-items-center mb-1">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" class="author-avatar" alt="Author">
+                            <span class="author-name"><a routerLink="#">Alex Mathers</a></span>
+                        </div>
+                        <div class="post-title"><a routerLink="#">Eight uncomfortable truths about why some people are instantly likeable</a></div>
+                        <div class="post-sneak">I spent years watching people who seemed to make friends without trying.</div>
+                        <div class="post-meta">
+                            <span>Apr 10</span>
+                            <span><i class="ti-thumb-up"></i> 12.2K</span>
+                            <span><i class="ti-comment"></i> 198</span>
+                        </div>
+                    </div>
+                    <a routerLink="#"><img src="https://miro.medium.com/v2/resize:fit:1400/0*MJJzgxUizQGBZAL9.jpeg" class="post-img-thumb" alt="Preview"></a>
+                </div>
+                <!-- Post 4 -->
+                <div class="post-item">
+                    <div class="post-info">
+                        <div class="d-flex align-items-center mb-1">
+                            <img src="https://randomuser.me/api/portraits/women/32.jpg" class="author-avatar" alt="Author">
+                            <span class="author-name"><a routerLink="#">Kevin Blake</a></span>
+                        </div>
+                        <div class="post-title"><a routerLink="#">New Class of Life: The Immortal “Aeonophiles”</a></div>
+                        <div class="post-sneak">Ultra-slow-growing microorganisms can live for potentially millions of years</div>
+                        <div class="post-meta">
+                            <span>May 25</span>
+                            <span><i class="ti-thumb-up"></i> 6.3K</span>
+                            <span><i class="ti-comment"></i> 120</span>
+                        </div>
+                    </div>
+                    <a routerLink="#"><img src="https://miro.medium.com/v2/resize:fit:2000/format:webp/1*CDEobKc3xWEVf5mOS3GP7A.jpeg" class="post-img-thumb" alt="Preview"></a>
+                </div>
+                <!-- Post 5 -->
+                <div class="post-item">
+                    <div class="post-info">
+                        <div class="d-flex align-items-center mb-1">
+                            <img src="https://randomuser.me/api/portraits/women/21.jpg" class="author-avatar" alt="Author">
+                            <span class="author-name"><a routerLink="#">Favour Ogazi</a></span>
+                        </div>
+                        <div class="post-title"><a routerLink="#">My Dear, I Am Trying.</a></div>
+                        <div class="post-sneak">They say your twenties are the most important years of your life.</div>
+                        <div class="post-meta">
+                            <span>Mar 17</span>
+                            <span><i class="ti-thumb-up"></i> 6.6K</span>
+                            <span><i class="ti-comment"></i> 139</span>
+                        </div>
+                    </div>
+                    <a routerLink="#"><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*7RLhPlkS-a6-l8iFCWA3Rw@2x.jpeg" class="post-img-thumb" alt="Preview"></a>
+                </div>
+                <!-- Thêm post mẫu nếu muốn -->
+            </div>
+        </main>
+        <!-- Sidebar -->
+        <aside class="col-lg-3 col-md-3 d-none d-md-block border-start bg-white pt-4">
+            <div class="sidebar-inner ps-4">
+                <div class="sidebar-section">
+                    <h6>Staff Picks</h6>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-1">
+                            <img src="https://randomuser.me/api/portraits/men/44.jpg" class="author-avatar" alt="Author">
+                            <span class="author-name"><a routerLink="#">Sam A</a></span>
+                        </div>
+                        <div class="sidebar-post-title"><a routerLink="#">I Took a Chance, and Ended Up In a Movie with Robert De Niro</a></div>
+                        <span class="text-secondary" style="font-size:11px;">May 30</span>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-1">
+                            <img src="https://randomuser.me/api/portraits/men/24.jpg" class="author-avatar" alt="Author">
+                            <span class="author-name"><a routerLink="#">Lorraine Humbert</a></span>
+                        </div>
+                        <div class="sidebar-post-title"><a routerLink="#">I Rode Through the Frozen Silence of a Norwegian Night</a></div>
+                        <span class="text-secondary" style="font-size:11px;">Jun 8</span>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-1">
+                            <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTXnaABQ8VHLuSIcRxk13NyI69roQ9HSoF0iy_JMYlNivDL45zn" class="author-avatar" alt="Author">
+                            <span class="author-name"><a routerLink="#">Barack Obama</a></span>
+                        </div>
+                        <div class="sidebar-post-title"><a routerLink="#">Conversation at The Connecticut Forum</a></div>
+                        <span class="text-secondary" style="font-size:11px;">Jun 19</span>
+                    </div>
+                    <div class="mb-3 full-list"><a routerLink="#">See the full list</a></div>
+                </div>
+                <div class="sidebar-section bg-light p-3 rounded">
+                    <h6>Writing on Blog</h6>
+                    <ul class="list-unstyled mb-2 ps-1">
+                        <li>New writer FAQ</li>
+                        <li>Expert writing advice</li>
+                        <li>Grow your readership</li>
+                    </ul>
+                    <a routerLink="blogWriting.html"><button class="btn btn-dark btn-sm rounded-pill">Start writing</button></a>
+                </div>
+                <div class="sidebar-section">
+                    <h6>Recommended categories</h6>
+                    <a routerLink="#"><span class="category-tag">Politics</span></a>
+                    <a routerLink="#"><span class="category-tag">Blockchain</span></a>
+                    <a routerLink="#"><span class="category-tag">Women</span></a>
+                    <a routerLink="#"><span class="category-tag">Mindfulness</span></a>
+                    <a routerLink="#"><span class="category-tag">AWS</span></a>
+                    <a routerLink="#"><span class="category-tag">Sexuality</span></a>
+                    <a routerLink="#"><span class="category-tag">Fitness</span></a>
+                    <div class="mb-3 full-list"><a routerLink="#">See more categories</a></div>
+                </div>
+                <div class="sidebar-section">
+                    <h6>Reading list</h6>
+                    <p style="font-size:15px;">Click the <i class="ti-bookmark"></i> on any story to easily add it to your reading list or a custom list that you can share.</p>
+                </div>
+                <div class="sidebar-footer">
+                    <div class="sidebar-footer-links">
+                        <a routerLink="#">Help</a>
+                        <a routerLink="#">Status</a>
+                        <a routerLink="#">About</a>
+                        <a routerLink="#">Careers</a>
+                        <a routerLink="#">Press</a>
+                        <a routerLink="#">Blog</a>
+                        <a routerLink="#">Privacy</a>
+                        <a routerLink="#">Rules</a>
+                        <a routerLink="#">Terms</a>
+                        <a routerLink="#">Text to speech</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>

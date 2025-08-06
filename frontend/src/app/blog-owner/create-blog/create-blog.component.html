@@ -10,7 +10,7 @@
       <div class="collapse navbar-collapse">
         <div class="d-flex align-items-center gap-3 ms-auto">
           <button class="btn btn-success btn-sm rounded-pill px-3" type="submit">
-            Publish
+            {{ isEditMode ? 'Update' : 'Publish' }}
           </button>
           <div class="dropdown">
             <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">

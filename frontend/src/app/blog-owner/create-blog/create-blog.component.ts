@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
+import { Inject, PLATFORM_ID } from '@angular/core';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-create-blog',
@@ -14,6 +18,8 @@ export class CreateBlogComponent implements OnInit {
 
   selectedTags: Set<string> = new Set();
   availableTags: string[] = [];
+  isEditMode : boolean = false;
+  editPostId: number | null = null;
 
   languages = [
     { id: 1, name: 'English', flag: '🇺🇸' },
@@ -34,7 +40,7 @@ export class CreateBlogComponent implements OnInit {
     ]
   };
 
-  constructor(private fb: FormBuilder, private http: HttpClient, private route: ActivatedRoute) {}
+  constructor(private fb: FormBuilder, private http: HttpClient, private route: ActivatedRoute, private router: Router, @Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngOnInit(): void {
     this.blogForm = this.fb.group({
@@ -46,12 +52,18 @@ export class CreateBlogComponent implements OnInit {
     this.availableTags = this.getAllTagsFromDB();
     this.route.queryParams.subscribe(params => {
       const editPostId = params['edit'];
-      if (editPostId) {
-        this.loadPostForEditing(editPostId);
+      if( editPostId) {
+        this.isEditMode = true;
+        this.editPostId = +editPostId; // Convert to number
+        this.loadPostForEditing(this.editPostId);
       }
     });
   }
   loadPostForEditing(postId: number): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      alert('This feature is only available in the browser.');
+      return;
+    }
     const accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
       alert('You need to be logged in to edit a post.');
@@ -105,32 +117,51 @@ export class CreateBlogComponent implements OnInit {
   }
   getAllTagsFromDB(): string[] {
     //
-    return ['Technology', 'Health', 'Travel', 'Food', 'Lifestyle', 'Education'];
+    return ['Technology', 'Romantic', 'Natural Language Processing'];;
   }
   submitBlog(): void {
+    if(!isPlatformBrowser(this.platformId)) {
+      alert('This feature is only available in the browser.');
+      return;
+    }
     if (this.blogForm.invalid) {
       alert('Please fill in all required fields.');
       return;
     }
-
     const accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
       alert('You need to be logged in to submit.');
       return;
     }
-
-    const payload = this.blogForm.value;
     const headers = new HttpHeaders().set('Authorization', `Bearer ${accessToken}`);
-    // console.log('Here is a payload:', payload);
-    this.http.post('http://localhost:3000/post-owner/create-post', payload, { headers }).subscribe({
-      next: () => {
-        alert(`Your blog "${payload.title}" was submitted successfully.`);
-        window.location.href = 'home.html';
-      },
-      error: err => {
-        console.error(err);
-        alert('Failed to submit blog.');
-      }
-    });
+    const payload = this.blogForm.value;
+
+    if (this.isEditMode && this.editPostId !== null) {
+      payload['postid'] = this.editPostId;
+
+      // Perform UPDATE
+      this.http.put('http://localhost:3000/post-owner/update-post', payload, { headers }).subscribe({
+        next: () => {
+          alert(`Your blog "${payload.title}" was updated successfully.`);
+          window.location.href = 'home.html';
+        },
+        error: err => {
+          console.error(err);
+          alert('Failed to update blog.');
+        }
+      });
+    } else {
+      // Perform CREATE
+      this.http.post('http://localhost:3000/post-owner/create-post', payload, { headers }).subscribe({
+        next: () => {
+          alert(`Your blog "${payload.title}" was submitted successfully.`);
+          window.location.href = 'home.html';
+        },
+        error: err => {
+          console.error(err);
+          alert('Failed to submit blog.');
+        }
+      });
+    }
   }
 }

@@ -14,6 +14,8 @@ export class HomePageComponent implements OnInit {
   posts: any[] = []; // Biến để lưu trữ bài viết
   searchQuery: string = ''; // Biến để lưu trữ từ khóa tìm kiếm
   searchTermDisplay: string | null = null; // Biến để hiển thị từ khóa tìm kiếm
+  recentSearches: string[] = []; // Biến để lưu trữ các từ khóa tìm kiếm gần đây
+  showRecentSearches: boolean = false; // Biến để kiểm soát hiển thị danh sách tìm kiếm gần đây
 
   constructor(
     private categoryService: CategoryService,
@@ -21,6 +23,7 @@ export class HomePageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadRecentSearches(); // Tải danh sách tìm kiếm gần đây từ localStorage
     this.categoryService.getCategories().subscribe({
       next: (res: any) => {
         const staticTabs = [
@@ -61,6 +64,7 @@ export class HomePageComponent implements OnInit {
   // Hàm để xử lý tìm kiếm bài viết
   onSearch(): void {
     const query = this.searchQuery.trim();
+    this.saveToRecentSearches(query); // Lưu từ khóa tìm kiếm vào danh sách gần đây
     if (!query) {
       // Nếu không nhập gì: reset danh sách và searchQuery
       this.searchTermDisplay = null; // Clear search term display
@@ -78,6 +82,59 @@ export class HomePageComponent implements OnInit {
       },
       error: (err) => console.error('Search error:', err)
     });
+    this.saveToRecentSearches(query); // Lưu từ khóa tìm kiếm vào danh sách gần đây
   }
 
+  // Hàm để tải danh sách tìm kiếm gần đây từ localStorage
+  loadRecentSearches(): void {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const stored = localStorage.getItem('recentSearches');
+      if (stored) {
+        this.recentSearches = JSON.parse(stored);
+      }
+    }
+  }
+
+  // Hàm để thêm từ khóa tìm kiếm vào danh sách tìm kiếm gần đây
+  saveToRecentSearches(term: string): void {
+    if (!term.trim()) return;
+
+    if (typeof window !== 'undefined' && window.localStorage) {
+      // Tránh trùng lặp
+      const exists = this.recentSearches.includes(term);
+      if (!exists) {
+        this.recentSearches.unshift(term);
+        // Giới hạn số lượng
+        if (this.recentSearches.length > 5) {
+          this.recentSearches = this.recentSearches.slice(0, 5);
+        }
+        // Lưu localStorage nếu muốn nhớ khi refresh
+        localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches));
+      }    
+    }
+  }
+
+  onSearchFocus(): void {
+    if (!this.searchQuery.trim()) {
+      this.showRecentSearches = true;
+    }
+  }
+
+  onSearchBlur(): void {
+    setTimeout(() => {
+      this.showRecentSearches = false;
+    }, 200); // để tránh mất focus khi click recent
+  }
+
+  repeatSearch(term: string): void {
+    this.searchQuery = term;
+    this.onSearch();
+  }
+
+  removeRecentSearch(term: string): void {
+    this.recentSearches = this.recentSearches.filter(t => t !== term);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches));
+    }
+  }
 }

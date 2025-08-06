@@ -61,7 +61,7 @@ const userController = {
       return responseUtils.error(res, error.message);
     }
   },
-  enabel: async (req, res) => {
+  enable: async (req, res) => {
     try {
       const { userid } = req.params;
       await userService.enableUser(userid);

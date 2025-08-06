@@ -77,6 +77,23 @@ body {
     color: green;
     border: 1.5px solid green;
 }
+.search-result-title {
+    font-family: 'Helvetica Neue', sans-serif;
+    font-size: 42px;
+    margin-bottom: 1rem;
+    margin-top: 1.5rem;
+    line-height: 1.3;
+}
+
+.search-result-title .search-prefix {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.search-result-title .search-term {
+    color: var(--text-primary);
+    font-weight: 700;
+}
 .nav-category-bar {
     position: sticky;
     top: 0;

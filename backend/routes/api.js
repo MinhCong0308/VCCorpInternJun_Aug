@@ -213,7 +213,7 @@ router.group(
       userController.update
     );
     router.put("/:userid/disable", userController.disable);
-    router.put("/:userid/enable", userController.enabel);
+    router.put("/:userid/enable", userController.enable);
   }
 );
 

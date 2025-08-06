@@ -8,7 +8,6 @@ import { BlogManageComponent } from './blog-manage/blog-manage.component';
 
 @NgModule({
   declarations: [AccountComponent, BlogManageComponent],
-
   imports: [
     CommonModule,
     UseraccountRoutingModule,

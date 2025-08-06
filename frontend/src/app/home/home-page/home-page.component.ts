@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { CategoryService } from '../../core/services/category.service';
 import { PostService } from '../../core/services/post.service';
+import { AccountService } from '../../core/services/account.service';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 
@@ -20,10 +21,13 @@ export class HomePageComponent implements OnInit {
   showRecentSearches: boolean = false; // Biến để kiểm soát hiển thị danh sách tìm kiếm gần đây
   isLoggedIn: boolean = false; // Biến để kiểm tra trạng thái đăng nhập
   isBrowser: boolean; // Biến để kiểm tra môi trường trình duyệt
+  avatarUrl: string = ''; // Biến để lưu trữ URL của avatar người dùng
+  defaultAvatar: string = 'https://randomuser.me/api/portraits/lego/1.jpg'; // URL của avatar mặc định
 
   constructor(
     private categoryService: CategoryService,
     private postService: PostService,
+    private accountService: AccountService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
@@ -33,6 +37,7 @@ export class HomePageComponent implements OnInit {
   ngOnInit(): void {
     if (this.isBrowser) {
       this.isLoggedIn = !!localStorage.getItem('accessToken'); // Kiểm tra xem người dùng đã đăng nhập hay chưa
+      console.log('Access Token:', localStorage.getItem('accessToken'));
     }
     this.loadRecentSearches(); // Tải danh sách tìm kiếm gần đây từ localStorage
     this.categoryService.getCategories().subscribe({
@@ -45,7 +50,17 @@ export class HomePageComponent implements OnInit {
       },
       error: (err) => console.error('Failed to fetch categories', err)
     });
-    this.loadPosts(); // Mặc định là Latest
+    this.loadPosts(); // Mặc định là 
+    
+    this.accountService.getProfile().subscribe({
+      next: (res: any) => {
+        this.avatarUrl = res?.data?.avatarUrl || this.defaultAvatar;
+      },
+      error: (err) => {
+        console.error('Failed to load profile', err);
+        this.avatarUrl = this.defaultAvatar;
+      }
+    });
   }
 
   // Hàm để xử lý sự kiện khi người dùng click vào logo

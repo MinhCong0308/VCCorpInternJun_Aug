@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CategoryService } from '../../core/services/category.service';
 import { PostService } from '../../core/services/post.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home-page',
@@ -19,7 +20,8 @@ export class HomePageComponent implements OnInit {
 
   constructor(
     private categoryService: CategoryService,
-    private postService: PostService
+    private postService: PostService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -35,6 +37,17 @@ export class HomePageComponent implements OnInit {
       error: (err) => console.error('Failed to fetch categories', err)
     });
     this.loadPosts(); // Mặc định là Latest
+  }
+
+  // Hàm để xử lý sự kiện khi người dùng click vào logo
+  onLogoClick(): void {
+    if (this.router.url === '/home') {
+      // Đang ở /home → reload lại trang
+      window.location.reload();
+    } else {
+      // Nếu đang ở trang khác → chuyển về /home
+      this.router.navigate(['/home']);
+    }
   }
 
   // Hàm để xử lý sự kiện khi người dùng chọn một category

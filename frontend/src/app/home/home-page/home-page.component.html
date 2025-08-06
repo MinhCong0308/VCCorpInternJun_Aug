@@ -1,7 +1,7 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
     <div class="container-fluid px-4">
-        <a class="navbar-brand logo" routerLink="/">
+        <a class="navbar-brand logo" (click)="onLogoClick()" style="cursor: pointer;">
             <img src="./assets/img/logo.png" class="logo-img" alt="logo-image">
             BlogBlogBlog
         </a>
@@ -38,8 +38,8 @@
                 </div>
             </div>
             <div class="d-flex align-items-center gap-3 ms-auto">
-                <a routerLink="login.html"><button class="btn btn-login">Log in</button></a>
-                <a routerLink="signup.html"><button class="btn btn-signup">Sign up</button></a>
+                <a routerLink="/auth/login"><button class="btn btn-login">Log in</button></a>
+                <a routerLink="/auth/signup"><button class="btn btn-signup">Sign up</button></a>
             </div>
         </div>
     </div>

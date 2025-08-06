@@ -40,6 +40,18 @@ const postsService = {
 
         const { count, rows } = await db.Post.findAndCountAll({
             ...options,
+            attributes: {
+                include: [
+                    [
+                        Sequelize.literal(`(
+                            SELECT COUNT(*)
+                            FROM Comment
+                            WHERE Comment.postid = Post.postid
+                        )`),
+                        'commentCount'
+                    ]
+                ]
+            },
             include: [
                 {model: db.User, attributes: ['firstname', 'lastname', 'avatar']},
                 {model: db.Language, attributes: ['languagename']},
@@ -96,6 +108,18 @@ const postsService = {
 
         const { count, rows } = await db.Post.findAndCountAll({
             ...options,
+            attributes: {
+                include: [
+                    [
+                        Sequelize.literal(`(
+                            SELECT COUNT(*)
+                            FROM Comment
+                            WHERE Comment.postid = Post.postid
+                        )`),
+                        'commentCount'
+                    ]
+                ]
+            },
             include: [
                 {model: db.User, attributes: ['firstname', 'lastname', 'avatar']},
                 {model: db.Language, attributes: ['languagename']},
@@ -120,6 +144,18 @@ const postsService = {
             where: { 
                 postid: postId,
                 status: 2 
+            },
+            attributes: {
+                include: [
+                    [
+                        Sequelize.literal(`(
+                            SELECT COUNT(*)
+                            FROM Comment
+                            WHERE Comment.postid = Post.postid
+                        )`),
+                        'commentCount'
+                    ]
+                ]
             },
             include: [
                 { model: db.User, attributes: ['firstname', 'lastname', 'avatar'] },

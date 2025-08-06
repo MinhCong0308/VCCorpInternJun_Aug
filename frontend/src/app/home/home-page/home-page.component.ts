@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { CategoryService } from '../../core/services/category.service';
 import { PostService } from '../../core/services/post.service';
 import { Router } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-home-page',
@@ -17,14 +18,22 @@ export class HomePageComponent implements OnInit {
   searchTermDisplay: string | null = null; // Biến để hiển thị từ khóa tìm kiếm
   recentSearches: string[] = []; // Biến để lưu trữ các từ khóa tìm kiếm gần đây
   showRecentSearches: boolean = false; // Biến để kiểm soát hiển thị danh sách tìm kiếm gần đây
+  isLoggedIn: boolean = false; // Biến để kiểm tra trạng thái đăng nhập
+  isBrowser: boolean; // Biến để kiểm tra môi trường trình duyệt
 
   constructor(
     private categoryService: CategoryService,
     private postService: PostService,
-    private router: Router
-  ) {}
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 
   ngOnInit(): void {
+    if (this.isBrowser) {
+      this.isLoggedIn = !!localStorage.getItem('accessToken'); // Kiểm tra xem người dùng đã đăng nhập hay chưa
+    }
     this.loadRecentSearches(); // Tải danh sách tìm kiếm gần đây từ localStorage
     this.categoryService.getCategories().subscribe({
       next: (res: any) => {
@@ -100,7 +109,7 @@ export class HomePageComponent implements OnInit {
 
   // Hàm để tải danh sách tìm kiếm gần đây từ localStorage
   loadRecentSearches(): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (this.isBrowser) {
       const stored = localStorage.getItem('recentSearches');
       if (stored) {
         this.recentSearches = JSON.parse(stored);
@@ -112,7 +121,7 @@ export class HomePageComponent implements OnInit {
   saveToRecentSearches(term: string): void {
     if (!term.trim()) return;
 
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (this.isBrowser) {
       // Tránh trùng lặp
       const exists = this.recentSearches.includes(term);
       if (!exists) {
@@ -146,7 +155,7 @@ export class HomePageComponent implements OnInit {
 
   removeRecentSearch(term: string): void {
     this.recentSearches = this.recentSearches.filter(t => t !== term);
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (this.isBrowser) {
       localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches));
     }
   }

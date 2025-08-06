@@ -87,6 +87,7 @@ router.group("/account", middlewares([authenticated]), (router) => {
     uploads.single("avatar"),
     accountController.updateAvatar
   );
+  router.get("/profile", accountController.getProfile);
 });
 router.group(
   "/post-owner",
@@ -108,6 +109,10 @@ router.group(
       postController.updatePost
     );
     router.get("/get-all-posts", postController.getAllPosts);
+    router.get(
+      "/get-specific-post/:postid",
+      postController.getSpecificPost
+    );
   }
 );
 
@@ -133,7 +138,6 @@ router.group(
   }
 );
 
-// ===== LANGUAGE =====
 router.group(
   "/languages",
   (router) => {
@@ -156,7 +160,6 @@ router.group(
   }
 );
 
-// ===== COMMENT =====
 router.group("/comments", middlewares([authenticated, checkRole(["user"])]), (router) => {
 
   router.get("/", commentController.getAll);
@@ -172,7 +175,6 @@ router.group("/comments", middlewares([authenticated, checkRole(["user"])]), (ro
   );
 });
 
-// ===== POST ADMIN =====
 router.group(
   "/post-admin",
   middlewares([authenticated, checkRole(["admin"])]),
@@ -193,7 +195,6 @@ router.group("/posts", (router) => {
   router.put("/:postId/unlike", middlewares([authenticated, checkRole(["user"])]), postsController.unlikePost);
 });
 
-// ===== USER =====
 router.group(
   "/users",
   middlewares([authenticated, checkRole(["admin"])]),

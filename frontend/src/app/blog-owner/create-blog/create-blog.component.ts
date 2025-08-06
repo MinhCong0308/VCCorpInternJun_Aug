@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-create-blog',
@@ -12,10 +13,7 @@ export class CreateBlogComponent implements OnInit {
   blogForm!: FormGroup;
 
   selectedTags: Set<string> = new Set();
-  availableTags: string[] = [
-    'Tech', 'Travel', 'Food', 'Education', 'Health',
-    'Science', 'Art', 'Finance', 'Music', 'Games'
-  ];
+  availableTags: string[] = [];
 
   languages = [
     { id: 1, name: 'English', flag: '🇺🇸' },
@@ -36,20 +34,53 @@ export class CreateBlogComponent implements OnInit {
     ]
   };
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {}
+  constructor(private fb: FormBuilder, private http: HttpClient, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.blogForm = this.fb.group({
       title: ['', Validators.required],
       content: ['', Validators.required],
-      languageId: [1, Validators.required],
+      languageid: [1, Validators.required],
       tags: [[]]
+    });
+    this.availableTags = this.getAllTagsFromDB();
+    this.route.queryParams.subscribe(params => {
+      const editPostId = params['edit'];
+      if (editPostId) {
+        this.loadPostForEditing(editPostId);
+      }
+    });
+  }
+  loadPostForEditing(postId: number): void {
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      alert('You need to be logged in to edit a post.');
+      return;
+    }
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${accessToken}`);
+    this.http.get<any>(`http://localhost:3000/post-owner/get-specific-post/${postId}`, { headers }).subscribe({
+      next: (data) => {
+        console.log('Post data:', data.data);
+        this.blogForm.patchValue({
+          title: data.data.title,
+          content: data.data.content,
+          languageid: data.data.languageid,
+          tags: data.data.tags || []
+        });
+        this.selectedTags = new Set(data.data.tags || []);
+        this.selectedLanguageName = this.languages.find(lang => lang.id === data.data.languageid)?.name || 'English';
+        this.selectedLanguageFlag = this.languages.find(lang => lang.id === data.data.languageid)?.flag || '🇺🇸';
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Failed to load post for editing.');
+      }
     });
   }
 
   selectLanguage(lang: { id: number; name: string; flag: string }, event: Event): void {
     event.preventDefault();
-    this.blogForm.patchValue({ languageId: lang.id });
+    this.blogForm.patchValue({ languageid: lang.id });
     this.selectedLanguageName = lang.name;
     this.selectedLanguageFlag = lang.flag;
   }
@@ -72,7 +103,10 @@ export class CreateBlogComponent implements OnInit {
     this.selectedTags.delete(tag);
     this.blogForm.patchValue({ tags: Array.from(this.selectedTags) });
   }
-
+  getAllTagsFromDB(): string[] {
+    //
+    return ['Technology', 'Health', 'Travel', 'Food', 'Lifestyle', 'Education'];
+  }
   submitBlog(): void {
     if (this.blogForm.invalid) {
       alert('Please fill in all required fields.');
@@ -87,7 +121,7 @@ export class CreateBlogComponent implements OnInit {
 
     const payload = this.blogForm.value;
     const headers = new HttpHeaders().set('Authorization', `Bearer ${accessToken}`);
-
+    // console.log('Here is a payload:', payload);
     this.http.post('http://localhost:3000/post-owner/create-post', payload, { headers }).subscribe({
       next: () => {
         alert(`Your blog "${payload.title}" was submitted successfully.`);

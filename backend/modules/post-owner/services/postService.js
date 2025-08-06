@@ -5,6 +5,7 @@ const { Op } = require('sequelize');
 const postService = {
     createPost: async (title, content, userid, languageid, tags) => {
         try {
+            console.log("Here is start of createPost");
             const post = await db.Post.create({
                 userid,
                 languageid,
@@ -20,6 +21,7 @@ const postService = {
             await post.save();
             return { message: "Post created successfully", post };
         } catch (error) {
+            console.log("Error creating post:", error.message);
             throw new Error("Error creating post");
         }
     },
@@ -40,7 +42,7 @@ const postService = {
         post.content = newContent;
         // post.status = config.config.statuspostenum.PENDING; 
         await post.save();
-        return {message: "Update post successfully"};
+        return { message: "Update post successfully" };
     },
     getAllPosts: async (userid) => {
         try {
@@ -76,9 +78,31 @@ const postService = {
                 });
             }
         } catch (error) {
-            console.error("Error setting tags for post:", error);
+            // console.error("Error setting tags for post:", error);
             throw new Error("Error setting tags for post");
         }
+    },
+    getSpecificPost: async (postid, userid) => {
+        const post = await db.Post.findOne({
+            where: {
+                postid: postid,
+                userid: userid
+            },
+            include: [{
+                model: db.Category,
+                as: 'Categories',
+                through: { attributes: [] } 
+            }]
+        });
+        if (!post) {
+            throw new Error("Post not found or you are not authorized to view this post");
+        }
+        return {
+            title: post.title,
+            content: post.content,
+            languageid: post.languageid,
+            tags: post.Categories.map(category => category.name)
+        };
     }
 };
 

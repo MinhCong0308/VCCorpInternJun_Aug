@@ -148,15 +148,25 @@ export class HomePageComponent implements OnInit {
     }, 200); // để tránh mất focus khi click recent
   }
 
+  // Hàm để lặp lại tìm kiếm với từ khóa đã nhập
   repeatSearch(term: string): void {
     this.searchQuery = term;
     this.onSearch();
   }
 
+  // Hàm để xóa từ khóa tìm kiếm gần đây
   removeRecentSearch(term: string): void {
     this.recentSearches = this.recentSearches.filter(t => t !== term);
     if (this.isBrowser) {
       localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches));
     }
+  }
+
+  // Hàm để đăng xuất
+  logout(): void {
+    if (this.isBrowser) {
+      localStorage.removeItem('accessToken');
+    }
+    this.router.navigate(['/auth/login']);
   }
 }

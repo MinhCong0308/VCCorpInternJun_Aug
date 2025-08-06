@@ -68,7 +68,7 @@
                         <!-- Thêm các ngôn ngữ khác nếu cần -->
                     </ul>
                 </div>
-                <a routerLink="/" class="text-secondary text-decoration-none ms-2 me-1">
+                <a routerLink="/" class="text-secondary text-decoration-none mt-1 ms-2 me-2">
                     <i class="ti-bell fs-5"></i>
                 </a>
                 <div class="dropdown">
@@ -78,7 +78,7 @@
                     <ul class="dropdown-menu dropdown-menu-end mt-2">
                         <li><a class="dropdown-item" routerLink="/">Profile</a></li>
                         <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" routerLink="/">Sign out</a></li>
+                        <li><a class="dropdown-item" (click)="logout()" style="cursor: pointer">Sign out</a></li>
                     </ul>
                 </div>
             </div>

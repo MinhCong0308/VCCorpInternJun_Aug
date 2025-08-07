@@ -374,11 +374,12 @@ aside {
     padding-top: 0.9rem;
 }
 .full-list a {
-    color: var(--text-secondary);
-    text-decoration: none;
+    color: var(--text-secondary) !important;
+    text-decoration: none !important;
+    cursor: pointer;
 }
 .full-list a:hover {
-    text-decoration: underline;
+    text-decoration: underline !important;
 }
 /* Footer */
 .main-footer {

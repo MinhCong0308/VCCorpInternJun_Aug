@@ -13,6 +13,9 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class HomePageComponent implements OnInit {
   categories: any[] = [];
+  recommendedCategories: any[] = []; // Biến để lưu trữ các category được gợi ý
+  allCategories: any[] = []; // Biến để lưu trữ tất cả các category (không bao gồm các static tabs), CÓ THỂ MỞ RỘNG THÀNH 1 TRANG EXPLORE-CATEGORIES
+  showAllRecommended: boolean = false; // Toggle để hiển thị thêm
   selectedCategory: any = 'latest'; // Biến theo dõi category đang chọn
   posts: any[] = []; // Biến để lưu trữ bài viết
   searchQuery: string = ''; // Biến để lưu trữ từ khóa tìm kiếm
@@ -47,6 +50,10 @@ export class HomePageComponent implements OnInit {
           { categoryid: 'trending', categoryname: 'Trending' }
         ];
         this.categories = [...staticTabs, ...res];
+        this.allCategories = res; // Lưu danh sách đầy đủ
+        // Lấy ngẫu nhiên 6 categories cho Recommended
+        const shuffled = [...res].sort(() => 0.5 - Math.random());
+        this.recommendedCategories = shuffled.slice(0, 6);
       },
       error: (err) => console.error('Failed to fetch categories', err)
     });
@@ -78,6 +85,7 @@ export class HomePageComponent implements OnInit {
   selectCategory(id: any): void {
     this.selectedCategory = id;
     this.searchTermDisplay = null; // Clear search term display khi chọn category mới
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     this.loadPosts();
   }
 
@@ -183,5 +191,10 @@ export class HomePageComponent implements OnInit {
       localStorage.removeItem('accessToken');
     }
     this.router.navigate(['/auth/login']);
+  }
+
+  // Hàm để toggle See more categories
+  toggleRecommended(): void {
+    this.showAllRecommended = !this.showAllRecommended;
   }
 }

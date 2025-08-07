@@ -269,14 +269,12 @@
                 </div>
                 <div class="sidebar-section">
                     <h6>Recommended categories</h6>
-                    <a routerLink="#"><span class="category-tag">Politics</span></a>
-                    <a routerLink="#"><span class="category-tag">Blockchain</span></a>
-                    <a routerLink="#"><span class="category-tag">Women</span></a>
-                    <a routerLink="#"><span class="category-tag">Mindfulness</span></a>
-                    <a routerLink="#"><span class="category-tag">AWS</span></a>
-                    <a routerLink="#"><span class="category-tag">Sexuality</span></a>
-                    <a routerLink="#"><span class="category-tag">Fitness</span></a>
-                    <div class="mb-3 full-list"><a routerLink="#">See more categories</a></div>
+                    <a *ngFor="let cat of showAllRecommended ? allCategories : recommendedCategories" (click)="selectCategory(cat.categoryid)">
+                        <span class="category-tag">{{ cat.categoryname }}</span>
+                    </a>
+                    <div class="mb-3 full-list">
+                        <a (click)="toggleRecommended()">{{ showAllRecommended ? 'See less' : 'See more categories' }}</a>
+                    </div>
                 </div>
                 <div class="sidebar-section">
                     <h6>Reading list</h6>

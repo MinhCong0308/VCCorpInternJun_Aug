@@ -269,7 +269,7 @@
                 </div>
                 <div class="sidebar-section">
                     <h6>Recommended categories</h6>
-                    <a *ngFor="let cat of showAllRecommended ? allCategories : recommendedCategories" (click)="selectCategory(cat.categoryid)">
+                    <a *ngFor="let cat of showAllRecommended ? allCategories : recommendedCategories" (click)="selectCategory(cat.categoryid)" style="cursor: pointer;">
                         <span class="category-tag">{{ cat.categoryname }}</span>
                     </a>
                     <div class="mb-3 full-list">

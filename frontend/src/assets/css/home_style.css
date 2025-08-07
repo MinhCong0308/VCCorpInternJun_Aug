@@ -349,6 +349,10 @@ aside {
     color: #595959;
     display: inline-block;
 }
+.category-tag:hover {
+    background-color: lightgray;
+    transition: background-color 0.4s;
+}
 .post-meta .ti {
     vertical-align: -2px;
 }

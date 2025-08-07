@@ -231,32 +231,32 @@
         <aside class="col-lg-3 col-md-3 d-none d-md-block border-start bg-white pt-4">
             <div class="sidebar-inner ps-4">
                 <div class="sidebar-section">
-                    <h6>Staff Picks</h6>
-                    <div class="mb-3">
+                    <h6>Top Picks</h6>
+
+                    <div *ngFor="let post of trendingPreviewPosts" class="mb-3">
                         <div class="d-flex align-items-center mb-1">
-                            <img src="https://randomuser.me/api/portraits/men/44.jpg" class="author-avatar" alt="Author">
-                            <span class="author-name"><a routerLink="#">Sam A</a></span>
+                            <img
+                                [src]="post.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'"
+                                class="author-avatar"
+                                alt="Author"
+                            />
+                            <span class="author-name">
+                                <a routerLink="#">{{ post.User?.firstname }} {{ post.User?.lastname }}</a>
+                            </span>
                         </div>
-                        <div class="sidebar-post-title"><a routerLink="#">I Took a Chance, and Ended Up In a Movie with Robert De Niro</a></div>
-                        <span class="text-secondary" style="font-size:11px;">May 30</span>
-                    </div>
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-1">
-                            <img src="https://randomuser.me/api/portraits/men/24.jpg" class="author-avatar" alt="Author">
-                            <span class="author-name"><a routerLink="#">Lorraine Humbert</a></span>
+
+                        <div class="sidebar-post-title">
+                            <a routerLink="#">{{ post.title }}</a>
                         </div>
-                        <div class="sidebar-post-title"><a routerLink="#">I Rode Through the Frozen Silence of a Norwegian Night</a></div>
-                        <span class="text-secondary" style="font-size:11px;">Jun 8</span>
+
+                        <span class="text-secondary" style="font-size: 11px;">
+                        {{ post.createdAt | date: 'MMM d' }}
+                        </span>
                     </div>
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-1">
-                            <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTXnaABQ8VHLuSIcRxk13NyI69roQ9HSoF0iy_JMYlNivDL45zn" class="author-avatar" alt="Author">
-                            <span class="author-name"><a routerLink="#">Barack Obama</a></span>
-                        </div>
-                        <div class="sidebar-post-title"><a routerLink="#">Conversation at The Connecticut Forum</a></div>
-                        <span class="text-secondary" style="font-size:11px;">Jun 19</span>
+
+                    <div class="mb-3 full-list">
+                        <a (click)="selectCategory('trending')">See the full list</a>
                     </div>
-                    <div class="mb-3 full-list"><a routerLink="#">See the full list</a></div>
                 </div>
                 <div class="sidebar-section bg-light p-3 rounded">
                     <h6>Writing on Blog</h6>

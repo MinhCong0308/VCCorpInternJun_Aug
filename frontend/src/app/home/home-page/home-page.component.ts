@@ -26,6 +26,7 @@ export class HomePageComponent implements OnInit {
   isBrowser: boolean; // Biến để kiểm tra môi trường trình duyệt
   avatarUrl: string = ''; // Biến để lưu trữ URL của avatar người dùng
   defaultAvatar: string = 'https://randomuser.me/api/portraits/lego/1.jpg'; // URL của avatar mặc định
+  trendingPreviewPosts: any[] = []; // Biển để lưu 3 bài post trending
 
   constructor(
     private categoryService: CategoryService,
@@ -40,9 +41,10 @@ export class HomePageComponent implements OnInit {
   ngOnInit(): void {
     if (this.isBrowser) {
       this.isLoggedIn = !!localStorage.getItem('accessToken'); // Kiểm tra xem người dùng đã đăng nhập hay chưa
-      console.log('Access Token:', localStorage.getItem('accessToken'));
+      // console.log('Access Token:', localStorage.getItem('accessToken'));
     }
     this.loadRecentSearches(); // Tải danh sách tìm kiếm gần đây từ localStorage
+    this.getTrendingPreviewPosts(); // Tải danh sách post trending
     this.categoryService.getCategories().subscribe({
       next: (res: any) => {
         const staticTabs = [
@@ -197,4 +199,17 @@ export class HomePageComponent implements OnInit {
   toggleRecommended(): void {
     this.showAllRecommended = !this.showAllRecommended;
   }
+
+  // Hàm lấy 3 top picks
+  getTrendingPreviewPosts(): void {
+    this.postService.getPublishedPostsTrending().subscribe({
+      next: (res: any) => {
+        this.trendingPreviewPosts = res?.data?.posts.slice(0, 3) || [];
+      },
+      error: (err) => {
+        console.error('Failed to fetch trending preview', err);
+      }
+    });
+  }
+
 }

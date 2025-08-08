@@ -10,13 +10,13 @@ export class PostService {
 
   constructor(private http: HttpClient) { }
 
-  getPublishedPosts(limit: number = 10, page: number = 1): Observable<any> {
+  getPublishedPosts(): Observable<any> {
     return this.http.get(`${this.baseUrl}/posts`);
   }
-  getPublishedPostsTrending(limit: number = 10, page: number = 1): Observable<any> {
+  getPublishedPostsTrending(): Observable<any> {
     return this.http.get(`${this.baseUrl}/posts/trending`);
   }
-  getPostsByCategory(categoryId: number, limit: number = 10, page: number = 1): Observable<any> {
+  getPostsByCategory(categoryId: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/posts?categoryId=${categoryId}`);
   }
   searchPosts(query: string) {

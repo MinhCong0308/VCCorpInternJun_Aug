@@ -1,7 +1,7 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
     <div class="container-fluid px-4">
-        <a class="navbar-brand logo" routerLink="/">
+        <a class="navbar-brand logo" (click)="onLogoClick()" style="cursor: pointer;">
             <img src="./assets/img/logo.png" class="logo-img" alt="logo-image">
             BlogBlogBlog
         </a>
@@ -9,7 +9,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <div class="flex-grow-1 mx-4 d-none d-md-block">
+            <div class="flex-grow-1 mx-4 d-none d-md-block" style="position: relative;">
                 <form (submit)="onSearch()" class="search-bar-group input-group" style="margin-left: -16px;">
                     <span class="input-group-text bg-transparent border-0">
                         <i class="ti-search"></i>
@@ -21,12 +21,66 @@
                         style="box-shadow: none;"
                         [(ngModel)]="searchQuery"
                         name="search"
+                        (focus)="onSearchFocus()"
+                        (blur)="onSearchBlur()"
+                        autocomplete="off"
                     />
                 </form>
+                <!-- Recent Searches Dropdown -->
+                <div *ngIf="showRecentSearches && !searchQuery && recentSearches.length > 0" class="recent-searches-dropdown shadow"
+                    (mousedown)="$event.preventDefault()">
+                    <div class="recent-title">RECENT SEARCHES</div>
+                    <div class="recent-item" *ngFor="let term of recentSearches">
+                        <i class="ti-search"></i>
+                        <span (click)="repeatSearch(term)">{{ term }}</span>
+                        <i class="ti-close" (click)="removeRecentSearch(term)"></i>
+                    </div>
+                </div>
             </div>
-            <div class="d-flex align-items-center gap-3 ms-auto">
-                <a routerLink="login.html"><button class="btn btn-login">Log in</button></a>
-                <a routerLink="signup.html"><button class="btn btn-signup">Sign up</button></a>
+            <!-- Nếu chưa login -->
+            <div *ngIf="!isLoggedIn" class="d-flex align-items-center gap-3 ms-auto">
+                <a routerLink="/auth/login"><button class="btn btn-login">Log in</button></a>
+                <a routerLink="/auth/signup"><button class="btn btn-signup">Sign up</button></a>
+            </div>
+            <!-- Nếu đã login -->
+            <div *ngIf="isLoggedIn" class="d-flex align-items-center gap-3 ms-auto">
+                <a routerLink="/" class="btn btn-write">
+                    <i class="ti-pencil-alt"></i> Write
+                </a>
+                <!-- Language Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
+                        type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span style="font-size: 1.2em;">🇺🇸</span>
+                        <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="langDropdown">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2" routerLink="/">
+                                <span style="font-size:1.2em;">🇻🇳</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2" routerLink="/">
+                                <span style="font-size:1.2em;">🇫🇷</span>
+                            </a>
+                        </li>
+                        <!-- Thêm các ngôn ngữ khác nếu cần -->
+                    </ul>
+                </div>
+                <a routerLink="/" class="text-secondary text-decoration-none mt-1 ms-2 me-2">
+                    <i class="ti-bell fs-5"></i>
+                </a>
+                <div class="dropdown">
+                    <a routerLink="/" class="d-block" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img [src]="avatarUrl" class="rounded-circle" width="32" height="32" alt="Profile" />
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end mt-2">
+                        <li><a class="dropdown-item" routerLink="/">Profile</a></li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li><a class="dropdown-item" (click)="logout()" style="cursor: pointer">Sign out</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -80,7 +134,7 @@
                         </div>
                     </div>
                     <a [routerLink]="['/post-detail', post.postid]">
-                        <img [src]="post.coverImage || 'https://via.placeholder.com/150'" class="post-img-thumb" alt="Preview">
+                        <img [src]="post.coverImage || 'https://picsum.photos/200'" class="post-img-thumb" alt="Preview">
                     </a>
                 </div>
                 <!-- Cần sửa thêm để có thể ấn vào bất kỳ chỗ nào ngoài ảnh và tên author cũng có thể routerLink tới post detail -->
@@ -177,32 +231,32 @@
         <aside class="col-lg-3 col-md-3 d-none d-md-block border-start bg-white pt-4">
             <div class="sidebar-inner ps-4">
                 <div class="sidebar-section">
-                    <h6>Staff Picks</h6>
-                    <div class="mb-3">
+                    <h6>Top Picks</h6>
+
+                    <div *ngFor="let post of trendingPreviewPosts" class="mb-3">
                         <div class="d-flex align-items-center mb-1">
-                            <img src="https://randomuser.me/api/portraits/men/44.jpg" class="author-avatar" alt="Author">
-                            <span class="author-name"><a routerLink="#">Sam A</a></span>
+                            <img
+                                [src]="post.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'"
+                                class="author-avatar"
+                                alt="Author"
+                            />
+                            <span class="author-name">
+                                <a routerLink="#">{{ post.User?.firstname }} {{ post.User?.lastname }}</a>
+                            </span>
                         </div>
-                        <div class="sidebar-post-title"><a routerLink="#">I Took a Chance, and Ended Up In a Movie with Robert De Niro</a></div>
-                        <span class="text-secondary" style="font-size:11px;">May 30</span>
-                    </div>
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-1">
-                            <img src="https://randomuser.me/api/portraits/men/24.jpg" class="author-avatar" alt="Author">
-                            <span class="author-name"><a routerLink="#">Lorraine Humbert</a></span>
+
+                        <div class="sidebar-post-title">
+                            <a routerLink="#">{{ post.title }}</a>
                         </div>
-                        <div class="sidebar-post-title"><a routerLink="#">I Rode Through the Frozen Silence of a Norwegian Night</a></div>
-                        <span class="text-secondary" style="font-size:11px;">Jun 8</span>
+
+                        <span class="text-secondary" style="font-size: 11px;">
+                        {{ post.createdAt | date: 'MMM d' }}
+                        </span>
                     </div>
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-1">
-                            <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTXnaABQ8VHLuSIcRxk13NyI69roQ9HSoF0iy_JMYlNivDL45zn" class="author-avatar" alt="Author">
-                            <span class="author-name"><a routerLink="#">Barack Obama</a></span>
-                        </div>
-                        <div class="sidebar-post-title"><a routerLink="#">Conversation at The Connecticut Forum</a></div>
-                        <span class="text-secondary" style="font-size:11px;">Jun 19</span>
+
+                    <div class="mb-3 full-list">
+                        <a (click)="selectCategory('trending')">See the full list</a>
                     </div>
-                    <div class="mb-3 full-list"><a routerLink="#">See the full list</a></div>
                 </div>
                 <div class="sidebar-section bg-light p-3 rounded">
                     <h6>Writing on Blog</h6>
@@ -215,14 +269,12 @@
                 </div>
                 <div class="sidebar-section">
                     <h6>Recommended categories</h6>
-                    <a routerLink="#"><span class="category-tag">Politics</span></a>
-                    <a routerLink="#"><span class="category-tag">Blockchain</span></a>
-                    <a routerLink="#"><span class="category-tag">Women</span></a>
-                    <a routerLink="#"><span class="category-tag">Mindfulness</span></a>
-                    <a routerLink="#"><span class="category-tag">AWS</span></a>
-                    <a routerLink="#"><span class="category-tag">Sexuality</span></a>
-                    <a routerLink="#"><span class="category-tag">Fitness</span></a>
-                    <div class="mb-3 full-list"><a routerLink="#">See more categories</a></div>
+                    <a *ngFor="let cat of showAllRecommended ? allCategories : recommendedCategories" (click)="selectCategory(cat.categoryid)" style="cursor: pointer;">
+                        <span class="category-tag">{{ cat.categoryname }}</span>
+                    </a>
+                    <div class="mb-3 full-list">
+                        <a (click)="toggleRecommended()">{{ showAllRecommended ? 'See less' : 'See more categories' }}</a>
+                    </div>
                 </div>
                 <div class="sidebar-section">
                     <h6>Reading list</h6>

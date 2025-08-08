@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { AbstractControl } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
 
 
 @Component({
@@ -21,15 +22,27 @@ export class SignupComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private authService: AuthService
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
   ngOnInit(): void {
     this.initializeForm();    
-    if (this.isLoggedIn()) {
-      this.router.navigate(['/home']);
+    if(this.isBrowser) {
+      this.authService.checkSession().subscribe(valid => {
+        if (valid) {
+          this.router.navigate(['/home']);
+        }
+      });
+    }
+    if(this.isBrowser && window.location.search.includes('oauth=success')) { 
+      this.authService.checkSession().subscribe(valid => {
+        if (valid) {
+          this.router.navigate(['/home']);
+        }
+      });
     }
   }
 
@@ -127,10 +140,6 @@ export class SignupComponent implements OnInit {
       },
       body: JSON.stringify(signupData)
     });
-  }
-
-  private isLoggedIn(): boolean {
-    return this.isBrowser && !!localStorage.getItem('accessToken');
   }
 
   private markAllFieldsAsTouched(): void {

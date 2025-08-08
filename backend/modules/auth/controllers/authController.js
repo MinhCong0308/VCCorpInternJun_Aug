@@ -49,10 +49,7 @@ const authController = {
       console.log(userData);
       const data = await authService.signup(userData);
       await authService.requestOTP(userData.email);
-      return responseUtils.ok(res, {
-        ...data,
-        message: "User created. OTP sent for verification.",
-      });
+      return responseUtils.ok(res, data);
     } catch (error) {
       return responseUtils.unauthorized(res, error.message);
     }

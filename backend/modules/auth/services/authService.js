@@ -81,7 +81,6 @@ const authService = {
       last_login_at: new Date(),
     });
     return {
-      message: "User created. Please verify your email with OTP.",
       email: email,
     };
   },

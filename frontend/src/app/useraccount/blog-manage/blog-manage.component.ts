@@ -84,24 +84,21 @@ export class BlogManageComponent implements OnInit {
     }
   }
 
-  async loadPosts(): Promise<void> {
+  loadPosts(): void {
     this.isLoading = true;
-    this.errorMessage = '';
-    if(!isPlatformBrowser(this.platformId)) {
-      this.errorMessage = 'This feature is only available in the browser.';
-      return;
-    }
-    try {
-      this.posts = await this.postService.getAllPosts();
-      this.isLoading = false;
-    } catch (error) {
-      this.isLoading = false;
-      this.errorMessage = 'Failed to load posts. Please try again later.';
-      console.error('Error loading posts:', error);
-    }
-    console.log('Posts loaded:', this.posts);
+    this.posts = [];
+    this.postService.getAllPosts().subscribe({
+      next: (posts) => {
+        this.posts = posts;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.errorMessage = 'Failed to load posts. Please try again later.';
+        this.isLoading = false;
+        console.error('Error loading posts:', error);
+      }
+    });
   }
-
   switchTab(tab: string, event: Event): void {
     event.preventDefault();
     this.activeTab = tab;
@@ -151,19 +148,13 @@ export class BlogManageComponent implements OnInit {
     event.preventDefault();
     this.router.navigate(['/blog-owner/create'], { queryParams: { edit: postId } });
   }
-
-  async deletePost(postId: number, event: Event): Promise<void> {
+  deletePost(postId: number, event: Event): void {
     event.preventDefault();
-    
     const confirmed = confirm('Are you sure you want to delete this post?');
     if (!confirmed) return;
-    if(!isPlatformBrowser(this.platformId)) {
-      this.errorMessage = 'This feature is only available in the browser.';
-      return;
-    }
-    // console.log('Deleting post with ID:', postId);
     this.postService.deletePost(postId).subscribe({
       next: (response) => {
+        console.log('Post deleted successfully:', response);
         if (response.success) {
           this.successMessage = 'Post deleted successfully.';
           this.loadPosts(); // Reload posts after deletion
@@ -176,7 +167,6 @@ export class BlogManageComponent implements OnInit {
       }
     });
   }
-
   logout(): void {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('userInfo');

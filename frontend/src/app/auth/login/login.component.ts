@@ -29,6 +29,7 @@ export class LoginComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.initializeForm();
 <<<<<<< HEAD
+<<<<<<< HEAD
     if(this.isBrowser) {
       this.authService.checkSession().subscribe(valid => {
         if (valid) {
@@ -39,12 +40,17 @@ export class LoginComponent implements OnInit {
     if(this.isBrowser && window.location.search.includes('oauth=success')) { 
       this.authService.checkSession().subscribe((valid) => {
 =======
+=======
+>>>>>>> 1b8a733560d756502b1199a28a7b985769d82fad
     if(this.isBrowser && await this.checkSession()) {
       this.router.navigate(['/home']);
     }
     if(this.isBrowser && window.location.search.includes('oauth=success')) {
       this.checkSession().then((valid) => {
+<<<<<<< HEAD
 >>>>>>> 1b8a733 (Using cookie instead of localStorage)
+=======
+>>>>>>> 1b8a733560d756502b1199a28a7b985769d82fad
         if (valid) {
           this.router.navigate(['/home']);
         }
@@ -166,7 +172,10 @@ export class LoginComponent implements OnInit {
   //     this.errorMessage = decodeURIComponent(error);
   //   }
   // }
+<<<<<<< HEAD
 >>>>>>> 1b8a733 (Using cookie instead of localStorage)
+=======
+>>>>>>> 1b8a733560d756502b1199a28a7b985769d82fad
 
   private markAllFieldsAsTouched(): void {
     Object.values(this.loginForm.controls).forEach(control => {

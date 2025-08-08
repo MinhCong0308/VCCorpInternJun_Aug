@@ -64,13 +64,7 @@ export class CreateBlogComponent implements OnInit {
       alert('This feature is only available in the browser.');
       return;
     }
-    const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
-      alert('You need to be logged in to edit a post.');
-      return;
-    }
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${accessToken}`);
-    this.http.get<any>(`http://localhost:3000/post-owner/get-specific-post/${postId}`, { headers }).subscribe({
+    this.http.get<any>(`http://localhost:3000/post-owner/get-specific-post/${postId}`, { withCredentials: true }).subscribe({
       next: (data) => {
         console.log('Post data:', data.data);
         this.blogForm.patchValue({
@@ -133,14 +127,13 @@ export class CreateBlogComponent implements OnInit {
       alert('You need to be logged in to submit.');
       return;
     }
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${accessToken}`);
     const payload = this.blogForm.value;
 
     if (this.isEditMode && this.editPostId !== null) {
       payload['postid'] = this.editPostId;
 
       // Perform UPDATE
-      this.http.put('http://localhost:3000/post-owner/update-post', payload, { headers }).subscribe({
+      this.http.put('http://localhost:3000/post-owner/update-post', payload, { withCredentials: true }).subscribe({
         next: () => {
           alert(`Your blog "${payload.title}" was updated successfully.`);
           window.location.href = 'home.html';
@@ -152,7 +145,7 @@ export class CreateBlogComponent implements OnInit {
       });
     } else {
       // Perform CREATE
-      this.http.post('http://localhost:3000/post-owner/create-post', payload, { headers }).subscribe({
+      this.http.post('http://localhost:3000/post-owner/create-post', payload, { withCredentials: true }).subscribe({
         next: () => {
           alert(`Your blog "${payload.title}" was submitted successfully.`);
           window.location.href = 'home.html';

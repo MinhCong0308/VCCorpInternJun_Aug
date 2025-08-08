@@ -7,11 +7,20 @@ const oauthController = {
     },
     googleCallback: async (req, res) => {
         try {
-            const user = req.user;
-            if (!user) {
-                return responseUtils.unauthorized(res, "Authentication failed");
-            }
-            return responseUtils.ok(res, user);
+            const oauthResult = req.user; // User data from passport
+            res.cookie("accessToken", oauthResult.accessToken, {
+                httpOnly: true,
+                secure: false,
+                sameSite: 'lax',
+                maxAge: 3600000, // 1 hour
+            });
+            res.cookie("refreshToken", oauthResult.refreshToken, {
+                httpOnly: true,
+                secure: false,
+                sameSite: 'lax',
+                maxAge: 31536000000, // 1 year 
+            });
+            res.redirect("http://localhost:4200/login?oauth=success");
         } catch (error) {
             console.error("Google OAuth callback error:", error);
             return responseUtils.error(res, error.message);

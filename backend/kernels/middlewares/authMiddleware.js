@@ -5,14 +5,15 @@ const db = require('models/index');
 
 const authenticated = async (req, res, next) => {
     try {
-        const token = req.headers.authorization?.split(' ')[1];        
+        const token = req.cookies?.accessToken;
         if (!token) {
+            console.log("No token provided");
             return responseUtils.unauthorized(res, 'No token provided');
         }
         const decoded = jwt.verify(token, config.config.jwt.secret);
         console.log("Decoded token: ", decoded);
         if (!decoded || !decoded.userId) {
-            console.log("Here");
+            console.log("Invalid token");
             return responseUtils.unauthorized(res, 'Invalid token');
         }
         const userid = decoded.userId;
@@ -25,7 +26,7 @@ const authenticated = async (req, res, next) => {
             }]
         });
         if (!user) {
-            console.log("User not found or not authenticated");
+            // console.log("User not found or not authenticated");
             return responseUtils.unauthorized(res, 'User not found or not authenticated');
         }
         req.user = user;

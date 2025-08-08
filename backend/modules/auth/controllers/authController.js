@@ -11,7 +11,19 @@ const authController = {
         userData,
         config.config.roleenum.USER
       );
-      return responseUtils.ok(res, data);
+      res.cookie("accessToken", data.accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        maxAge: 3600000, // 1 hour
+      });
+      res.cookie("refreshToken", data.refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        maxAge: 31536000000, // 1 year
+      });
+      return responseUtils.ok(res, data.user);
     } catch (error) {
       console.error("Login error: ", error);
       return responseUtils.unauthorized(res, error.message);
@@ -59,5 +71,23 @@ const authController = {
       return responseUtils.unauthorized(res, error.message);
     }
   },
+  getSessionInfo: async (req, res) => {
+    try {
+      const user = req.user;
+      if (!user) {
+        return responseUtils.unauthorized(res, {});
+      }
+      const userData = {
+        userid: user.userid,
+        email: user.email,
+        username: user.username,
+        role: user.Role.rolename,
+      }
+      return responseUtils.ok(res, userData);
+    } catch(err) {
+      console.error("getSessionInfo error:", err);
+    return responseUtils.unauthorized(res, "Invalid session");
+    }
+  }
 };
 module.exports = authController;

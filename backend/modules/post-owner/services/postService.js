@@ -5,7 +5,6 @@ const { Op } = require("sequelize");
 const postService = {
     createPost: async (title, content, userid, languageid, tags) => {
         try {
-            console.log("Here is start of createPost");
             const post = await db.Post.create({
                 userid,
                 languageid,

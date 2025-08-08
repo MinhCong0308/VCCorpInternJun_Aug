@@ -24,15 +24,17 @@ export class LoginComponent implements OnInit {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.initializeForm();
-
-    if (this.isBrowser && this.isLoggedIn()) {
+    if(this.isBrowser && await this.checkSession()) {
       this.router.navigate(['/home']);
     }
-
-    if (this.isBrowser) {
-      this.handleOAuthCallback();
+    if(this.isBrowser && window.location.search.includes('oauth=success')) {
+      this.checkSession().then((valid) => {
+        if (valid) {
+          this.router.navigate(['/home']);
+        }
+      });
     }
   }
 
@@ -64,11 +66,6 @@ export class LoginComponent implements OnInit {
 
       if (response.ok) {
         const data = await response.json();
-
-        if (this.isBrowser) {
-          localStorage.setItem('accessToken', data.data.accessToken);
-        }
-
         this.successMessage = 'Login successful! Redirecting...';
 
         setTimeout(() => {
@@ -87,9 +84,8 @@ export class LoginComponent implements OnInit {
   }
 
   handleGoogleLogin(): void {
-    if (!this.isBrowser) return;
-
-    this.isLoading = true;
+    if (!this.isBrowser) return
+    this.isLoading = false;
     const baseUrl = 'http://localhost:3000'; // your API base
     const authUrl = `${baseUrl}/auth/oauth/google`;
     window.location.href = authUrl;
@@ -101,27 +97,30 @@ export class LoginComponent implements OnInit {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
+      credentials: 'include'
     });
   }
 
-  private isLoggedIn(): boolean {
-    return this.isBrowser && !!localStorage.getItem('accessToken');
+  private async checkSession(): Promise<boolean> {
+    const res = await fetch(`http://localhost:3000/auth/me`, {
+      credentials: 'include',
+    });
+    return res.ok;
   }
+  // private handleOAuthCallback(): void {
+  //   const urlParams = new URLSearchParams(window.location.search);
+  //   const token = urlParams.get('token');
+  //   const error = urlParams.get('error');
 
-  private handleOAuthCallback(): void {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    const error = urlParams.get('error');
-
-    if (token) {
-      localStorage.setItem('accessToken', token);
-      this.successMessage = 'Login successful! Redirecting...';
-      window.history.replaceState({}, document.title, window.location.pathname);
-      setTimeout(() => this.router.navigate(['/home']), 1000);
-    } else if (error) {
-      this.errorMessage = decodeURIComponent(error);
-    }
-  }
+  //   if (token) {
+  //     localStorage.setItem('accessToken', token);
+  //     this.successMessage = 'Login successful! Redirecting...';
+  //     window.history.replaceState({}, document.title, window.location.pathname);
+  //     setTimeout(() => this.router.navigate(['/home']), 1000);
+  //   } else if (error) {
+  //     this.errorMessage = decodeURIComponent(error);
+  //   }
+  // }
 
   private markAllFieldsAsTouched(): void {
     Object.values(this.loginForm.controls).forEach(control => {

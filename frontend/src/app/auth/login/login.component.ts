@@ -26,8 +26,9 @@ export class LoginComponent implements OnInit {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.initializeForm();
+<<<<<<< HEAD
     if(this.isBrowser) {
       this.authService.checkSession().subscribe(valid => {
         if (valid) {
@@ -37,6 +38,13 @@ export class LoginComponent implements OnInit {
     }
     if(this.isBrowser && window.location.search.includes('oauth=success')) { 
       this.authService.checkSession().subscribe((valid) => {
+=======
+    if(this.isBrowser && await this.checkSession()) {
+      this.router.navigate(['/home']);
+    }
+    if(this.isBrowser && window.location.search.includes('oauth=success')) {
+      this.checkSession().then((valid) => {
+>>>>>>> 1b8a733 (Using cookie instead of localStorage)
         if (valid) {
           this.router.navigate(['/home']);
         }
@@ -66,6 +74,7 @@ export class LoginComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
+<<<<<<< HEAD
     const { email, password } = this.loginForm.value;
     this.authService.login(email, password).subscribe({
       next: (response) => {
@@ -95,6 +104,69 @@ export class LoginComponent implements OnInit {
     const authUrl = `${baseUrl}/auth/oauth/google`;
     window.location.href = authUrl;
   }
+=======
+    try {
+      const { email, password } = this.loginForm.value;
+      const response = await this.login(email, password);
+
+      if (response.ok) {
+        const data = await response.json();
+        this.successMessage = 'Login successful! Redirecting...';
+
+        setTimeout(() => {
+          this.router.navigate(['/home']);
+        }, 1000);
+      } else {
+        const errorData = await response.json();
+        this.errorMessage = errorData.message || 'Login failed!';
+      }
+    } catch (error: any) {
+      this.errorMessage = 'Network error. Please try again.';
+      console.error('Login error:', error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  handleGoogleLogin(): void {
+    if (!this.isBrowser) return
+    this.isLoading = false;
+    const baseUrl = 'http://localhost:3000'; // your API base
+    const authUrl = `${baseUrl}/auth/oauth/google`;
+    window.location.href = authUrl;
+  }
+
+  private async login(email: string, password: string): Promise<Response> {
+    const baseUrl = 'http://localhost:3000'; // your API base
+    return fetch(`${baseUrl}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+      credentials: 'include'
+    });
+  }
+
+  private async checkSession(): Promise<boolean> {
+    const res = await fetch(`http://localhost:3000/auth/me`, {
+      credentials: 'include',
+    });
+    return res.ok;
+  }
+  // private handleOAuthCallback(): void {
+  //   const urlParams = new URLSearchParams(window.location.search);
+  //   const token = urlParams.get('token');
+  //   const error = urlParams.get('error');
+
+  //   if (token) {
+  //     localStorage.setItem('accessToken', token);
+  //     this.successMessage = 'Login successful! Redirecting...';
+  //     window.history.replaceState({}, document.title, window.location.pathname);
+  //     setTimeout(() => this.router.navigate(['/home']), 1000);
+  //   } else if (error) {
+  //     this.errorMessage = decodeURIComponent(error);
+  //   }
+  // }
+>>>>>>> 1b8a733 (Using cookie instead of localStorage)
 
   private markAllFieldsAsTouched(): void {
     Object.values(this.loginForm.controls).forEach(control => {

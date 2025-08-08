@@ -1,12 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
-interface Post {
-  postid: number;
-  title: string;
-  content: string;
-  createdAt: string;
-}
+import { PostService, Post } from '../../services/post.service';
 
 interface UserProfile {
   fullname: string;
@@ -45,22 +40,24 @@ export class BlogManageComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object) {}
-  ngOnInit(): void {
-    this.checkAuthentication();
-    this.loadUserProfile();
-    this.loadPosts();
-  }
-
-  private checkAuthentication(): void {
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostService) {}
+  async ngOnInit(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) {
       this.errorMessage = 'This feature is only available in the browser.';
       return;
     }
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
+    if (!await this.checkSession()) {
       this.router.navigate(['/auth/login']);
+      return;
     }
+    this.loadUserProfile();
+    this.loadPosts();
+  }
+  private async checkSession(): Promise<boolean> {
+    const res = await fetch(`http://localhost:3000/auth/me`, {
+      credentials: 'include',
+    });
+    return res.ok;
   }
 
   private async loadUserProfile(): Promise<void> {
@@ -68,14 +65,10 @@ export class BlogManageComponent implements OnInit {
       this.errorMessage = 'This feature is only available in the browser.';
       return;
     }
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
     try {
       const response = await fetch('http://localhost:3000/account/profile', {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -94,44 +87,19 @@ export class BlogManageComponent implements OnInit {
   async loadPosts(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = '';
-
-    try {
-      if(!isPlatformBrowser(this.platformId)) {
-        this.errorMessage = 'This feature is only available in the browser.';
-        return;
-      }
-      this.posts = [];
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        this.errorMessage = 'You need to be logged in to view posts.';
-        return;
-      }
-
-      const response = await fetch('http://localhost:3000/post-owner/get-all-posts', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.message || 'Failed to fetch posts');
-      }
-
-      if (responseData.data?.posts && Array.isArray(responseData.data.posts)) {
-        this.posts = responseData.data.posts;
-      } else {
-        this.posts = [];
-      }
-    } catch (error: any) {
-      this.errorMessage = error.message || 'Error fetching posts';
-      console.error('Error fetching posts:', error);
-    } finally {
-      this.isLoading = false;
+    if(!isPlatformBrowser(this.platformId)) {
+      this.errorMessage = 'This feature is only available in the browser.';
+      return;
     }
+    try {
+      this.posts = await this.postService.getAllPosts();
+      this.isLoading = false;
+    } catch (error) {
+      this.isLoading = false;
+      this.errorMessage = 'Failed to load posts. Please try again later.';
+      console.error('Error loading posts:', error);
+    }
+    console.log('Posts loaded:', this.posts);
   }
 
   switchTab(tab: string, event: Event): void {
@@ -189,44 +157,24 @@ export class BlogManageComponent implements OnInit {
     
     const confirmed = confirm('Are you sure you want to delete this post?');
     if (!confirmed) return;
-
-    try {
-      if(!isPlatformBrowser(this.platformId)) {
-        this.errorMessage = 'This feature is only available in the browser.'; 
-        return;
-      }
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        this.errorMessage = 'You need to be logged in to delete posts.';
-        return;
-      }
-
-      const response = await fetch('http://localhost:3000/post-owner/delete-post', {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ postid: postId })
-      });
-
-      const data = await response.json();
-      
-      if (response.ok && data.success) {
-        this.successMessage = 'Post deleted successfully!';
-        await this.loadPosts(); // Reload posts
-        
-        // Clear success message after 3 seconds
-        setTimeout(() => {
-          this.successMessage = '';
-        }, 3000);
-      } else {
-        this.errorMessage = data.message || 'Failed to delete post.';
-      }
-    } catch (error: any) {
-      this.errorMessage = 'An error occurred while deleting the post.';
-      console.error('Error deleting post:', error);
+    if(!isPlatformBrowser(this.platformId)) {
+      this.errorMessage = 'This feature is only available in the browser.';
+      return;
     }
+    // console.log('Deleting post with ID:', postId);
+    this.postService.deletePost(postId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.successMessage = 'Post deleted successfully.';
+          this.loadPosts(); // Reload posts after deletion
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
+        } else {
+          this.errorMessage = response.message || 'Failed to delete post.';
+        }
+      }
+    });
   }
 
   logout(): void {

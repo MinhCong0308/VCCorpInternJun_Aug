@@ -100,8 +100,7 @@ router.group(
       postController.createPost
     );
     router.delete(
-      "/delete-post",
-      validate([postValidation.deletePost]),
+      "/delete-post/:postid",
       postController.deletePost
     );
     router.put(

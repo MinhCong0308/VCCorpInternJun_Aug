@@ -116,11 +116,9 @@ export class AccountComponent implements OnInit {
         this.userProfile[type] = value;
         this.editMode[type] = false;
         this.successMessage = `${type.charAt(0).toUpperCase() + type.slice(1)} updated successfully!`;
-        
-        // Clear success message after 3 seconds
         setTimeout(() => {
           this.successMessage = '';
-        }, 3000);
+        }, 1000);
       } else {
         this.errorMessage = data.message || 'Failed to update.';
       }

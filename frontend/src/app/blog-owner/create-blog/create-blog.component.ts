@@ -110,8 +110,7 @@ export class CreateBlogComponent implements OnInit {
     this.blogForm.patchValue({ tags: Array.from(this.selectedTags) });
   }
   getAllTagsFromDB(): string[] {
-    //
-    return ['Technology', 'Romantic', 'Natural Language Processing'];;
+    return ['Technology', 'Romantic', 'Natural Language Processing'];
   }
   submitBlog(): void {
     if(!isPlatformBrowser(this.platformId)) {
@@ -120,11 +119,6 @@ export class CreateBlogComponent implements OnInit {
     }
     if (this.blogForm.invalid) {
       alert('Please fill in all required fields.');
-      return;
-    }
-    const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
-      alert('You need to be logged in to submit.');
       return;
     }
     const payload = this.blogForm.value;

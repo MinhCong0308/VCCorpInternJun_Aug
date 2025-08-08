@@ -53,13 +53,25 @@ const postService = {
     getAllPosts: async (userid) => {
         try {
             const posts = await db.Post.findAll({
-                where: { userid: userid }
+                where: { userid: userid },
+                include : [{
+                    model: db.Category,
+                    as: 'Categories',
+                    through: { attributes: [] }  
+                }]
             });
             if (!posts || posts.length === 0) {
                 return { message: "No posts found for this user" };
             }
-            console.log("Posts retrieved successfully:", posts);
-            return {posts};
+            const postsWithTags = posts.map(post => ({
+                postid: post.postid,
+                title: post.title,
+                content: post.content,
+                languageid: post.languageid,
+                tags: post.Categories.map(category => category.categoryname),
+                createdAt: post.createdAt,
+            }));
+            return { posts: postsWithTags };
         } catch (error) {
             console.error("Error retrieving posts:", error);
             throw new Error("Error retrieving posts");
@@ -99,7 +111,6 @@ const postService = {
         if (!post) {
             throw new Error("Post not found or you are not authorized to view this post");
         }
-        // console.log("Specific post retrieved successfully:", post);
         return {
             title: post.title,
             content: post.content,

@@ -4,12 +4,11 @@ import { BlogOwnerModule } from './blog-owner/blog-owner.module';
 import { UseraccountModule } from './useraccount/useraccount.module';
 import { AdminModule } from './admin/admin.module';
 import { authGuard } from './core/guards/auth.guard';
+import { PostModule } from './post/post.module';
 
 export const routes: Routes = [
-  {
-    path: '',
-    loadChildren: () => import('./home/home.module').then((m) => m.HomeModule),
-  },
+  { path: '', loadChildren: () => import('./home/home.module').then(m => m.HomeModule) },
+  { path: 'post-detail', loadChildren: () => PostModule },
   { path: 'auth', loadChildren: () => AuthModule },
   { path: 'blog-owner', loadChildren: () => BlogOwnerModule, canActivate: [authGuard] },
   { path: 'useraccount', loadChildren: () => UseraccountModule, canActivate: [authGuard] },

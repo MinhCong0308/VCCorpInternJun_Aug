@@ -22,4 +22,7 @@ export class PostService {
   searchPosts(query: string) {
     return this.http.get<any>(`${this.baseUrl}/posts?search=${encodeURIComponent(query)}`);
   }
+  getPostDetail(postId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/posts/${postId}`);
+  }
 }

@@ -41,7 +41,7 @@ export class HomePageComponent implements OnInit {
   ngOnInit(): void {
     if (this.isBrowser) {
       this.isLoggedIn = !!localStorage.getItem('accessToken'); // Kiểm tra xem người dùng đã đăng nhập hay chưa
-      // console.log('Access Token:', localStorage.getItem('accessToken'));
+      console.log('Access Token:', localStorage.getItem('accessToken'));
     }
     this.loadRecentSearches(); // Tải danh sách tìm kiếm gần đây từ localStorage
     this.getTrendingPreviewPosts(); // Tải danh sách post trending
@@ -52,7 +52,9 @@ export class HomePageComponent implements OnInit {
           { categoryid: 'trending', categoryname: 'Trending' },
         ];
         this.categories = [...staticTabs, ...res];
+        console.log("this.categories=", this.categories);
         this.allCategories = res; // Lưu danh sách đầy đủ
+        // console.log("allCategories=", this.allCategories);
         // Lấy ngẫu nhiên 6 categories cho Recommended
         const shuffled = [...res].sort(() => 0.5 - Math.random());
         this.recommendedCategories = shuffled.slice(0, 6);

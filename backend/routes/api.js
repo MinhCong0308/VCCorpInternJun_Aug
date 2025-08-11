@@ -27,6 +27,7 @@ const router = express.Router({ mergeParams: true });
 const oauthController = require("modules/oauth/controllers/oauthController");
 const dashboardController = require("modules/dashboard/controllers/dashboardController");
 const passport = require("modules/oauth/passport");
+const manageTokenController = require("modules/manage_token/controllers/manageTokenController");
 const { uploads } = require("kernels/middlewares/multer");
 const multer = require("multer");
 
@@ -59,6 +60,8 @@ router.group("/auth", (router) => {
     authController.verifyOTP
   );
   router.get("/me", middlewares([authenticated]), authController.getSessionInfo);
+  router.post("/logout", middlewares([authenticated]), authController.logout);
+  router.post("/refresh", manageTokenController.refreshToken);
   router.group("/oauth", (router) => {
     router.get("/google", oauthController.loginWithGoogle);
     router.get(

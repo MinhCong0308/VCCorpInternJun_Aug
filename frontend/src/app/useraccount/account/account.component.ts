@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 interface UserProfile {
   email: string;
@@ -40,7 +41,7 @@ export class AccountComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
 
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.loadUserProfile();
@@ -135,15 +136,12 @@ export class AccountComponent implements OnInit {
     const file = input.files?.[0];
     
     if (!file) return;
-
-    // Validate file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
     if (!allowedTypes.includes(file.type)) {
       this.errorMessage = 'Please select a valid image file (JPG, PNG, or GIF)';
       return;
     }
 
-    // Validate file size (2MB max)
     const maxSize = 2 * 1024 * 1024;
     if (file.size > maxSize) {
       this.errorMessage = 'File size must be less than 2MB';
@@ -216,8 +214,15 @@ export class AccountComponent implements OnInit {
     }
   }
 
-  logout(): void {    
-    this.router.navigate(['/auth/login']);
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/auth/login']);
+      },
+      error: (error) => {
+        console.error('Logout error:', error);
+      }
+    });
   }
 
   private clearMessages(): void {

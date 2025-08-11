@@ -2,19 +2,20 @@ const jwt = require('jsonwebtoken');
 const config = require('configs/index');
 const responseUtils = require('utils/responseUtils');
 const db = require('models/index');
-
+const manageTokenServices = require('modules/manage_token/services/manageTokenService');
 const authenticated = async (req, res, next) => {
     try {
-        const token = req.cookies?.accessToken;
-        if (!token) {
-            console.log("No token provided");
+        const accessToken = req.cookies?.accessToken;
+        if (!accessToken) {
             return responseUtils.unauthorized(res, 'No token provided');
         }
-        const decoded = jwt.verify(token, config.config.jwt.secret);
-        console.log("Decoded token: ", decoded);
+        const decoded = jwt.verify(accessToken, config.config.jwt.secret);
         if (!decoded || !decoded.userId) {
-            console.log("Invalid token");
             return responseUtils.unauthorized(res, 'Invalid token');
+        }
+        const isRevoked = await manageTokenServices.isTokenRevoked('access', accessToken);
+        if(isRevoked) {
+            return responseUtils.unauthorized(res, 'Token is revoked');
         }
         const userid = decoded.userId;
         const user = await db.User.findByPk(userid, {
@@ -26,7 +27,6 @@ const authenticated = async (req, res, next) => {
             }]
         });
         if (!user) {
-            // console.log("User not found or not authenticated");
             return responseUtils.unauthorized(res, 'User not found or not authenticated');
         }
         req.user = user;

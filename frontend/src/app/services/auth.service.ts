@@ -64,4 +64,13 @@ export class AuthService {
       })
     );
   }
+  logout(): Observable<void> {
+    const url = `${this.baseUrl}/logout`;
+    return this.http.post<void>(url, {}, {withCredentials: true}).pipe(
+      catchError((error) => {
+        console.error('Logout error:', error);
+        return throwError(() => new Error('Logout failed'));
+      })
+    );
+  }
 }

@@ -52,7 +52,7 @@ export class HomePageComponent implements OnInit {
           { categoryid: 'trending', categoryname: 'Trending' },
         ];
         this.categories = [...staticTabs, ...res];
-        console.log("this.categories=", this.categories);
+        // console.log("this.categories=", this.categories);
         this.allCategories = res; // Lưu danh sách đầy đủ
         // console.log("allCategories=", this.allCategories);
         // Lấy ngẫu nhiên 6 categories cho Recommended

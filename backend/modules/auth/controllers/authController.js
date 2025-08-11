@@ -49,7 +49,7 @@ const authController = {
       console.log(userData);
       const data = await authService.signup(userData);
       await authService.requestOTP(userData.email);
-      return responseUtils.ok(res, data);
+      return responseUtils.ok(res, {data, message: "User created. Please verify your email with OTP."});
     } catch (error) {
       return responseUtils.unauthorized(res, error.message);
     }

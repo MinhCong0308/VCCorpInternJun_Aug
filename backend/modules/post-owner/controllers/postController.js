@@ -19,7 +19,8 @@ const postsController = {
     deletePost: async (req, res) => {
         try {
             const userid = req.user.userid; // Get userid from authenticated user
-            const {postid} = req.body;
+            const {postid} = req.params;
+            console.log("Deleting post with ID:", postid, "for user ID:", userid);
             const data = await postService.deletePost(postid, userid);
             return responseUtils.ok(res, data);
         } catch (error) {
@@ -41,6 +42,7 @@ const postsController = {
         const userid = req.user.userid; // Get userid from authenticated user
         try {
             const data = await postService.getAllPosts(userid);
+            // console.log("Data retrieved successfully:", data);
             return responseUtils.ok(res, data);
         } catch (error) {
             return responseUtils.error(res, error.message);

@@ -8,11 +8,8 @@ const accountController = {
     updateUsername: async(req, res) => {
         try {
             const {username} = req.body;
-            const token = req.headers.authorization?.split(" ")[1];
-            const decoded = jwt.verify(token, config.config.jwt.secret);
-            const userid = decoded.userId;
+            const userid = req.user.userid; // Get userid from authenticated user
             const data = await accountService.updateUsername(username, userid);
-            console.log("Data: ", data);
             return responseUtils.ok(res, data);
         } catch(error) {
             return responseUtils.error(res, error.message);
@@ -21,7 +18,7 @@ const accountController = {
     updateFullname: async(req, res) => {
         try {
             const {newFullname} = req.body;
-            const userid = jwt.verify(req.headers.authorization.split(" ")[1], config.config.jwt.secret).userId;   
+            const userid = req.user.userid; 
             const data = await accountService.updateFullname(newFullname, userid);
             return responseUtils.ok(res, data);
         } catch(error) {
@@ -30,7 +27,7 @@ const accountController = {
     },
     deactivateAccount: async(req, res) => {
         try {
-            const userid = jwt.verify(req.headers.authorization.split(" ")[1], config.config.jwt.secret).userId;
+            const userid = req.user.userid; 
             const data = await accountService.deactivateAccount(userid);
             return responseUtils.ok(res, data);
         } catch(error) {
@@ -47,7 +44,7 @@ const accountController = {
             if (!avatarUrl) {
                 return responseUtils.error(res, "Avatar URL is required");
             }
-            const userid = jwt.verify(req.headers.authorization.split(" ")[1], config.config.jwt.secret).userId;
+            const userid = req.user.userid; // Get userid from authenticated user
             const data = await accountService.updateAvatar(avatarUrl, userid);
             return responseUtils.ok(res, data);
         } catch(error) {

@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
-
+import { PostService , Post} from '../../services/post.service';
 
 @Component({
   selector: 'app-create-blog',
@@ -20,6 +20,7 @@ export class CreateBlogComponent implements OnInit {
   availableTags: string[] = [];
   isEditMode : boolean = false;
   editPostId: number | null = null;
+  post: Post | null = null;
 
   languages = [
     { id: 1, name: 'English', flag: '🇺🇸' },
@@ -40,7 +41,7 @@ export class CreateBlogComponent implements OnInit {
     ]
   };
 
-  constructor(private fb: FormBuilder, private http: HttpClient, private route: ActivatedRoute, private router: Router, @Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(private fb: FormBuilder, private http: HttpClient, private route: ActivatedRoute, private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostService) {}
 
   ngOnInit(): void {
     this.blogForm = this.fb.group({
@@ -64,27 +65,22 @@ export class CreateBlogComponent implements OnInit {
       alert('This feature is only available in the browser.');
       return;
     }
-    const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
-      alert('You need to be logged in to edit a post.');
-      return;
-    }
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${accessToken}`);
-    this.http.get<any>(`http://localhost:3000/post-owner/get-specific-post/${postId}`, { headers }).subscribe({
-      next: (data) => {
-        console.log('Post data:', data.data);
+    this.postService.getSpecificPost(postId).subscribe({
+      next: (post) => {
+        console.log('Post loaded for editing:', post);
+        this.post = post;
         this.blogForm.patchValue({
-          title: data.data.title,
-          content: data.data.content,
-          languageid: data.data.languageid,
-          tags: data.data.tags || []
+          title: post.title,
+          content: post.content,
+          languageid: post.languageid,
+          tags: post.tags
         });
-        this.selectedTags = new Set(data.data.tags || []);
-        this.selectedLanguageName = this.languages.find(lang => lang.id === data.data.languageid)?.name || 'English';
-        this.selectedLanguageFlag = this.languages.find(lang => lang.id === data.data.languageid)?.flag || '🇺🇸';
+        this.selectedTags = new Set(post.tags);
+        this.selectedLanguageName = this.languages.find(lang => lang.id === post.languageid)?.name || 'English';
+        this.selectedLanguageFlag = this.languages.find(lang => lang.id === post.languageid)?.flag || '🇺🇸';
       },
-      error: (err) => {
-        console.error(err);
+      error: (error) => {
+        console.error(error);
         alert('Failed to load post for editing.');
       }
     });
@@ -116,8 +112,7 @@ export class CreateBlogComponent implements OnInit {
     this.blogForm.patchValue({ tags: Array.from(this.selectedTags) });
   }
   getAllTagsFromDB(): string[] {
-    //
-    return ['Technology', 'Romantic', 'Natural Language Processing'];;
+    return ['Technology', 'Romantic', 'Natural Language Processing'];
   }
   submitBlog(): void {
     if(!isPlatformBrowser(this.platformId)) {
@@ -128,22 +123,16 @@ export class CreateBlogComponent implements OnInit {
       alert('Please fill in all required fields.');
       return;
     }
-    const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
-      alert('You need to be logged in to submit.');
-      return;
-    }
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${accessToken}`);
     const payload = this.blogForm.value;
 
     if (this.isEditMode && this.editPostId !== null) {
       payload['postid'] = this.editPostId;
 
       // Perform UPDATE
-      this.http.put('http://localhost:3000/post-owner/update-post', payload, { headers }).subscribe({
+      this.http.put('http://localhost:3000/post-owner/update-post', payload, { withCredentials: true }).subscribe({
         next: () => {
           alert(`Your blog "${payload.title}" was updated successfully.`);
-          window.location.href = 'home.html';
+          this.router.navigate(['/home']);
         },
         error: err => {
           console.error(err);
@@ -152,10 +141,10 @@ export class CreateBlogComponent implements OnInit {
       });
     } else {
       // Perform CREATE
-      this.http.post('http://localhost:3000/post-owner/create-post', payload, { headers }).subscribe({
+      this.http.post('http://localhost:3000/post-owner/create-post', payload, { withCredentials: true }).subscribe({
         next: () => {
           alert(`Your blog "${payload.title}" was submitted successfully.`);
-          window.location.href = 'home.html';
+          this.router.navigate(['/home']);
         },
         error: err => {
           console.error(err);

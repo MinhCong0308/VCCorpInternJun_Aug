@@ -31,7 +31,6 @@ const oauthService = {
                 roleid: config.config.roleenum.USER,
                 last_login_at: new Date(),
             });
-            console.log("New user created:", newUser);
             await this.sendWelcomeEmail(newUser.email, password);
         }
         user = await db.User.findOne({

@@ -58,6 +58,7 @@ router.group("/auth", (router) => {
     validate([authValidation.verifyOTP]),
     authController.verifyOTP
   );
+  router.get("/me", middlewares([authenticated]), authController.getSessionInfo);
   router.group("/oauth", (router) => {
     router.get("/google", oauthController.loginWithGoogle);
     router.get(
@@ -99,8 +100,7 @@ router.group(
       postController.createPost
     );
     router.delete(
-      "/delete-post",
-      validate([postValidation.deletePost]),
+      "/delete-post/:postid",
       postController.deletePost
     );
     router.put(

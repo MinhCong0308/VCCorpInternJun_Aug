@@ -2,6 +2,7 @@ import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -19,20 +20,27 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private authService: AuthService
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.initializeForm();
-
-    if (this.isBrowser && this.isLoggedIn()) {
-      this.router.navigate(['/home']);
+    if(this.isBrowser) {
+      this.authService.checkSession().subscribe(valid => {
+        if (valid) {
+         this.router.navigate(['/home']);
+        }
+      });
     }
-
-    if (this.isBrowser) {
-      this.handleOAuthCallback();
+    if(this.isBrowser && window.location.search.includes('oauth=success')) {
+      this.checkSession().then((valid) => {
+        if (valid) {
+          this.router.navigate(['/home']);
+        }
+      });
     }
   }
 
@@ -48,8 +56,8 @@ export class LoginComponent implements OnInit {
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
-  async onSubmit(): Promise<void> {
-    if (this.loginForm.invalid) {
+  onSubmit(): void {
+    if (!this.loginForm.valid) {
       this.markAllFieldsAsTouched();
       return;
     }
@@ -57,71 +65,55 @@ export class LoginComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
-
-    try {
-      const { email, password } = this.loginForm.value;
-      const response = await this.login(email, password);
-
-      if (response.ok) {
-        const data = await response.json();
-
-        if (this.isBrowser) {
-          localStorage.setItem('accessToken', data.data.accessToken);
+    const { email, password } = this.loginForm.value;
+    this.authService.login(email, password).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.successMessage = 'Login successful! Redirecting...';
+          setTimeout(() => {
+            this.router.navigate(['/home']);
+          }, 1000);
+        } else {
+          this.errorMessage = response.message || 'Login failed!';
         }
-
-        this.successMessage = 'Login successful! Redirecting...';
-
-        setTimeout(() => {
-          this.router.navigate(['/home']);
-        }, 1000);
-      } else {
-        const errorData = await response.json();
-        this.errorMessage = errorData.message || 'Login failed!';
+      },
+      error: (error) => {
+        this.errorMessage = 'Network error. Please try again.';
+        console.error('Login error:', error);
+      },
+      complete: () => {
+        this.isLoading = false;
       }
-    } catch (error: any) {
-      this.errorMessage = 'Network error. Please try again.';
-      console.error('Login error:', error);
-    } finally {
-      this.isLoading = false;
-    }
-  }
-
-  handleGoogleLogin(): void {
-    if (!this.isBrowser) return;
-
-    this.isLoading = true;
-    const baseUrl = 'http://localhost:3000'; // your API base
-    const authUrl = `${baseUrl}/auth/oauth/google`;
-    window.location.href = authUrl;
-  }
-
-  private async login(email: string, password: string): Promise<Response> {
-    const baseUrl = 'http://localhost:3000'; // your API base
-    return fetch(`${baseUrl}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
     });
   }
 
-  private isLoggedIn(): boolean {
-    return this.isBrowser && !!localStorage.getItem('accessToken');
+  handleGoogleLogin(): void {
+    if (!this.isBrowser) return
+    this.isLoading = false;
+    const baseUrl = 'http://localhost:3000'; 
+    const authUrl = `${baseUrl}/auth/oauth/google`;
+    window.location.href = authUrl;
   }
-
-  private handleOAuthCallback(): void {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    const error = urlParams.get('error');
-
-    if (token) {
-      localStorage.setItem('accessToken', token);
-      this.successMessage = 'Login successful! Redirecting...';
-      window.history.replaceState({}, document.title, window.location.pathname);
-      setTimeout(() => this.router.navigate(['/home']), 1000);
-    } else if (error) {
-      this.errorMessage = decodeURIComponent(error);
-    }
+  private async checkSession(): Promise<boolean> {
+    const res = await fetch(`http://localhost:3000/auth/me`, {
+      credentials: 'include',
+    });
+    return res.ok;
   }
+  // private handleOAuthCallback(): void {
+  //   const urlParams = new URLSearchParams(window.location.search);
+  //   const token = urlParams.get('token');
+  //   const error = urlParams.get('error');
+
+  //   if (token) {
+  //     localStorage.setItem('accessToken', token);
+  //     this.successMessage = 'Login successful! Redirecting...';
+  //     window.history.replaceState({}, document.title, window.location.pathname);
+  //     setTimeout(() => this.router.navigate(['/home']), 1000);
+  //   } else if (error) {
+  //     this.errorMessage = decodeURIComponent(error);
+  //   }
+  // }
 
   private markAllFieldsAsTouched(): void {
     Object.values(this.loginForm.controls).forEach(control => {
@@ -134,9 +126,5 @@ export class LoginComponent implements OnInit {
       localStorage.removeItem('accessToken');
     }
     this.router.navigate(['/login']);
-  }
-
-  getToken(): string | null {
-    return this.isBrowser ? localStorage.getItem('accessToken') : null;
   }
 }

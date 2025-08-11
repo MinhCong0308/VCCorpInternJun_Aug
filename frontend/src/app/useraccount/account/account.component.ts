@@ -51,21 +51,13 @@ export class AccountComponent implements OnInit {
       this.errorMessage = 'This feature is only available in the browser.';
       return;
     }
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      this.errorMessage = 'You need to be logged in to view your account.';
-      this.successMessage = '';
-
-      this.router.navigate(['/auth/login']);
-      return;
-    }
-
     try {
       const response = await fetch('http://localhost:3000/account/profile', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
       });
       if (response.ok) {
         const responseJson = await response.json();
@@ -101,13 +93,6 @@ export class AccountComponent implements OnInit {
       this.errorMessage = 'This feature is only available in the browser.';
       return;
     }
-    const token = localStorage.getItem('accessToken');
-    
-    if (!token) {
-      this.errorMessage = 'You need to be logged in.';
-      return;
-    }
-    
     if (!value) {
       this.errorMessage = 'Value cannot be empty.';
       return;
@@ -120,10 +105,9 @@ export class AccountComponent implements OnInit {
       const response = await fetch(`http://localhost:3000/account/update-${type}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ [fieldName]: value })
+          'Content-Type': 'application/json'},
+        body: JSON.stringify({ [fieldName]: value }),
+        credentials: 'include'
       });
 
       const data = await response.json();
@@ -132,11 +116,9 @@ export class AccountComponent implements OnInit {
         this.userProfile[type] = value;
         this.editMode[type] = false;
         this.successMessage = `${type.charAt(0).toUpperCase() + type.slice(1)} updated successfully!`;
-        
-        // Clear success message after 3 seconds
         setTimeout(() => {
           this.successMessage = '';
-        }, 3000);
+        }, 1000);
       } else {
         this.errorMessage = data.message || 'Failed to update.';
       }
@@ -175,18 +157,10 @@ export class AccountComponent implements OnInit {
       const formData = new FormData();
       formData.append('avatar', file);
 
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        this.errorMessage = 'You need to be logged in.';
-        return;
-      }
-
       const response = await fetch('http://localhost:3000/account/update-avatar', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
+        body: formData,
+        credentials: 'include'
       });
 
       const data = await response.json();
@@ -212,12 +186,6 @@ export class AccountComponent implements OnInit {
   }
 
   async deactivateAccount(): Promise<void> {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      this.errorMessage = 'You need to be logged in.';
-      return;
-    }
-
     const confirmed = confirm('Are you sure you want to deactivate your account?');
     if (!confirmed) return;
 
@@ -229,15 +197,13 @@ export class AccountComponent implements OnInit {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
+        },
+        credentials: 'include'
       });
 
       const data = await response.json();
-      
       if (response.ok) {
         alert('Account deactivated successfully.');
-        localStorage.removeItem('accessToken');
         this.router.navigate(['/auth/login']);
       } else {
         this.errorMessage = data.message || 'Failed to deactivate account.';
@@ -250,8 +216,7 @@ export class AccountComponent implements OnInit {
     }
   }
 
-  logout(): void {
-    localStorage.removeItem('accessToken');
+  logout(): void {    
     this.router.navigate(['/auth/login']);
   }
 

@@ -90,56 +90,25 @@ export class SignupComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    try {
-      const formData = this.signupForm.value;
-      const response = await this.signup(formData);
-
-      if (response.ok) {
-        this.successMessage = 'Signup successful! Please verify your email.';
-        localStorage.setItem('verifyEmail', formData.email);
-        
-        // Redirect after short delay
-        setTimeout(() => {
-          this.router.navigate(['/auth/verify-otp']);
-        }, 1500);
-      } else {
-        const errorData = await response.json();
-        this.errorMessage = errorData.message || 'Signup failed!';
+    this.authService.signup(this.signupForm.value).subscribe({
+      next: (response) => {
+        this.successMessage = response.message;
+        this.router.navigate(['/auth/verify-otp']);
+      },
+      error: (error) => {
+        this.errorMessage = error.message;
+      },
+      complete: () => {
+        this.isLoading = false;
       }
-    } catch (error: any) {
-      this.errorMessage = 'Network error. Please try again.';
-      console.error('Signup error:', error);
-    } finally {
-      this.isLoading = false;
-    }
+    });
   }
 
   handleGoogleSignup(): void {
     this.isLoading = true;
-    const baseUrl = 'http://localhost:3000'; // Replace with your API base URL
+    const baseUrl = 'http://localhost:3000'; 
     const authUrl = `${baseUrl}/auth/oauth/google?signup=true`;
     window.location.href = authUrl;
-  }
-
-  private async signup(formData: any): Promise<Response> {
-    const baseUrl = 'http://localhost:3000'; // Replace with your API base URL
-    
-    const signupData = {
-      firstname: formData.firstName,
-      lastname: formData.lastName,
-      username: formData.username,
-      email: formData.email,
-      password: formData.password,
-      confirm_password: formData.confirmPassword
-    };
-
-    return fetch(`${baseUrl}/auth/signup`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(signupData)
-    });
   }
 
   private markAllFieldsAsTouched(): void {

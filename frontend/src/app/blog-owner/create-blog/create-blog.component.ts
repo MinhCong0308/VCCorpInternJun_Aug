@@ -67,7 +67,7 @@ export class CreateBlogComponent implements OnInit {
     }
     this.postService.getSpecificPost(postId).subscribe({
       next: (post) => {
-        console.log('Post loaded for editing:', post);
+        // console.log('Post loaded for editing:', post);
         this.post = post;
         this.blogForm.patchValue({
           title: post.title,

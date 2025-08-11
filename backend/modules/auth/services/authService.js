@@ -9,9 +9,7 @@ require("dotenv").config();
 const config = require("configs/index");
 const authService = {
   async login(userInfo, roleId) {
-    // tested
     const { email, password } = userInfo;
-    // console.log("Here ", config.config.statusenum.AUTHENTICATED);
     const user = await db.User.findOne({
       where: {
         [Op.and]: [

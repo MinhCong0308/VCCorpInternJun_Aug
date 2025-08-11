@@ -112,10 +112,14 @@ const postService = {
             throw new Error("Post not found or you are not authorized to view this post");
         }
         return {
-            title: post.title,
-            content: post.content,
-            languageid: post.languageid,
-            tags: post.Categories.map(category => category.categoryname)
+            post: {
+                postid: post.postid,
+                title: post.title,
+                content: post.content,
+                languageid: post.languageid,
+                tags: post.Categories.map(category => category.categoryname),
+                createdAt: post.createdAt,
+            }
         };
     }
 };

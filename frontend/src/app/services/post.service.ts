@@ -41,7 +41,10 @@ export class PostService {
       `${this.baseUrl}/get-specific-post/${postid}`,
       { withCredentials: true }
     ).pipe(
-      map(response => response.data.post),
+      map(response => {
+        // console.log('Fetched post:', response.data.post);
+        return response.data.post;
+      }),
       catchError(error => {
         console.error('Error fetching post:', error);
         return throwError(() => new Error(error.message || 'Fetch post error'));

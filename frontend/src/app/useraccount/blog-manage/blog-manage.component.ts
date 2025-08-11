@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, Inject, PLATFORM_ID } from '@
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { PostService, Post } from '../../services/post.service';
+import { AuthService } from '../../services/auth.service';
 
 interface UserProfile {
   fullname: string;
@@ -40,7 +41,7 @@ export class BlogManageComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostService) {}
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostService, private authService: AuthService) {}
   async ngOnInit(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) {
       this.errorMessage = 'This feature is only available in the browser.';
@@ -168,9 +169,14 @@ export class BlogManageComponent implements OnInit {
     });
   }
   logout(): void {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('userInfo');
-    this.router.navigate(['/auth/login']);
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/auth/login']);
+      },
+      error: (error) => {
+        console.error('Logout error:', error);
+      }
+    });
   }
 
   private clearMessages(): void {

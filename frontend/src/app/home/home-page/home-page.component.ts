@@ -49,7 +49,7 @@ export class HomePageComponent implements OnInit {
       next: (res: any) => {
         const staticTabs = [
           { categoryid: 'latest', categoryname: 'Latest' },
-          { categoryid: 'trending', categoryname: 'Trending' }
+          { categoryid: 'trending', categoryname: 'Trending' },
         ];
         this.categories = [...staticTabs, ...res];
         this.allCategories = res; // Lưu danh sách đầy đủ
@@ -57,10 +57,10 @@ export class HomePageComponent implements OnInit {
         const shuffled = [...res].sort(() => 0.5 - Math.random());
         this.recommendedCategories = shuffled.slice(0, 6);
       },
-      error: (err) => console.error('Failed to fetch categories', err)
+      error: (err) => console.error('Failed to fetch categories', err),
     });
-    this.loadPosts(); // Mặc định là 
-    
+    this.loadPosts(); // Mặc định là
+
     this.accountService.getProfile().subscribe({
       next: (res: any) => {
         this.avatarUrl = res?.data?.avatarUrl || this.defaultAvatar;
@@ -68,7 +68,7 @@ export class HomePageComponent implements OnInit {
       error: (err) => {
         console.error('Failed to load profile', err);
         this.avatarUrl = this.defaultAvatar;
-      }
+      },
     });
   }
 
@@ -94,17 +94,19 @@ export class HomePageComponent implements OnInit {
   // Hàm để tải bài viết dựa trên category đã chọn
   loadPosts(): void {
     if (this.selectedCategory === 'latest') {
-      this.postService.getPublishedPosts().subscribe(res => {
+      this.postService.getPublishedPosts().subscribe((res) => {
         this.posts = res?.data?.posts || [];
       });
     } else if (this.selectedCategory === 'trending') {
-      this.postService.getPublishedPostsTrending().subscribe(res => {
+      this.postService.getPublishedPostsTrending().subscribe((res) => {
         this.posts = res?.data?.posts || [];
       });
     } else {
-      this.postService.getPostsByCategory(this.selectedCategory).subscribe(res => {
-        this.posts = res?.data?.posts || [];
-      });
+      this.postService
+        .getPostsByCategory(this.selectedCategory)
+        .subscribe((res) => {
+          this.posts = res?.data?.posts || [];
+        });
     }
   }
 
@@ -119,7 +121,7 @@ export class HomePageComponent implements OnInit {
       this.searchQuery = ''; // Clear search input
       this.loadPosts(); // Tải lại bài viết theo category đã chọn
       return;
-    };
+    }
 
     this.postService.searchPosts(query).subscribe({
       next: (res) => {
@@ -127,7 +129,7 @@ export class HomePageComponent implements OnInit {
         this.selectedCategory = null; // clear highlight
         this.searchTermDisplay = query; // Hiển thị từ khóa tìm kiếm
       },
-      error: (err) => console.error('Search error:', err)
+      error: (err) => console.error('Search error:', err),
     });
     this.saveToRecentSearches(query); // Lưu từ khóa tìm kiếm vào danh sách gần đây
   }
@@ -156,8 +158,11 @@ export class HomePageComponent implements OnInit {
           this.recentSearches = this.recentSearches.slice(0, 5);
         }
         // Lưu localStorage nếu muốn nhớ khi refresh
-        localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches));
-      }    
+        localStorage.setItem(
+          'recentSearches',
+          JSON.stringify(this.recentSearches)
+        );
+      }
     }
   }
 
@@ -181,9 +186,12 @@ export class HomePageComponent implements OnInit {
 
   // Hàm để xóa từ khóa tìm kiếm gần đây
   removeRecentSearch(term: string): void {
-    this.recentSearches = this.recentSearches.filter(t => t !== term);
+    this.recentSearches = this.recentSearches.filter((t) => t !== term);
     if (this.isBrowser) {
-      localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches));
+      localStorage.setItem(
+        'recentSearches',
+        JSON.stringify(this.recentSearches)
+      );
     }
   }
 
@@ -208,8 +216,7 @@ export class HomePageComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to fetch trending preview', err);
-      }
+      },
     });
   }
-
 }

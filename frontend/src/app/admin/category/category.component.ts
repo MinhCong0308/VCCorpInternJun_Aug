@@ -1,0 +1,160 @@
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import {
+  CategoryService,
+  Category,
+} from '../../core/services/category.service';
+import { RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
+
+@Component({
+  selector: 'app-category',
+  templateUrl: './category.component.html',
+  styleUrls: ['./category.component.css'],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, HttpClientModule],
+  encapsulation: ViewEncapsulation.None,
+})
+export class CategoryComponent implements OnInit {
+  categories: Category[] = [];
+  searchForm: FormGroup;
+  categoryForm: FormGroup;
+  isEditing = false;
+  selectedCategory: Category | null = null;
+  errorMsg = '';
+  currentPage = 1;
+  totalPages = 0;
+  totalItems = 0;
+
+  constructor(
+    private fb: FormBuilder,
+    private categoryService: CategoryService
+  ) {
+    this.searchForm = this.fb.group({
+      keyword: [''],
+    });
+    this.categoryForm = this.fb.group({
+      categoryname: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(50),
+        ],
+      ],
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadCategories();
+  }
+
+  // Lấy danh sách category có phân trang và tìm kiếm
+  loadCategories(page: number = 1): void {
+    const keyword = this.searchForm.get('keyword')?.value || '';
+    this.categoryService.getAllCategories(keyword, page).subscribe({
+      next: (data) => {
+        this.categories = data.categories;
+        this.currentPage = data.page;
+        this.totalPages = data.totalPages;
+        this.totalItems = data.total;
+        this.errorMsg = '';
+      },
+      error: (err) => {
+        this.errorMsg = 'Failed to load categories.';
+      },
+    });
+  }
+
+  // Tìm kiếm category
+  onSearch(): void {
+    this.currentPage = 1;
+    this.loadCategories(1);
+  }
+
+  // Chuyển trang
+  onPageChange(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.loadCategories(page);
+    }
+  }
+
+  // Tạo mảng số trang cho phân trang
+  getPagesArray(): number[] {
+    return Array(this.totalPages)
+      .fill(0)
+      .map((_, i) => i + 1);
+  }
+
+  // Hiện modal thêm mới
+  onAddNew(): void {
+    this.isEditing = false;
+    this.selectedCategory = null;
+    this.categoryForm.reset();
+    (window as any).$('#categoryModal').modal('show');
+  }
+
+  // Hiện modal sửa
+  onEdit(category: Category): void {
+    this.isEditing = true;
+    this.selectedCategory = category;
+    this.categoryForm.patchValue({
+      categoryname: category.categoryname,
+    });
+    (window as any).$('#categoryModal').modal('show');
+  }
+
+  // Thêm mới hoặc cập nhật category
+  onSubmit(): void {
+    if (this.categoryForm.invalid) return;
+    const categoryData = {
+      categoryname: this.categoryForm.value.categoryname,
+    };
+    let action$;
+    if (this.isEditing && this.selectedCategory) {
+      action$ = this.categoryService.updateCategory(
+        this.selectedCategory.categoryid,
+        categoryData
+      );
+    } else {
+      action$ = this.categoryService.createCategory(categoryData);
+    }
+    action$.subscribe({
+      next: () => {
+        // Nếu thêm mới thì về trang 1, nếu sửa thì giữ nguyên trang
+        if (!this.isEditing) {
+          this.currentPage = 1;
+        }
+        this.loadCategories(this.currentPage);
+        (window as any).$('#categoryModal').modal('hide');
+      },
+      error: (err) => {
+        this.errorMsg = err?.error?.message || 'Operation failed.';
+      },
+    });
+  }
+
+  // Xóa category
+  onDelete(id: number): void {
+    if (confirm('Are you sure you want to delete this category?')) {
+      this.categoryService.deleteCategory(id).subscribe({
+        next: () => {
+          // Nếu xóa hết ở trang hiện tại thì lùi về trang trước
+          if (this.categories.length === 1 && this.currentPage > 1) {
+            this.currentPage--;
+          }
+          this.loadCategories(this.currentPage);
+        },
+        error: (err) => {
+          this.errorMsg = err?.error?.message || 'Delete failed.';
+        },
+      });
+    }
+  }
+}

@@ -88,7 +88,6 @@ const authController = {
   },
   logout: async (req, res) => {
     try {
-      // console.log("Request: ", req.cookies);
       const accessToken = req.cookies.accessToken;
       const refreshToken = req.cookies.refreshToken;
       await manageTokenServices.revokeToken("access", accessToken);

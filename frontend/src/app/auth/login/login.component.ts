@@ -100,20 +100,6 @@ export class LoginComponent implements OnInit {
     });
     return res.ok;
   }
-  // private handleOAuthCallback(): void {
-  //   const urlParams = new URLSearchParams(window.location.search);
-  //   const token = urlParams.get('token');
-  //   const error = urlParams.get('error');
-
-  //   if (token) {
-  //     localStorage.setItem('accessToken', token);
-  //     this.successMessage = 'Login successful! Redirecting...';
-  //     window.history.replaceState({}, document.title, window.location.pathname);
-  //     setTimeout(() => this.router.navigate(['/home']), 1000);
-  //   } else if (error) {
-  //     this.errorMessage = decodeURIComponent(error);
-  //   }
-  // }
 
   private markAllFieldsAsTouched(): void {
     Object.values(this.loginForm.controls).forEach(control => {
@@ -122,9 +108,14 @@ export class LoginComponent implements OnInit {
   }
 
   logout(): void {
-    if (this.isBrowser) {
-      localStorage.removeItem('accessToken');
-    }
-    this.router.navigate(['/login']);
+    // remove cookie
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/login']);
+      },
+      error: (error) => {
+        console.error('Logout error:', error);
+      }
+    });
   }
 }

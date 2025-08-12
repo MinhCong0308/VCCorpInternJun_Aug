@@ -2,7 +2,7 @@ const responseUtils = require("utils/responseUtils");
 const authService = require("modules/auth/services/authService");
 require("dotenv").config();
 const config = require("configs/index");
-
+const manageTokenServices = require("modules/manage_token/services/manageTokenService");
 const authController = {
   logIn: async (req, res) => {
     try {
@@ -84,6 +84,20 @@ const authController = {
     } catch(err) {
       console.error("getSessionInfo error:", err);
     return responseUtils.unauthorized(res, "Invalid session");
+    }
+  },
+  logout: async (req, res) => {
+    try {
+      const accessToken = req.cookies.accessToken;
+      const refreshToken = req.cookies.refreshToken;
+      await manageTokenServices.revokeToken("access", accessToken);
+      await manageTokenServices.revokeToken("refresh", refreshToken);
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
+      return responseUtils.ok(res, { message: "Logged out successfully" });
+    } catch (error) {
+      console.error("Logout error:", error);
+      return responseUtils.unauthorized(res, "Logout failed");
     }
   }
 };

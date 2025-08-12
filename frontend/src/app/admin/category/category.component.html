@@ -1,0 +1,214 @@
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Manage Categories</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item">
+            <a routerLink="/admin/dashboard">Home</a>
+          </li>
+          <li class="breadcrumb-item active">Categories</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Category Modal -->
+<div
+  class="modal fade"
+  id="categoryModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="categoryModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="categoryModalLabel">
+          {{ isEditing ? "Edit Category" : "Add New Category" }}
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="categoryName">Name</label>
+            <input
+              id="categoryName"
+              type="text"
+              formControlName="categoryname"
+              class="form-control"
+              placeholder="Enter category name"
+            />
+            <div
+              *ngIf="
+                categoryForm.get('categoryname')?.touched &&
+                categoryForm.get('categoryname')?.invalid
+              "
+              class="text-danger mt-1 small"
+            >
+              <div
+                *ngIf="categoryForm.get('categoryname')?.errors?.['required']"
+              >
+                Name is required.
+              </div>
+              <div
+                *ngIf="categoryForm.get('categoryname')?.errors?.['minlength']"
+              >
+                Minimum 2 characters.
+              </div>
+              <div
+                *ngIf="categoryForm.get('categoryname')?.errors?.['maxlength']"
+              >
+                Maximum 50 characters.
+              </div>
+            </div>
+          </div>
+          <div *ngIf="errorMsg" class="alert alert-danger py-1 px-2">
+            {{ errorMsg }}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="categoryForm.invalid"
+          >
+            {{ isEditing ? "Update" : "Create" }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <!-- Card Tìm kiếm -->
+    <div class="card card-default">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-search"></i>
+          Search
+        </h3>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+          <div class="row">
+            <div class="col-md-10">
+              <div class="form-group">
+                <input
+                  type="text"
+                  formControlName="keyword"
+                  class="form-control"
+                  placeholder="Search by category name..."
+                />
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block">
+                  <i class="fas fa-search"></i> Search
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <!-- Category Table -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Category List</h3>
+            <div class="card-tools">
+              <button
+                type="button"
+                class="btn btn-primary"
+                (click)="onAddNew()"
+              >
+                <i class="fas fa-plus-circle mr-1"></i>
+                Add New Category
+              </button>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th style="width: 60px">#</th>
+                  <th>Name</th>
+                  <th style="width: 200px; text-align: center">Post Count</th>
+                  <th style="width: 150px; text-align: center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let category of categories; let i = index">
+                  <td>{{ i + 1 }}.</td>
+                  <td>{{ category.categoryname }}</td>
+                  <td style="text-align: center">{{ category.totalPost }}</td>
+                  <td style="text-align: center">
+                    <button
+                      class="btn btn-sm btn-primary"
+                      (click)="onEdit(category)"
+                      title="Edit"
+                    >
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger ml-1"
+                      (click)="onDelete(category.categoryid)"
+                      title="Delete"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-footer clearfix">
+            <ul class="pagination pagination-sm m-0 float-right">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <a class="page-link" (click)="onPageChange(currentPage - 1)"
+                  >«</a
+                >
+              </li>
+              <li
+                class="page-item"
+                *ngFor="let page of getPagesArray()"
+                [class.active]="page === currentPage"
+              >
+                <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
+              </li>
+              <li
+                class="page-item"
+                [class.disabled]="currentPage === totalPages"
+              >
+                <a class="page-link" (click)="onPageChange(currentPage + 1)"
+                  >»</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

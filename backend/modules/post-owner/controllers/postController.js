@@ -60,6 +60,6 @@ const postsController = {
             console.error("Error retrieving specific post:", error);
             return responseUtils.error(res, error.message);
         }
-    }
+    },
 };
 module.exports = postsController;

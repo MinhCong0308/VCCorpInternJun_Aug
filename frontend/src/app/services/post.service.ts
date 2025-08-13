@@ -9,6 +9,7 @@ export interface Post {
   content: string;
   languageid: number;
   tags: string[];
+  status: string;
   createdAt: string;
 }
 @Injectable({

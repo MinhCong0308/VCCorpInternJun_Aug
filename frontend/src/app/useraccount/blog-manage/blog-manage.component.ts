@@ -147,7 +147,14 @@ export class BlogManageComponent implements OnInit {
 
   editPost(postId: number, event: Event): void {
     event.preventDefault();
-    this.router.navigate(['/blog-owner/create'], { queryParams: { edit: postId } });
+    // check post status
+    const post = this.posts.find(p => p.postid === postId);
+    console.log('Post status:', post?.status);
+    if (post && post.status === 'PENDING') {
+      this.router.navigate(['/blog-owner/create'], { queryParams: { edit: postId } });
+    } else {
+      this.errorMessage = 'You can only edit pending posts.';
+    }
   }
   deletePost(postId: number, event: Event): void {
     event.preventDefault();

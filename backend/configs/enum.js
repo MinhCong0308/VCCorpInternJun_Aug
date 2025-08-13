@@ -30,12 +30,17 @@ const RoleNameById = Object.freeze({
   1: "USER",
   2: "ADMIN",
 });
-
+const StatusNameById = Object.freeze({
+  1: "PENDING",
+  2: "APPROVED",
+  3: "REJECTED",
+});
 module.exports = {
   roleenum,
   statusenum,
   RoleNameById,
   statuspostenum,
+  StatusNameById,
   statuscode,
   statusUser,
 };

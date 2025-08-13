@@ -21,8 +21,9 @@ const authController = {
         httpOnly: true,
         secure: false,
         sameSite: 'lax',
-        maxAge: 31536000000, // 1 year
+        maxAge: 604800000, // 1 week
       });
+      // console.log("Request cookies:", req.cookies);
       return responseUtils.ok(res, data.user);
     } catch (error) {
       console.error("Login error: ", error);
@@ -32,7 +33,6 @@ const authController = {
   logInAdmin: async (req, res) => {
     try {
       const adminData = req.body;
-      // Gọi service với vai trò ADMIN
       const data = await authService.login(
         adminData,
         config.config.roleenum.ADMIN

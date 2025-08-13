@@ -43,6 +43,9 @@ const postService = {
         if (post.userid !== userid) {
             throw new Error("You are not authorized to update this post");
         }
+        if (post.status !== config.config.statuspostenum.PENDING) {
+            throw new Error("Only pending posts can be updated");
+        }
         post.title = title;
         post.content = content;
         post.languageid = languageid;
@@ -69,8 +72,10 @@ const postService = {
                 content: post.content,
                 languageid: post.languageid,
                 tags: post.Categories.map(category => category.categoryname),
+                status: config.config.StatusNameById[post.status],
                 createdAt: post.createdAt,
             }));
+            console.log("Posts retrieved successfully:", postsWithTags);
             return { posts: postsWithTags };
         } catch (error) {
             console.error("Error retrieving posts:", error);
@@ -118,6 +123,8 @@ const postService = {
                 content: post.content,
                 languageid: post.languageid,
                 tags: post.Categories.map(category => category.categoryname),
+                // how to map the statusenum => status name
+                status: config.config.StatusNameById[post.status],
                 createdAt: post.createdAt,
             }
         };

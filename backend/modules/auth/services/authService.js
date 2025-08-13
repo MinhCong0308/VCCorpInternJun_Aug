@@ -52,7 +52,6 @@ const authService = {
     };
   },
   async signup(userInfo) {
-    // tested
     const { firstname, lastname, username, email, password, confirm_password } =
       userInfo;
     const existingUser = await db.User.findOne({

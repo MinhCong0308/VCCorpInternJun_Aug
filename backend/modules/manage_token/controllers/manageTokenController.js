@@ -7,24 +7,28 @@ const manageTokenController = {
     refreshToken: async(req, res) => {
         try {
             const refreshToken = req.cookies?.refreshToken;
+            console.log("Received refresh token:", refreshToken);
             if(!refreshToken) {
+                console.log("No refresh token found in cookies");
                 return responseUtils.unauthorized(res, 'Unauthorized, Please log in');
             }
             const decoded = jwt.verify(refreshToken, config.config.jwt.secret);
             if(!decoded || ! decoded.userId) {
+                console.log("Invalid refresh token");
                 return responseUtils.unauthorized(res, 'Token is not usable');
             }
             // check for blacklist existance token
-            const isTokenRevoked = manageTokenServices.isTokenRevoked('refresh', refreshToken);
+            const isTokenRevoked = await manageTokenServices.isTokenRevoked('refresh', refreshToken);
             if(isTokenRevoked) {
-                return responseUtils.unauthorized(res, 'Token is revoked');
+                console.log("The refresh token has been revoked:", refreshToken);
+                return responseUtils.error(res, 'Token is revoked');
             }
             const newToken = await manageTokenServices.refreshToken(decoded.userId);
             res.cookie("accessToken", newToken.accessToken, {
                 httpOnly: true,
                 secure: false,
                 sameSite: 'lax',
-                maxAge: 3600000, // 1 hour
+                maxAge: 120000, // 2 minutes
             });
             res.cookie("refreshToken", newToken.refreshToken, {
                 httpOnly: true,
@@ -32,9 +36,11 @@ const manageTokenController = {
                 sameSite: 'lax',
                 maxAge: 604800000, // 1 week
             });
+            console.log("New tokens generated:", newToken);
             await manageTokenServices.revokeToken('refresh', refreshToken);
             return responseUtils.ok(res, newToken);
         } catch(error) {
+            console.log("Here bro");
             return responseUtils.unauthorized(res, 'Unauthorized: ' + error.message);
         }
     },

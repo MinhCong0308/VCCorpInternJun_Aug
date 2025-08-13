@@ -4,6 +4,7 @@ import { PostService } from '../../core/services/post.service';
 import { AccountService } from '../../core/services/account.service';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-home-page',
@@ -33,16 +34,24 @@ export class HomePageComponent implements OnInit {
     private postService: PostService,
     private accountService: AccountService,
     private router: Router,
+    private authService: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
   ngOnInit(): void {
-    if (this.isBrowser) {
-      this.isLoggedIn = !!localStorage.getItem('accessToken'); // Kiểm tra xem người dùng đã đăng nhập hay chưa
-      console.log('Access Token:', localStorage.getItem('accessToken'));
-    }
+    this.authService.checkSession().subscribe({
+      next: (ok) => {
+        this.isLoggedIn = ok;
+        if (ok) {
+          this.loadProfile();
+        }
+      },
+      error: () => {
+        this.isLoggedIn = false;
+      }
+    });
     this.loadRecentSearches(); // Tải danh sách tìm kiếm gần đây từ localStorage
     this.getTrendingPreviewPosts(); // Tải danh sách post trending
     this.categoryService.getCategories().subscribe({
@@ -62,7 +71,10 @@ export class HomePageComponent implements OnInit {
       error: (err) => console.error('Failed to fetch categories', err),
     });
     this.loadPosts(); // Mặc định là
+  }
 
+  // Hàm để lấy profile người dùng đã đăng nhập
+  loadProfile(): void {
     this.accountService.getProfile().subscribe({
       next: (res: any) => {
         this.avatarUrl = res?.data?.avatarUrl || this.defaultAvatar;
@@ -198,10 +210,7 @@ export class HomePageComponent implements OnInit {
   }
 
   // Hàm để đăng xuất
-  logout(): void {
-    if (this.isBrowser) {
-      localStorage.removeItem('accessToken');
-    }
+  logout(): void {    
     this.router.navigate(['/auth/login']);
   }
 

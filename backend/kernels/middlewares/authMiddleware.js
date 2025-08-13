@@ -10,6 +10,7 @@ const authenticated = async (req, res, next) => {
             return responseUtils.unauthorized(res, 'No token provided');
         }
         const decoded = jwt.verify(accessToken, config.config.jwt.secret);
+        console.log('Decoded: ', decoded);
         if (!decoded || !decoded.userId) {
             return responseUtils.unauthorized(res, 'Invalid token');
         }

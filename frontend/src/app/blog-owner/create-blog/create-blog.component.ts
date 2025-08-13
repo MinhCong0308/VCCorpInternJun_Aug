@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
-import { PostService , Post} from '../../services/post.service';
+import { PostBlogOwnerService , Post} from '../../core/services/postowner.service';
 
 @Component({
   selector: 'app-create-blog',
@@ -41,7 +41,7 @@ export class CreateBlogComponent implements OnInit {
     ]
   };
 
-  constructor(private fb: FormBuilder, private http: HttpClient, private route: ActivatedRoute, private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostService) {}
+  constructor(private fb: FormBuilder, private http: HttpClient, private route: ActivatedRoute, private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService) {}
 
   ngOnInit(): void {
     this.blogForm = this.fb.group({

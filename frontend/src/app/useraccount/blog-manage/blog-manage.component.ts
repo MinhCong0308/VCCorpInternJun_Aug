@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
-import { PostService, Post } from '../../services/post.service';
-import { AuthService } from '../../services/auth.service';
+import { PostBlogOwnerService, Post } from '../../core/services/postowner.service';
+import { AuthService } from '../../core/services/auth.service';
 
 interface UserProfile {
   fullname: string;
@@ -41,31 +41,19 @@ export class BlogManageComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostService, private authService: AuthService) {}
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService) {}
   async ngOnInit(): Promise<void> {
-    if (!isPlatformBrowser(this.platformId)) {
-      this.errorMessage = 'This feature is only available in the browser.';
-      return;
-    }
-    if (!await this.checkSession()) {
-      this.router.navigate(['/auth/login']);
-      return;
-    }
-    this.loadUserProfile();
-    this.loadPosts();
-  }
-  private async checkSession(): Promise<boolean> {
-    const res = await fetch(`http://localhost:3000/auth/me`, {
-      credentials: 'include',
+    this.authService.checkSession().subscribe(valid => {
+      if (valid) {
+        this.loadUserProfile();
+        this.loadPosts();
+      }
+      else {
+        this.router.navigate(['/auth/login']);
+      }
     });
-    return res.ok;
   }
-
   private async loadUserProfile(): Promise<void> {
-    if (!isPlatformBrowser(this.platformId)) {
-      this.errorMessage = 'This feature is only available in the browser.';
-      return;
-    }
     try {
       const response = await fetch('http://localhost:3000/account/profile', {
         method: 'GET',

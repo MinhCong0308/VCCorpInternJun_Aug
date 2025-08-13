@@ -15,7 +15,7 @@ export interface Post {
 @Injectable({
   providedIn: 'root' // for all components
 })
-export class PostService {
+export class PostBlogOwnerService {
   private baseUrl = 'http://localhost:3000/post-owner';
   constructor(private http: HttpClient) {}
   getAllPosts(): Observable<Post[]> {

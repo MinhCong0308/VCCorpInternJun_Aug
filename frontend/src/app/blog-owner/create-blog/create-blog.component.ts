@@ -85,7 +85,6 @@ export class CreateBlogComponent implements OnInit {
       }
     });
   }
-
   selectLanguage(lang: { id: number; name: string; flag: string }, event: Event): void {
     event.preventDefault();
     this.blogForm.patchValue({ languageid: lang.id });

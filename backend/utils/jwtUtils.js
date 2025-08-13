@@ -10,8 +10,7 @@ module.exports = {
       },
       config.jwt.secret,
       {
-        // expiresIn: config.jwt.ttl,
-        expiresIn: '2m'
+        expiresIn: config.jwt.ttl,
       }
     );
 

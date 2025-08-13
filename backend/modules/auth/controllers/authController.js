@@ -15,7 +15,7 @@ const authController = {
         httpOnly: true,
         secure: false,
         sameSite: 'lax',
-        maxAge: 120000, // 2 minutes
+        maxAge: 3600000, // 1 hour
       });
       res.cookie("refreshToken", data.refreshToken, {
         httpOnly: true,
@@ -83,7 +83,7 @@ const authController = {
     } catch(err) {
       console.log("ERROR");
       console.error("getSessionInfo error:", err);
-    return responseUtils.unauthorized(res, "Invalid session");
+      return responseUtils.unauthorized(res, "Invalid session");
     }
   },
   logout: async (req, res) => {

@@ -21,14 +21,14 @@ const manageTokenController = {
             const isTokenRevoked = await manageTokenServices.isTokenRevoked('refresh', refreshToken);
             if(isTokenRevoked) {
                 console.log("The refresh token has been revoked:", refreshToken);
-                return responseUtils.error(res, 'Token is revoked');
+                return responseUtils.unauthorized(res, 'Token is revoked');
             }
             const newToken = await manageTokenServices.refreshToken(decoded.userId);
             res.cookie("accessToken", newToken.accessToken, {
                 httpOnly: true,
                 secure: false,
                 sameSite: 'lax',
-                maxAge: 120000, // 2 minutes
+                maxAge: 3600000, // 1 hour
             });
             res.cookie("refreshToken", newToken.refreshToken, {
                 httpOnly: true,
@@ -40,7 +40,6 @@ const manageTokenController = {
             await manageTokenServices.revokeToken('refresh', refreshToken);
             return responseUtils.ok(res, newToken);
         } catch(error) {
-            console.log("Here bro");
             return responseUtils.unauthorized(res, 'Unauthorized: ' + error.message);
         }
     },

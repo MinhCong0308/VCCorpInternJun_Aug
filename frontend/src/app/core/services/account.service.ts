@@ -1,6 +1,6 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
@@ -18,29 +18,16 @@ export class AccountService {
   ) { }
 
   getProfile(): Observable<any> {
-    // Don't make the API call on server side
     if (!isPlatformBrowser(this.platformId)) {
-      return new Observable(observer => {
-        // Just complete the observable without emitting any value
-        observer.complete();
-      });
+      console.error("This feature is only available in the browser.");
+      return EMPTY;
     }
-
-    // We're in browser environment now
-    const token = localStorage.getItem('accessToken') || '';
-    if (!token) {
-      this.router.navigate(['/login']);
-      return throwError(() => new Error('No token available'));
-    }
-
     return this.http.get(`${this.baseUrl}/account/profile`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      withCredentials: true
     }).pipe(
-      catchError(error => {
+      catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
-          this.router.navigate(['/login']);
+          this.router.navigate(['/auth/login']);
         }
         return throwError(() => error);
       })

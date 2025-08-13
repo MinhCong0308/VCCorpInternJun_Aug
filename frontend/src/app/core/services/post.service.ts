@@ -1,6 +1,6 @@
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, EMPTY, Observable, throwError } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -33,24 +33,15 @@ export class PostService {
   }
   likePost(postId: number): Observable<any> {
     if (!isPlatformBrowser(this.platformId)) {
-      return new Observable(observer => {
-        observer.complete();
-      });
+      console.error("This feature is only available in the browser.");
+      return EMPTY;
     }
-    const token = localStorage.getItem('accessToken') || '';
-    if (!token) {
-      this.router.navigate(['/login']);
-      return throwError(() => new Error('No token available'));
-    }
-    
     return this.http.put(`${this.baseUrl}/posts/${postId}/like`, {}, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      withCredentials: true,
     }).pipe(
       catchError(error => {
         if (error.status === 401) {
-          this.router.navigate(['/login']);
+          this.router.navigate(['/auth/login']);
         }
         return throwError(() => error);
       })

@@ -4,6 +4,7 @@ import { CommentService } from '../../core/services/comment.service';
 import { AccountService } from '../../core/services/account.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-post-detail',
@@ -29,6 +30,7 @@ export class PostDetailComponent implements OnInit {
     private commentService: CommentService,
     private accountService: AccountService,
     private router: Router,
+    private authService: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -36,10 +38,21 @@ export class PostDetailComponent implements OnInit {
   
 
   ngOnInit(): void {
-    if (this.isBrowser) {
-      this.isLoggedIn = !!localStorage.getItem('accessToken'); // Kiểm tra xem người dùng đã đăng nhập hay chưa
-      console.log('Access Token:', localStorage.getItem('accessToken'));
-    }
+    // if (this.isBrowser) {
+    //   this.isLoggedIn = !!localStorage.getItem('accessToken'); // Kiểm tra xem người dùng đã đăng nhập hay chưa
+    //   console.log('Access Token:', localStorage.getItem('accessToken'));
+    // }
+    this.authService.checkSession().subscribe({
+      next: (ok) => {
+        this.isLoggedIn = ok;
+        if (ok) {
+          this.loadProfile();
+        }
+      },
+      error: () => {
+        this.isLoggedIn = false;
+      }
+    });
     this.route.paramMap.subscribe(params => {
       this.postId = params.get('postId');
       // console.log("postId:", this.postId);
@@ -49,16 +62,18 @@ export class PostDetailComponent implements OnInit {
       }
       this.loadPost(this.postId);
       this.loadComments(this.postId);
+    });
+  }
 
-      this.accountService.getProfile().subscribe({
-        next: (res: any) => {
-          this.avatarUrl = res?.data?.avatarUrl || this.defaultAvatar;
-        },
-        error: (err) => {
-          console.error('Failed to load profile', err);
-          this.avatarUrl = this.defaultAvatar;
-        }
-      });
+  loadProfile(): void {
+    this.accountService.getProfile().subscribe({
+      next: (res: any) => {
+        this.avatarUrl = res?.data?.avatarUrl || this.defaultAvatar;
+      },
+      error: (err) => {
+        console.error('Failed to load profile', err);
+        this.avatarUrl = this.defaultAvatar;
+      }
     });
   }
 
@@ -100,9 +115,13 @@ export class PostDetailComponent implements OnInit {
 
   // Hàm để đăng xuất
   logout(): void {
-    if (this.isBrowser) {
-      localStorage.removeItem('accessToken');
-    }
-    this.router.navigate(['/auth/login']);
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/auth/login']);
+      },
+      error: (error) => {
+        console.error('Logout error:', error);
+      }
+    });
   }
 }

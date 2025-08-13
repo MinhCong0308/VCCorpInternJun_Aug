@@ -209,11 +209,6 @@ export class HomePageComponent implements OnInit {
     }
   }
 
-  // Hàm để đăng xuất
-  logout(): void {    
-    this.router.navigate(['/auth/login']);
-  }
-
   // Hàm để toggle See more categories
   toggleRecommended(): void {
     this.showAllRecommended = !this.showAllRecommended;
@@ -228,6 +223,18 @@ export class HomePageComponent implements OnInit {
       error: (err) => {
         console.error('Failed to fetch trending preview', err);
       },
+    });
+  }
+
+  // Hàm để đăng xuất
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/auth/login']);
+      },
+      error: (error) => {
+        console.error('Logout error:', error);
+      }
     });
   }
 }

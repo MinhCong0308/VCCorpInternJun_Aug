@@ -98,6 +98,7 @@
               <div class="flex-grow-1">
                 <h2>
                   <a [routerLink]="['/post', post.postid]" class="blog-title">{{ post.title }}</a>
+                  <span class="blog-status">{{post.status}}</span>
                 </h2>
                 <p class="blog-subtitle">{{ truncateContent(post.content) }}</p>
                 <div class="blog-meta">

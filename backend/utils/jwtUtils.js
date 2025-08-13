@@ -24,7 +24,7 @@ module.exports = {
       },
       config.jwt.secret,
       {
-        expiresIn: "1y",
+        expiresIn: "1w"
       }
     );
 

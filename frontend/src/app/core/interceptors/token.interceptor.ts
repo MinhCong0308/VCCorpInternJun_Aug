@@ -1,7 +1,7 @@
 import { HttpInterceptorFn,  HttpErrorResponse, HttpRequest, HttpHandlerFn, HttpBackend, HttpClient} from '@angular/common/http';
 import { inject } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, filter, switchMap, take, tap } from 'rxjs';
+import { catchError, filter, switchMap, take, tap, finalize } from 'rxjs';
 import { Router } from '@angular/router';
 const API_BASE = 'http://localhost:3000'; 
 
@@ -11,10 +11,12 @@ const refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null)
 
 export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
   const http = inject(HttpClient);
-  // const router = inject(Router);
-  if (req.url.includes('/auth/refresh')) {
+  const router = inject(Router);
+  
+  if (req.url.includes('/auth/refresh') || req.url.includes('/auth/login')) {
     return next(req);
   }
+  
   function refreshCall(): Observable<any> {
     if(isRefreshing) {
       return refreshTokenSubject.pipe(
@@ -25,33 +27,42 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
     } else {
       isRefreshing = true;
       refreshTokenSubject.next(null);
-      // console.log("Refreshing token");
+      
       return http.post(`${API_BASE}/auth/refresh`, {}, { withCredentials: true }).pipe(
         tap((response: any) => {
-          // console.log('Token refreshed:', response);
           isRefreshing = false;
           refreshTokenSubject.next(response);
         }),
         catchError((error) => {
-          // console.error('Error refreshing token:', error);
           isRefreshing = false;
           refreshTokenSubject.next(null);
-          // router.navigate(['auth/login']);
+          
+          // Clear any stored tokens and redirect to login
+          if (error.status === 401) {
+            console.log('Refresh token expired, redirecting to login');
+            router.navigate(['/auth/login']);
+          }
           return throwError(() => error);
+        }),
+        finalize(() => {
+          isRefreshing = false;
         })
       );
     }
   }
+  
   return next(req).pipe(
     catchError((error) => {
       if (error instanceof HttpErrorResponse && error.status === 401) {
-        // console.log("Token expired");
         return refreshCall().pipe(
           switchMap(() => {
             return next(req);
           }),
           catchError((refreshError) => {
-            // console.log("Refresh failed", refreshError);
+            // Don't retry if refresh failed with 401 - user needs to login
+            if (refreshError.status === 401) {
+              return throwError(() => new Error('Authentication required'));
+            }
             return throwError(() => refreshError);
           })
         );

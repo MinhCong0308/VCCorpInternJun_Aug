@@ -86,7 +86,7 @@ router.group("/account", middlewares([authenticated]), (router) => {
     accountController.updateFullname
   );
   router.put("/deactivate-account", accountController.deactivateAccount);
-  router.put(
+  router.post(
     "/update-avatar",
     uploads.single("avatar"),
     accountController.updateAvatar
@@ -163,17 +163,16 @@ router.group(
   }
 );
 
-router.group("/comments", (router) => {
+router.group("/comments", middlewares([authenticated, checkRole(["user"])]), (router) => {
+
   router.get("/", commentController.getAll);
   router.post(
     "/",
-    middlewares([authenticated, checkRole(["user"])]),
     validate([commentValidation.create]),
     commentController.create
   );
   router.put(
     "/:commentId",
-    middlewares([authenticated, checkRole(["user"])]),
     validate([commentValidation.update]),
     commentController.update
   );

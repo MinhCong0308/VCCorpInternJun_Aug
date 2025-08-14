@@ -163,17 +163,16 @@ router.group(
   }
 );
 
-router.group("/comments", (router) => {
+router.group("/comments", middlewares([authenticated, checkRole(["user"])]), (router) => {
+
   router.get("/", commentController.getAll);
   router.post(
     "/",
-    middlewares([authenticated, checkRole(["user"])]),
     validate([commentValidation.create]),
     commentController.create
   );
   router.put(
     "/:commentId",
-    middlewares([authenticated, checkRole(["user"])]),
     validate([commentValidation.update]),
     commentController.update
   );

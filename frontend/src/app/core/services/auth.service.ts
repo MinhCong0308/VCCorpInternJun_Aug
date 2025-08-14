@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError, map, Observable, throwError, of, tap, shareReplay, timer, switchMap, retryWhen, take, delay } from 'rxjs';
+import { catchError, map, Observable, throwError, of, tap, shareReplay, timer, switchMap, timeout} from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 export interface User {
   userid: number;
@@ -32,9 +33,10 @@ interface SignUpWrapper {
 @Injectable({
   providedIn: 'root'
 })
-
 export class AuthService {
   private sessionCheck$: Observable<boolean> | null = null;
+  private platformId = inject(PLATFORM_ID);
+
   constructor(private http: HttpClient) { }
   baseUrl = "http://localhost:3000/auth";
 
@@ -42,7 +44,8 @@ export class AuthService {
     const url = `${this.baseUrl}/login`;
     return this.http.post<LogInWrapper>(url, { email, password }, {withCredentials: true}).pipe(
       tap(() => {
-        this.sessionCheck$ = null; // Reset session check on login
+        this.clearSessionCache(); // ✅ Use the method
+        console.log('Login successful - cleared session cache');
       }),
       catchError((error) => {
         console.error('Login error:', error);
@@ -50,51 +53,104 @@ export class AuthService {
       })
     );
   }
+
   checkSession(): Observable<boolean> {
-    if(!this.sessionCheck$) {
-      this.sessionCheck$ = timer(50).pipe( // ✅ Small initial delay
-        switchMap(() => 
-          this.http.get<{ success: boolean }>(`${this.baseUrl}/me`, {withCredentials: true})
-        ),
-        retryWhen(errors => 
-          errors.pipe(
-            take(2), // ✅ Retry up to 2 times
-            delay(200), // ✅ Wait 200ms between retries
-            tap(() => console.log('Retrying session check due to cookie timing...'))
-          )
-        ),
-        map((response) => {
-          console.log("Check session response:", response.success);
-          return response.success;
-        }),
-        catchError((error) => {
-          console.log("Check session error after retries:", error);
-          return of(false);
-        }),
-        shareReplay(1),
-        tap(() => {
-          setTimeout(() => {
-            this.sessionCheck$ = null;
-          }, 500);
-        })
-      );
+    if (!isPlatformBrowser(this.platformId)) {
+      console.log('AUTH SERVICE: Server-side - returning true');
+      return of(true);
     }
+    
+    if (this.sessionCheck$) {
+      console.log('AUTH SERVICE: Using cached session check');
+      return this.sessionCheck$;
+    }
+
+    console.log('AUTH SERVICE: Making new session check request');
+    
+    // ✅ Remove all delays - make it immediate
+    this.sessionCheck$ = this.http.get<{ success: boolean }>(`${this.baseUrl}/me`, { withCredentials: true }).pipe(
+      // timeout(2000), // Very short timeout
+      map(response => {
+        console.log('AUTH SERVICE: Session check response:', response.success);
+        return response.success;
+      }),
+      catchError((error) => {
+        console.log('AUTH SERVICE: Session check failed:', error.status, error.message);
+        return of(false);
+      }),
+      shareReplay(1),
+      tap((result) => {
+        console.log('AUTH SERVICE: Session check completed with result:', result);
+        setTimeout(() => {
+          console.log('AUTH SERVICE: Clearing session cache');
+          this.sessionCheck$ = null;
+        }, 200);
+      })
+    );
     return this.sessionCheck$;
   }
+  private makeSessionRequest(attempt: number): Observable<boolean> {
+    console.log(`Session check attempt ${attempt} - making HTTP request`);
+    return this.http.get<{ success: boolean }>(`${this.baseUrl}/me`, { withCredentials: true }).pipe(
+      timeout(5000), 
+      map(response => {
+        console.log(`Session check attempt ${attempt} HTTP response:`, response);
+        return response.success;
+      }),
+      catchError((error) => {
+        console.log(`Session check attempt ${attempt} failed:`, error.name, error.status, error.message);
+        const shouldRetry = attempt < 2 && (
+          error.name === 'TimeoutError' || 
+          error.status === 0 ||
+          error.code === 'NETWORK_ERROR' ||
+          error.message?.toLowerCase().includes('timeout') ||
+          error.message?.toLowerCase().includes('network')
+        );
+
+        if (shouldRetry) {
+          console.log(`Will retry session check... (attempt ${attempt + 1}/2)`);
+          return timer(600).pipe( 
+            switchMap(() => this.makeSessionRequest(attempt + 1))
+          );
+        }
+        
+        console.log('Session check failed - no more retries, returning false');
+        return of(false);
+      })
+    );
+  }
+
+  // ✅ Add the clearSessionCache method
+  clearSessionCache(): void {
+    console.log('Manually clearing session cache');
+    this.sessionCheck$ = null;
+  }
+
   signup(formData: SignUpInput): Observable<SignUpWrapper> {
     const url = `${this.baseUrl}/signup`;
     return this.http.post<SignUpWrapper>(url, formData, {withCredentials: true}).pipe(
+      tap(() => {
+        this.clearSessionCache(); // ✅ Use the method
+        console.log('Signup successful - cleared session cache');
+      }),
       catchError((error) => {
         console.error('Signup error:', error);
         return of({ success: false, data: '', status: error.status, message: error.message });
       })
     );
   }
+
   logout(): Observable<void> {
     const url = `${this.baseUrl}/logout`;
     return this.http.post<void>(url, {}, {withCredentials: true}).pipe(
+      tap(() => {
+        this.clearSessionCache(); // ✅ Use the method
+        console.log('Logout successful - cleared session cache');
+      }),
       catchError((error) => {
         console.error('Logout error:', error);
+        this.clearSessionCache(); // ✅ Use the method
+        console.log('Logout failed - cleared session cache anyway');
         return throwError(() => new Error('Logout failed'));
       })
     );

@@ -20,6 +20,7 @@ export class BlogManageComponent implements OnInit {
   
   posts: Post[] = [];
   userProfile!: UserProfile;
+  isInitializing = true;
 
   languages: Language[] = [
     { id: 1, flag: '🇺🇸' },
@@ -34,19 +35,36 @@ export class BlogManageComponent implements OnInit {
   successMessage = '';
   constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService) {}
   async ngOnInit(): Promise<void> {
+    if(!isPlatformBrowser(this.platformId)) {
+      this.isInitializing = false;
+      return;
+    }
+    this.isInitializing = true;
     this.profileService.getUserProfile().subscribe({
       next: (profile) => {
         this.userProfile = profile;
+        this.isInitializing = false;
+        this.loadPosts();
       },
       error: (error) => {
         console.error('Error fetching user profile:', error);
-        this.errorMessage = 'Failed to load user profile.';
+        this.isInitializing = false;
+        
+        if (error.status === 401 || error.message === 'Authentication required') {
+          this.errorMessage = 'Session expired. Please log in again.';
+          setTimeout(() => {
+            this.router.navigate(['/auth/login']);
+          }, 1000);
+        } else {
+          this.errorMessage = 'Failed to load user profile. Please try again.';
+        }
       }
     });
-    this.loadPosts();
   }
   
   loadPosts(): void {
+    if (!this.userProfile) return;
+    
     this.isLoading = true;
     this.posts = [];
     this.postService.getAllPosts().subscribe({
@@ -145,6 +163,10 @@ export class BlogManageComponent implements OnInit {
         console.error('Logout error:', error);
       }
     });
+  }
+
+  navigateToLogin(): void {
+    this.router.navigate(['/auth/login']);
   }
 
   private clearMessages(): void {

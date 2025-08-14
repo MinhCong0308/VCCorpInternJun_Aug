@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, filter, switchMap, take, tap } from 'rxjs';
 import { Router } from '@angular/router';
-const API_BASE = 'http://localhost:3000'; // or environment.apiBase
+const API_BASE = 'http://localhost:3000'; 
 
 let isRefreshing = false;
 const refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
@@ -11,7 +11,7 @@ const refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null)
 
 export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
   const http = inject(HttpClient);
-  const router = inject(Router);
+  // const router = inject(Router);
   if (req.url.includes('/auth/refresh')) {
     return next(req);
   }
@@ -36,7 +36,7 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
           // console.error('Error refreshing token:', error);
           isRefreshing = false;
           refreshTokenSubject.next(null);
-          router.navigate(['auth/login']);
+          // router.navigate(['auth/login']);
           return throwError(() => error);
         })
       );

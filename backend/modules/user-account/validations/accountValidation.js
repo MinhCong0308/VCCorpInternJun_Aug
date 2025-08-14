@@ -5,7 +5,7 @@ const accountValidation = {
         new BodyWithLocale("username").notEmpty()
     ],
     updateFullname: [
-        new BodyWithLocale("newFullname").notEmpty(),
+        new BodyWithLocale("fullname").notEmpty(),
     ],
     updateAvatar: [
         new BodyWithLocale("avatarUrl").notEmpty()

@@ -4,7 +4,7 @@ import { CommentService } from '../../core/services/comment.service';
 import { AccountService } from '../../core/services/account.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-post-detail',

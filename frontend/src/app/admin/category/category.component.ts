@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { AfterViewInit, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { CommonModule, NgFor, NgIf } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
@@ -11,17 +11,17 @@ import {
   Category,
 } from '../../core/services/category.service';
 import { RouterModule } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
+
+declare const $: any; // dùng cho tooltip Bootstrap 4
 
 @Component({
   selector: 'app-category',
   templateUrl: './category.component.html',
   styleUrls: ['./category.component.css'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, HttpClientModule],
-  encapsulation: ViewEncapsulation.None,
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgFor, NgIf ],
 })
-export class CategoryComponent implements OnInit {
+export class CategoryComponent implements OnInit, AfterViewInit {
   categories: Category[] = [];
   searchForm: FormGroup;
   categoryForm: FormGroup;
@@ -49,6 +49,13 @@ export class CategoryComponent implements OnInit {
         ],
       ],
     });
+  }
+
+  ngAfterViewInit(): void {
+    // Kích hoạt tooltip khi DOM sẵn sàng (AdminLTE/Bootstrap4 đã nạp ở layout)
+    if (typeof $ === 'function') {
+      $('[data-toggle="tooltip"]').tooltip();
+    }
   }
 
   ngOnInit(): void {

@@ -4,7 +4,7 @@ import { PostService } from '../../core/services/post.service';
 import { AccountService } from '../../core/services/account.service';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-home-page',

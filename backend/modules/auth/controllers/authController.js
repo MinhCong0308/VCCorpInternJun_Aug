@@ -14,13 +14,13 @@ const authController = {
       res.cookie("accessToken", data.accessToken, {
         httpOnly: true,
         secure: false,
-        sameSite: 'lax',
+        sameSite: "lax",
         maxAge: 3600000, // 1 hour
       });
       res.cookie("refreshToken", data.refreshToken, {
         httpOnly: true,
         secure: false,
-        sameSite: 'lax',
+        sameSite: "lax",
         maxAge: 604800000, // 1 week
       });
       return responseUtils.ok(res, data.user);
@@ -36,6 +36,18 @@ const authController = {
         adminData,
         config.config.roleenum.ADMIN
       );
+      res.cookie("accessToken", data.accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: 3600000, // 1 hour
+      });
+      res.cookie("refreshToken", data.refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: 604800000, // 1 week
+      });
       return responseUtils.ok(res, data);
     } catch (error) {
       console.error("Admin Login error: ", error);
@@ -48,7 +60,10 @@ const authController = {
       console.log(userData);
       const data = await authService.signup(userData);
       await authService.requestOTP(userData.email);
-      return responseUtils.ok(res, {data, message: "User created. Please verify your email with OTP."});
+      return responseUtils.ok(res, {
+        data,
+        message: "User created. Please verify your email with OTP.",
+      });
     } catch (error) {
       return responseUtils.unauthorized(res, error.message);
     }
@@ -78,9 +93,9 @@ const authController = {
         email: user.email,
         username: user.username,
         role: user.Role.rolename,
-      }
+      };
       return responseUtils.ok(res, userData);
-    } catch(err) {
+    } catch (err) {
       console.log("ERROR");
       console.error("getSessionInfo error:", err);
       return responseUtils.unauthorized(res, "Invalid session");
@@ -99,6 +114,6 @@ const authController = {
       console.error("Logout error:", error);
       return responseUtils.unauthorized(res, "Logout failed");
     }
-  }
+  },
 };
 module.exports = authController;

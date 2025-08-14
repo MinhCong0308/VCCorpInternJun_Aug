@@ -99,16 +99,23 @@
             </div>
             
             <div *ngIf="!isLoading && posts.length === 0" class="text-center">
-              <p class="text-muted">No posts found.</p>
+              <p class="text-muted">No post found.</p>
             </div>
 
             <article *ngFor="let post of posts" class="blog-post">
               <div class="d-flex justify-content-between align-items-start">
                 <div class="flex-grow-1">
-                  <h2>
-                    <a [routerLink]="['/post', post.postid]" class="blog-title">{{ post.title }}</a>
-                    <span class="blog-status">{{post.status}}</span>
-                  </h2>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="mb-0">
+                      <a [routerLink]="['/post', post.postid]" class="blog-title">{{ post.title }}</a>
+                    </h2>
+                    <span class="blog-status" 
+                          [ngClass]="{
+                            'status-pending': post.status === 'PENDING',
+                            'status-accepted': post.status === 'APPROVED',
+                            'status-rejected': post.status === 'REJECTED'
+                          }">{{post.status}}</span>
+                  </div>
                   <p class="blog-subtitle">{{ truncateContent(post.content) }}</p>
                   <div class="blog-meta">
                     <span class="blog-date">{{ formatDate(post.createdAt) }}</span>

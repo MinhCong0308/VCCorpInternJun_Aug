@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
@@ -6,7 +6,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { PostBlogOwnerService , Post} from '../../core/services/postowner.service';
-
+import { QuillEditorComponent } from 'ngx-quill';
 @Component({
   selector: 'app-create-blog',
   templateUrl: './create-blog.component.html',
@@ -15,7 +15,7 @@ import { PostBlogOwnerService , Post} from '../../core/services/postowner.servic
 })
 export class CreateBlogComponent implements OnInit {
   blogForm!: FormGroup;
-
+  @ViewChild('quillEditor', { static: false }) quillEditor!: QuillEditorComponent; // Dùng QuillEditorComponent
   selectedTags: Set<string> = new Set();
   availableTags: string[] = [];
   isEditMode : boolean = false;
@@ -152,4 +152,5 @@ export class CreateBlogComponent implements OnInit {
       });
     }
   }
+
 }

@@ -19,7 +19,7 @@ interface Language {
 export class BlogManageComponent implements OnInit {
   
   posts: Post[] = [];
-  userProfile!: UserProfile;
+  userProfile: UserProfile | null = null;
   isInitializing = true;
 
   languages: Language[] = [
@@ -33,7 +33,9 @@ export class BlogManageComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService) {}
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService) {
+    this.posts = []; // Ensure posts is always initialized as an empty array
+  }
   async ngOnInit(): Promise<void> {
     if(!isPlatformBrowser(this.platformId)) {
       this.isInitializing = false;
@@ -61,18 +63,22 @@ export class BlogManageComponent implements OnInit {
       }
     });
   }
-  
+    // if no post then content in home-content will be No post loaded.
+
   loadPosts(): void {
-    if (!this.userProfile) return;
+    if (!this.userProfile) {
+      this.posts = [];
+      return;
+    }
     
     this.isLoading = true;
-    this.posts = [];
     this.postService.getAllPosts().subscribe({
       next: (posts) => {
-        this.posts = posts;
+        this.posts = posts || []; // Ensure it's always an array
         this.isLoading = false;
       },
       error: (error) => {
+        this.posts = []; // Reset to empty array on error
         this.errorMessage = 'Failed to load posts. Please try again later.';
         this.isLoading = false;
         console.error('Error loading posts:', error);
@@ -133,6 +139,9 @@ export class BlogManageComponent implements OnInit {
       this.router.navigate(['/blog-owner/create'], { queryParams: { edit: postId } });
     } else {
       this.errorMessage = 'You can only edit pending posts.';
+      setTimeout(() => {
+        this.errorMessage = '';
+      }, 3000);
     }
   }
   deletePost(postId: number, event: Event): void {

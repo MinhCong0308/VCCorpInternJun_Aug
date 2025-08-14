@@ -8,7 +8,6 @@ const API_BASE = 'http://localhost:3000';
 let isRefreshing = false;
 const refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-
 export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
   const http = inject(HttpClient);
   const router = inject(Router);

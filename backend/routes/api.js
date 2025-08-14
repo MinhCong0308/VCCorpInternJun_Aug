@@ -86,7 +86,7 @@ router.group("/account", middlewares([authenticated]), (router) => {
     accountController.updateFullname
   );
   router.put("/deactivate-account", accountController.deactivateAccount);
-  router.post(
+  router.put(
     "/update-avatar",
     uploads.single("avatar"),
     accountController.updateAvatar

@@ -3,12 +3,7 @@ import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { PostBlogOwnerService, Post } from '../../core/services/postowner.service';
 import { AuthService } from '../../core/services/auth.service';
-
-interface UserProfile {
-  fullname: string;
-  avatarUrl: string;
-  bio?: string;
-}
+import { ProfileService, UserProfile} from '../../core/services/profile.service';
 
 interface Language {
   id: number;
@@ -24,11 +19,7 @@ interface Language {
 export class BlogManageComponent implements OnInit {
   
   posts: Post[] = [];
-  userProfile: UserProfile = {
-    fullname: '',
-    avatarUrl: '',
-    bio: ''
-  };
+  userProfile!: UserProfile;
 
   languages: Language[] = [
     { id: 1, flag: '🇺🇸' },
@@ -41,38 +32,20 @@ export class BlogManageComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService) {}
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService) {}
   async ngOnInit(): Promise<void> {
-    this.authService.checkSession().subscribe(valid => {
-      if (valid) {
-        this.loadUserProfile();
-        this.loadPosts();
-      }
-      else {
-        this.router.navigate(['/auth/login']);
+    this.profileService.getUserProfile().subscribe({
+      next: (profile) => {
+        this.userProfile = profile;
+      },
+      error: (error) => {
+        console.error('Error fetching user profile:', error);
+        this.errorMessage = 'Failed to load user profile.';
       }
     });
+    this.loadPosts();
   }
-  private async loadUserProfile(): Promise<void> {
-    try {
-      const response = await fetch('http://localhost:3000/account/profile', {
-        method: 'GET',
-        credentials: 'include'
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        this.userProfile = {
-          fullname: data.data.fullname || this.userProfile.fullname,
-          avatarUrl: data.data.avatarUrl || this.userProfile.avatarUrl,
-          bio: data.data.bio || this.userProfile.bio
-        };
-      }
-    } catch (error) {
-      console.error('Error loading profile:', error);
-    }
-  }
-
+  
   loadPosts(): void {
     this.isLoading = true;
     this.posts = [];

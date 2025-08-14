@@ -17,9 +17,9 @@ const accountController = {
     },
     updateFullname: async(req, res) => {
         try {
-            const {newFullname} = req.body;
+            const {fullname} = req.body;
             const userid = req.user.userid; 
-            const data = await accountService.updateFullname(newFullname, userid);
+            const data = await accountService.updateFullname(fullname, userid);
             return responseUtils.ok(res, data);
         } catch(error) {
             return responseUtils.unauthorized(res, error.message);

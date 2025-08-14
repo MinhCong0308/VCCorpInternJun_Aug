@@ -75,18 +75,18 @@ router.group("/auth", (router) => {
   });
 });
 router.group("/account", middlewares([authenticated]), (router) => {
-  router.post(
+  router.put(
     "/update-username",
     validate([accountValidation.updateUsername]),
     accountController.updateUsername
   );
-  router.post(
+  router.put(
     "/update-fullname",
     validate([accountValidation.updateFullname]),
     accountController.updateFullname
   );
-  router.post("/deactivate-account", accountController.deactivateAccount);
-  router.post(
+  router.put("/deactivate-account", accountController.deactivateAccount);
+  router.put(
     "/update-avatar",
     uploads.single("avatar"),
     accountController.updateAvatar

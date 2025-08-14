@@ -5,7 +5,7 @@ const commentService = {
         // Lấy toàn bộ comment của post, order by lft (dạng phẳng)
         const comments = await db.Comment.findAll({
             where: { postid: postId },
-            include: [{ model: db.User, attributes: ['userid', 'username', 'avatar'] }],
+            include: [{ model: db.User, attributes: ['userid', 'firstname', 'lastname', 'avatar'] }],
             order: [['lft', 'ASC']]
         });
         return comments;

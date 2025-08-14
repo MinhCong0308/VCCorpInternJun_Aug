@@ -44,7 +44,7 @@
             </div>
             <!-- Nếu đã login -->
             <div *ngIf="isLoggedIn" class="d-flex align-items-center gap-3 ms-auto">
-                <a routerLink="/" class="btn btn-write">
+                <a routerLink="/blog-owner/create" class="btn btn-write">
                     <i class="ti-pencil-alt"></i> Write
                 </a>
                 <!-- Language Dropdown -->
@@ -130,7 +130,7 @@
                         <div class="post-meta">
                             <span>{{ post.createdAt | date: 'MMM d' }}</span>
                             <span><i class="ti-thumb-up"></i> {{ post.like_cnt }}</span>
-                            <span><i class="ti-comment"></i> {{post.commentCount }}</span>
+                            <span><i class="ti-comment"></i> {{ post.commentCount }}</span>
                         </div>
                     </div>
                     <a [routerLink]="['/post-detail', post.postid]">

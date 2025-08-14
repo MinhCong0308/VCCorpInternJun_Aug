@@ -1,0 +1,345 @@
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand logo" routerLink="/home">
+            <img src="./assets/img/logo.png" class="logo-img" alt="logo-image">
+            BlogBlogBlog
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="flex-grow-1 mx-4 d-none d-md-block">
+                <div class="search-bar-group input-group" style="margin-left: -16px;">
+                    <span class="input-group-text bg-transparent border-0">
+                        <i class="ti-search"></i>
+                    </span>
+                    <input type="text" class="form-control bg-transparent border-0" placeholder="Search" style="box-shadow: none;" />
+                </div>
+            </div>
+            <!-- Nếu chưa login -->
+            <div *ngIf="!isLoggedIn" class="d-flex align-items-center gap-3 ms-auto">
+                <a routerLink="/auth/login"><button class="btn btn-login">Log in</button></a>
+                <a routerLink="/auth/signup"><button class="btn btn-signup">Sign up</button></a>
+            </div>
+            <!-- Nếu đã login -->
+            <div *ngIf="isLoggedIn" class="d-flex align-items-center gap-3 ms-auto">
+                <a routerLink="/blog-owner/create" class="btn btn-write">
+                    <i class="ti-pencil-alt"></i> Write
+                </a>
+                <!-- Language Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
+                        type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span style="font-size: 1.2em;">🇺🇸</span>
+                        <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="langDropdown">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2" routerLink="/">
+                                <span style="font-size:1.2em;">🇻🇳</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2" routerLink="/">
+                                <span style="font-size:1.2em;">🇫🇷</span>
+                            </a>
+                        </li>
+                        <!-- Thêm các ngôn ngữ khác nếu cần -->
+                    </ul>
+                </div>
+                <a routerLink="/" class="text-secondary text-decoration-none mt-1 ms-2 me-2">
+                    <i class="ti-bell fs-5"></i>
+                </a>
+                <div class="dropdown">
+                    <a routerLink="/" class="d-block" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img [src]="avatarUrl" class="rounded-circle" width="32" height="32" alt="Profile" />
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end mt-2">
+                        <li><a class="dropdown-item" routerLink="/">Profile</a></li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li><a class="dropdown-item" (click)="logout()" style="cursor: pointer">Sign out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="container main-content">
+    <div class="row justify-content-center">
+        <!-- Main Section -->
+        <div class="col-lg-7 col-md-10 col-12">
+            <h1 class="post-title">{{ post?.title }}</h1>
+            <div class="post-meta-detail mb-3" *ngIf="post">
+                <a routerLink="/">
+                    <img [src]="post.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'" alt="Author" class="author-avatar" />
+                </a>
+                <div class="post-author">
+                    <a routerLink="/">
+                        <span class="author-name">{{ post.User?.firstname }} {{ post.User?.lastname }}</span>
+                    </a>
+                    <span>{{ post.createdAt | date:'MMM d, y'}}</span>
+                </div>
+            </div>
+
+            <!-- Actions: Like, Bookmark, Share -->
+            <div class="post-actions">
+                <div class="like-wrapper">
+                    <button 
+                    class="icon-btn" 
+                    (click)="like(post.postid)" 
+                    [class.liked]="isLiked" 
+                    [class.animating]="isAnimating">
+                    <i class="ti-thumb-up"></i> {{ post?.like_cnt }}</button>
+                    <span class="plus-one" *ngIf="showPlusOne">+1</span>
+                </div>
+                <button class="icon-btn"><i class="ti-comment"></i> {{ post?.commentCount }}</button>
+            </div>
+
+            <!-- Cover image -->
+            <img *ngIf="post?.coverImage" class="cover-img" [src]="post.coverImage || 'https://picsum.photos/200'" alt="Cover" />
+            
+            <!-- Main post content -->
+            <article class="post-content" [innerHTML]="post?.content">
+
+            </article>
+
+            <!-- Tags -->
+            <div class="post-tags" *ngIf="post?.Categories?.length">
+                <a *ngFor="let cat of post.Categories">
+                    <span class="tag">{{ cat.categoryname }}</span>
+                </a>
+            </div>
+
+            <!-- Actions: Like, Bookmark, Share -->
+            <div class="post-actions">
+                <button class="icon-btn"><i class="ti-thumb-up"></i> {{ post?.like_cnt }}</button>
+                <button class="icon-btn"><i class="ti-comment"></i> {{ post?.commentCount }}</button>
+            </div>
+
+            <!-- Responses -->
+            <section class="post-responses mt-5 mb-4">
+                <h4 class="fw-bold mb-4" style="font-size: 1.35rem;">Responses ({{ comments.length }})</h4>
+                <!-- Form bình luận mới (ở đầu) -->
+                <div class="mb-4">
+                    <div class="reply-form d-flex align-items-start">
+                        <a href="#"><img src="https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg" class="rounded-circle" style="width:32px;height:32px;margin-right:12px;"></a>
+                        <textarea class="form-control" rows="3" placeholder="What are your thoughts?" style="resize:none;"></textarea>
+                    </div>
+                    <div class="text-end mt-2">
+                        <button class="btn btn-white btn-sm rounded-pill px-4">Cancel</button>
+                        <button class="btn btn-dark btn-sm rounded-pill px-4">Send</button>
+                    </div>
+                </div>
+
+                <!-- Danh sách bình luận -->
+                <div id="response-list">
+                    <div *ngFor="let c of comments" class="response mb-4 pb-3 border-bottom">
+                        <div class="d-flex align-items-center mb-2">
+                            <a routerLink="/">
+                                <img [src]="c.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'"
+                                    class="rounded-circle"
+                                    style="width:30px;height:30px;object-fit:cover;margin-right:10px;">
+                            </a>
+                            <a routerLink="/"><span class="me-2" style="font-size: 14px;">{{ c.User?.firstname }} {{ c.User?.lastname }}</span></a>
+                            <span style="font-size:13px;color:#888;">·  {{ c.createdAt | date:'mediumDate' }}</span>
+                        </div>
+                        <div style="font-size:14px;">{{ c.content }}</div>
+                        <div class="interact d-flex align-items-center mt-1" style="font-size: 13px;">
+                            <button class="btn btn-link px-0 me-2 text-decoration-underline btn-reply">Reply</button>
+                        </div>
+                    </div>
+
+                    <!-- Bình luận gốc 1 -->
+                    <!-- <div class="response mb-4 pb-3 border-bottom" data-root="1">
+                        <div class="d-flex align-items-center mb-2">
+                            <a routerLink="/">
+                                <img [src]="https://randomuser.me/api/portraits/lego/1.jpg" class="rounded-circle" style="width:30px;height:30px;object-fit:cover;margin-right:10px;">
+                            </a>
+                            <a routerLink="/">
+                                <span class="me-2" style="font-size: 14px;">Lily Bloom</span>
+                            </a>
+                            <span style="font-size:13px;color:#888;">· 2 days ago</span>
+                        </div>
+                        <div style="font-size:14px;">So true! Waiting often brings more clarity. I need to practice this more.</div>
+                        <div class="interact d-flex align-items-center mt-1" style="font-size:13px;">
+                            <button class="btn btn-link px-3 text-decoration-underline btn-reply">Reply</button>
+                        </div> -->
+
+                        <!-- Bình luận con -->
+                        <!-- <div class="response-child-list ms-5 mt-2"> -->
+                            <!-- Bình luận con hiển thị mặc định 1, các con còn lại ẩn -->
+                            <!-- <div class="response-child" data-child="1">
+                                <div class="d-flex align-items-center mb-1">
+                                    <a href="#"><img src="https://randomuser.me/api/portraits/men/24.jpg" class="rounded-circle" style="width:26px;height:26px;object-fit:cover;margin-right:8px;"></a>
+                                    <a href="#"><span class="me-2" style="font-size: 13px;">Peter Pham</span></a>
+                                    <span style="font-size:12px;color:#888;">· 1 day ago</span>
+                                </div>
+                                <div style="font-size:13px;">Agree with you!</div>
+                                <div class="interact d-flex align-items-center mt-1" style="font-size:12px;">
+                                    <button class="btn btn-link px-3 text-decoration-underline btn-reply">Reply</button>
+                                </div>
+                            </div> -->
+                            <!-- Bình luận con 2, ẩn mặc định -->
+                            <!-- <div class="response-child d-none" data-child="2">
+                                <div class="d-flex align-items-center mb-1">
+                                    <a href="#"><img src="https://randomuser.me/api/portraits/women/36.jpg" class="rounded-circle" style="width:26px;height:26px;object-fit:cover;margin-right:8px;"></a>
+                                    <a href="#"><span class="me-2" style="font-size: 13px;">Anna Smith</span></a>
+                                    <span style="font-size:12px;color:#888;">· 1 day ago</span>
+                                </div>
+                                <div style="font-size:13px;">Thanks for your insight!</div>
+                                <div class="interact d-flex align-items-center mt-1" style="font-size:12px;">
+                                    <button class="btn btn-link px-3 text-decoration-underline btn-reply">Reply</button>
+                                </div>
+                            </div>
+                        </div> -->
+                        <!-- Nút xem thêm bình luận con -->
+                        <!-- <button class="btn btn-link btn-see-more-child px-0 py-1 mt-1" style="font-size: 13px;">See more replies</button>
+                        <button class="btn btn-link btn-hide-child px-0 py-1 mt-1 d-none" style="font-size: 13px;">Hide replies</button>
+                    </div> -->
+                    <!-- Bình luận gốc 2 -->
+                    <!-- <div class="response mb-4 pb-3 border-bottom" data-root="2">
+                        <div class="d-flex align-items-center mb-2">
+                            <a href="#"><img src="https://randomuser.me/api/portraits/men/15.jpg" class="rounded-circle" style="width:30px;height:30px;object-fit:cover;margin-right:10px;"></a>
+                            <a href="#"><span class="me-2" style="font-size: 14px;">Alex Lee</span></a>
+                            <span style="font-size:13px;color:#888;">· 3 days ago</span>
+                        </div>
+                        <div style="font-size:14px;">This is the best post I've read about decision making. Thank you!</div>
+                        <div class="interact d-flex align-items-center mt-1" style="font-size:13px;">
+                            <button class="btn btn-link px-3 text-decoration-underline btn-reply">Reply</button>
+                        </div> -->
+                        <!-- Không có bình luận con -->
+                    <!-- </div> -->
+                    <!-- Bình luận gốc 3 -->
+                    <!-- <div class="response mb-4 pb-3 border-bottom" data-root="3">
+                        <div class="d-flex align-items-center mb-2">
+                            <a href="#"><img src="https://randomuser.me/api/portraits/men/41.jpg" class="rounded-circle" style="width:30px;height:30px;object-fit:cover;margin-right:10px;"></a>
+                            <a href="#"><span class="me-2" style="font-size: 14px;">Chris Do</span></a>
+                            <span style="font-size:13px;color:#888;">· 5 days ago</span>
+                        </div>
+                        <div style="font-size:14px;">Agree! More people should see this advice. 👍</div>
+                        <div class="interact d-flex align-items-center mt-1" style="font-size:13px;">
+                            <button class="btn btn-link px-3 text-decoration-underline btn-reply">Reply</button>
+                        </div>
+                    </div> -->
+                    <!-- Các bình luận gốc khác, mặc định ẩn, khi ấn See more responses sẽ hiện -->
+                    <!-- <div class="response mb-4 pb-3 border-bottom d-none" data-root="4"> -->
+                        <!-- ... giống trên ... -->
+                        <!-- <div class="d-flex align-items-center mb-2">
+                            <a href="#"><img src="https://randomuser.me/api/portraits/women/31.jpg" class="rounded-circle" style="width:30px;height:30px;object-fit:cover;margin-right:10px;"></a>
+                            <a href="#"><span class="me-2" style="font-size: 14px;">Diana Prince</span></a>
+                            <span style="font-size:13px;color:#888;">· 8 days ago</span>
+                        </div>
+                        <div style="font-size:14px;">Love this article!</div>
+                        <div class="interact d-flex align-items-center mt-1" style="font-size:13px;">
+                            <button class="btn btn-link px-3 text-decoration-underline btn-reply">Reply</button>
+                        </div> -->
+                        <!-- Có thể có bình luận con như trên -->
+                    <!-- </div> -->
+                    <!-- ... Thêm bình luận khác nếu muốn ... -->
+                </div>
+                <button class="btn btn-more-res px-4">See more responses</button>
+                <button class="btn btn-hide-res px-4 d-none">Hide responses</button>
+            </section>
+
+            <!-- Recommendation -->
+            <section class="recommended-posts py-4 mt-5 border-top">
+                <h4 class="fw-bold mb-4" style="font-size: 1.35rem;">Recommended from BlogBlogBlog</h4>
+                <div class="row">
+                
+                    <div class="rec col-md-6 mb-5">
+                        <a href="#"><img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80"
+                            alt="cover" class="rec-article-cover mb-2"></a>
+                        <div class="rec-author d-flex align-items-center mb-2">
+                            <a href="#"><img src="https://randomuser.me/api/portraits/men/37.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;"></a>
+                            <a href="#"><span style="font-size:13px;">Ryan Holiday</span></a>
+                        </div>
+                        <div class="rec-title fw-bold" style="font-size:1.15rem;line-height:1.3;"><a href="#">How to Be Patient in an Impatient World</a></div>
+                        <div class="text-secondary mb-2" style="font-size:0.97rem;">Patience is a virtue we often ignore.</div>
+                        <div class="d-flex align-items-center mt-2 justify-content-between" style="font-size:0.95rem;">
+                            <span class="text-secondary">Jul 1</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-thumb-up"></i> 13</button>
+                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-comment"></i> 2</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rec col-md-6 mb-5">
+                        <a href="#"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
+                            alt="cover" class="rec-article-cover mb-2"></a>
+                        <div class="rec-author d-flex align-items-center mb-2">
+                            <a href="#"><img src="https://randomuser.me/api/portraits/women/81.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;"></a>
+                            <a href="#"><span style="font-size:13px;">Marie Kondo</span></a>
+                        </div>
+                        <div class="rec-title fw-bold" style="font-size:1.15rem;line-height:1.3;"><a href="#">Declutter Your Decisions</a></div>
+                        <div class="text-secondary mb-2" style="font-size:0.97rem;">A simple approach to mental clarity.</div>
+                        <div class="d-flex align-items-center mt-2 justify-content-between" style="font-size:0.95rem;">
+                            <span class="text-secondary">Jun 30</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-thumb-up"></i> 8</button>
+                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-comment"></i> 1</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rec col-md-6 mb-5">
+                        <a href="#"><img src="https://blog.journey.cloud/content/images/2022/12/atomic-habits-an-easy-proven-way-to-build-good-habits-break-bad-ones-by-james-clear.png"
+                            alt="cover" class="rec-article-cover mb-2"></a>
+                        <div class="rec-author d-flex align-items-center mb-2">
+                            <a href="#"><img src="https://randomuser.me/api/portraits/men/75.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;"></a>
+                            <a href="#"><span style="font-size:13px;">James Clear</span></a>
+                        </div>
+                        <div class="rec-title fw-bold" style="font-size:1.15rem;line-height:1.3;"><a href="#">Atomic Habits: The Power of Tiny Changes</a></div>
+                        <div class="text-secondary mb-2" style="font-size:0.97rem;">Tiny decisions create big outcomes.</div>
+                        <div class="d-flex align-items-center mt-2 justify-content-between" style="font-size:0.95rem;">
+                            <span class="text-secondary">Jun 28</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-thumb-up"></i> 17</button>
+                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-comment"></i> 4</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rec col-md-6 mb-5">
+                        <a href="#"><img src="https://images.unsplash.com/photo-1454023492550-5696f8ff10e1?auto=format&fit=crop&w=400&q=80"
+                            alt="cover" class="rec-article-cover mb-2"></a>
+                        <div class="rec-author d-flex align-items-center mb-2">
+                            <a href="#"><img src="https://randomuser.me/api/portraits/women/55.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;"></a>
+                            <a href="#"><span style="font-size:13px;">Jane Doe</span></a>
+                        </div>
+                        <div class="rec-title fw-bold" style="font-size:1.15rem;line-height:1.3;"><a href="#">Making Choices When Nothing Feels Right</a></div>
+                        <div class="text-secondary mb-2" style="font-size:0.97rem;">Practical tips for difficult moments.</div>
+                        <div class="d-flex align-items-center mt-2 justify-content-between" style="font-size:0.95rem;">
+                            <span class="text-secondary">Jun 22</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-thumb-up"></i> 5</button>
+                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-comment"></i> 0</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="home.html"><button class="btn btn-more-rec ms-auto">See more recommendations</button></a>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="main-footer mt-1">
+    <hr class="footer-divider mb-4" />
+    <div class="footer-links">
+        <a href="#">Help</a>
+        <a href="#">Status</a>
+        <a href="#">About</a>
+        <a href="#">Careers</a>
+        <a href="#">Press</a>
+        <a href="#">Blog</a>
+        <a href="#">Privacy</a>
+        <a href="#">Rules</a>
+        <a href="#">Terms</a>
+        <a href="#">Text to speech</a>
+    </div>
+</footer>

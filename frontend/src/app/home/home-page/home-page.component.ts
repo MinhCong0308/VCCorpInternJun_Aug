@@ -4,6 +4,7 @@ import { PostService } from '../../core/services/post.service';
 import { AccountService } from '../../core/services/account.service';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-home-page',
@@ -33,16 +34,24 @@ export class HomePageComponent implements OnInit {
     private postService: PostService,
     private accountService: AccountService,
     private router: Router,
+    private authService: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
   ngOnInit(): void {
-    if (this.isBrowser) {
-      this.isLoggedIn = !!localStorage.getItem('accessToken'); // Kiểm tra xem người dùng đã đăng nhập hay chưa
-      // console.log('Access Token:', localStorage.getItem('accessToken'));
-    }
+    this.authService.checkSession().subscribe({
+      next: (ok) => {
+        this.isLoggedIn = ok;
+        if (ok) {
+          this.loadProfile();
+        }
+      },
+      error: () => {
+        this.isLoggedIn = false;
+      }
+    });
     this.loadRecentSearches(); // Tải danh sách tìm kiếm gần đây từ localStorage
     this.getTrendingPreviewPosts(); // Tải danh sách post trending
     this.categoryService.getCategories().subscribe({
@@ -52,7 +61,9 @@ export class HomePageComponent implements OnInit {
           { categoryid: 'trending', categoryname: 'Trending' },
         ];
         this.categories = [...staticTabs, ...res];
+        // console.log("this.categories=", this.categories);
         this.allCategories = res; // Lưu danh sách đầy đủ
+        // console.log("allCategories=", this.allCategories);
         // Lấy ngẫu nhiên 6 categories cho Recommended
         const shuffled = [...res].sort(() => 0.5 - Math.random());
         this.recommendedCategories = shuffled.slice(0, 6);
@@ -60,7 +71,10 @@ export class HomePageComponent implements OnInit {
       error: (err) => console.error('Failed to fetch categories', err),
     });
     this.loadPosts(); // Mặc định là
+  }
 
+  // Hàm để lấy profile người dùng đã đăng nhập
+  loadProfile(): void {
     this.accountService.getProfile().subscribe({
       next: (res: any) => {
         this.avatarUrl = res?.data?.avatarUrl || this.defaultAvatar;
@@ -195,14 +209,6 @@ export class HomePageComponent implements OnInit {
     }
   }
 
-  // Hàm để đăng xuất
-  logout(): void {
-    if (this.isBrowser) {
-      localStorage.removeItem('accessToken');
-    }
-    this.router.navigate(['/auth/login']);
-  }
-
   // Hàm để toggle See more categories
   toggleRecommended(): void {
     this.showAllRecommended = !this.showAllRecommended;
@@ -217,6 +223,18 @@ export class HomePageComponent implements OnInit {
       error: (err) => {
         console.error('Failed to fetch trending preview', err);
       },
+    });
+  }
+
+  // Hàm để đăng xuất
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/auth/login']);
+      },
+      error: (error) => {
+        console.error('Logout error:', error);
+      }
     });
   }
 }

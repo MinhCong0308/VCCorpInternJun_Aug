@@ -13,6 +13,8 @@ export interface Category {
   totalPost: string;
 }
 
+interface CategoriesResponse<T> { data: T }
+
 // Interface cho API Response
 export interface ApiResponse {
   success: boolean;
@@ -45,11 +47,9 @@ export class CategoryService {
    * Lấy danh sách tất cả categories không phân trang
    */
   getCategories(): Observable<Category[]> {
-    return this.http
-      .get<ApiResponse>(`${this.baseUrl}/categories/list-all`, {
-        headers: this.getHeaders(),
-      })
-      .pipe(map((response) => response.data.categories));
+    return this.http.get<CategoriesResponse<Category[]>>(`${this.baseUrl}/categories/list-all`).pipe(
+      map(response => response.data)
+    );
   }
 
   /**
@@ -82,6 +82,7 @@ export class CategoryService {
     return this.http
       .post<ApiResponse>(`${this.baseUrl}/categories`, data, {
         headers: this.getHeaders(),
+        withCredentials: true,
       })
       .pipe(
         map((response) => {
@@ -107,6 +108,7 @@ export class CategoryService {
     return this.http
       .put<ApiResponse>(`${this.baseUrl}/categories/${id}`, data, {
         headers: this.getHeaders(),
+        withCredentials: true,
       })
       .pipe(
         map((response) => {
@@ -129,6 +131,7 @@ export class CategoryService {
     return this.http
       .delete<ApiResponse>(`${this.baseUrl}/categories/${id}`, {
         headers: this.getHeaders(),
+        withCredentials: true,
       })
       .pipe(
         map((response) => {
@@ -144,20 +147,6 @@ export class CategoryService {
    * Lấy headers với Authorization token nếu có
    */
   private getHeaders(): HttpHeaders {
-    let token: string | null = null;
-    if (isPlatformBrowser(this.platformId)) {
-      try {
-        token = localStorage.getItem('accessToken');
-      } catch (_) {
-        token = null;
-      }
-    }
-    const headersConfig: { [key: string]: string } = {
-      'Content-Type': 'application/json',
-    };
-    if (token) {
-      headersConfig['Authorization'] = `Bearer ${token}`;
-    }
-    return new HttpHeaders(headersConfig);
+    return new HttpHeaders({ 'Content-Type': 'application/json' });
   }
 }

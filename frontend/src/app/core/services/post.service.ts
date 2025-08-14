@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, EMPTY, Observable, throwError } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +10,11 @@ import { Observable } from 'rxjs';
 export class PostService {
   private baseUrl = 'http://localhost:3000';
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) { }
 
   getPublishedPosts(): Observable<any> {
     return this.http.get(`${this.baseUrl}/posts`);
@@ -21,5 +27,24 @@ export class PostService {
   }
   searchPosts(query: string) {
     return this.http.get<any>(`${this.baseUrl}/posts?search=${encodeURIComponent(query)}`);
+  }
+  getPostDetail(postId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/posts/${postId}`);
+  }
+  likePost(postId: number): Observable<any> {
+    if (!isPlatformBrowser(this.platformId)) {
+      console.error("This feature is only available in the browser.");
+      return EMPTY;
+    }
+    return this.http.put(`${this.baseUrl}/posts/${postId}/like`, {}, {
+      withCredentials: true,
+    }).pipe(
+      catchError(error => {
+        if (error.status === 401) {
+          this.router.navigate(['/auth/login']);
+        }
+        return throwError(() => error);
+      })
+    )
   }
 }

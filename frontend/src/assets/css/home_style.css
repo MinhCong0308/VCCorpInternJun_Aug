@@ -136,6 +136,13 @@ body {
 .recent-item span {
   flex: 1;
 }
+.flag-icon {
+  width: 25px;
+  height: 18px;
+  object-fit: cover;
+  border-radius: 2px;
+  display: inline-block;
+}
 .nav-category-bar {
     position: sticky;
     top: 0;

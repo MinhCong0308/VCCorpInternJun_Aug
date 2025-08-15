@@ -5,6 +5,18 @@ import { AccountService } from '../../core/services/account.service';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import { LanguageService } from '../../core/services/language.service';
+
+interface Language {
+  languageid: number;
+  languagename: string;
+  locale_code: string;
+  is_default: boolean;
+  flag_image: string;
+  status: number;
+  createdAt: string;
+  updatedAt: string;
+}
 
 @Component({
   selector: 'app-home-page',
@@ -28,6 +40,8 @@ export class HomePageComponent implements OnInit {
   avatarUrl: string = ''; // Biến để lưu trữ URL của avatar người dùng
   defaultAvatar: string = 'https://randomuser.me/api/portraits/lego/1.jpg'; // URL của avatar mặc định
   trendingPreviewPosts: any[] = []; // Biển để lưu 3 bài post trending
+  languages: Language[] = [];
+  currentLanguage: Language | null = null;
 
   constructor(
     private categoryService: CategoryService,
@@ -35,6 +49,7 @@ export class HomePageComponent implements OnInit {
     private accountService: AccountService,
     private router: Router,
     private authService: AuthService,
+    private languageService: LanguageService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -48,9 +63,6 @@ export class HomePageComponent implements OnInit {
           this.loadProfile();
         }
       },
-      error: () => {
-        this.isLoggedIn = false;
-      }
     });
     this.loadRecentSearches(); // Tải danh sách tìm kiếm gần đây từ localStorage
     this.getTrendingPreviewPosts(); // Tải danh sách post trending
@@ -70,6 +82,7 @@ export class HomePageComponent implements OnInit {
       },
       error: (err) => console.error('Failed to fetch categories', err),
     });
+    this.loadLanguages();
     this.loadPosts(); // Mặc định là
   }
 
@@ -224,6 +237,30 @@ export class HomePageComponent implements OnInit {
         console.error('Failed to fetch trending preview', err);
       },
     });
+  }
+
+  goToPost(id: any): void {
+    this.router.navigate(['/post-detail', id]);
+  }
+
+  loadLanguages(): void {
+    this.languageService.getLanguages().subscribe({
+      next: (res: any) => {
+        const list: Language[] = res?.data?.languages || [];
+        this.languages = list;
+        const byDefault = this.languages.find(l => l.is_default);
+        this.currentLanguage = byDefault || null;
+      },
+      error: (err) => console.error('Failed to load languages', err),
+    });
+  }
+
+  selectLanguage(lang: Language) {
+    this.currentLanguage = lang;
+    if(this.isBrowser) {
+      localStorage.setItem('locale_code', lang.locale_code);
+    }
+    // Goi service doi ngon ngu o day
   }
 
   // Hàm để đăng xuất

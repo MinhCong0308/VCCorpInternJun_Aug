@@ -51,21 +51,22 @@
                 <div class="dropdown">
                     <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
                         type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span style="font-size: 1.2em;">🇺🇸</span>
+                        <ng-container *ngIf="currentLanguage as lang; else noLang">
+                            <img [src]="lang.flag_image" class="flag-icon me-1" alt="{{ lang.locale_code }}" />
+                        </ng-container>
+                        <ng-template #noLang>
+                            <span class="d-none d-lg-inline">Language</span>
+                        </ng-template>
                         <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="langDropdown">
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center gap-2" routerLink="/">
-                                <span style="font-size:1.2em;">🇻🇳</span>
+                        <li *ngFor="let lang of languages">
+                            <a class="dropdown-item d-flex align-items-center gap-2" (click)="selectLanguage(lang)" style="cursor: pointer;">
+                                <img [src]="lang.flag_image" class="flag-icon" alt="{{ lang.locale_code }}" />
+                                <span class="flex-grow-1">{{ lang.languagename }}</span>
+                                <i *ngIf="currentLanguage?.languageid === lang.languageid" class="ti-check text-success" aria-hidden="true"></i>
                             </a>
                         </li>
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center gap-2" routerLink="/">
-                                <span style="font-size:1.2em;">🇫🇷</span>
-                            </a>
-                        </li>
-                        <!-- Thêm các ngôn ngữ khác nếu cần -->
                     </ul>
                 </div>
                 <a routerLink="/" class="text-secondary text-decoration-none mt-1 ms-2 me-2">
@@ -115,16 +116,16 @@
                 </div>
 
                 <!-- Danh sách bài viết động -->
-                <div class="post-item" *ngFor="let post of posts">
+                <div class="post-item" *ngFor="let post of posts" (click)="goToPost(post.postid)" style="cursor:pointer">
                     <div class="post-info">
                         <div class="d-flex align-items-center mb-1">
-                            <a routerLink="#"><img [src]="post.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'" class="author-avatar" alt="Author"></a>
+                            <a routerLink="#" (click)="$event.stopPropagation()"><img [src]="post.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'" class="author-avatar" alt="Author"></a>
                             <span class="author-name">
-                                <a routerLink="#">{{ post.User?.firstname }} {{ post.User?.lastname }}</a>
+                                <a routerLink="#" (click)="$event.stopPropagation()">{{ post.User?.firstname }} {{ post.User?.lastname }}</a>
                             </span>
                         </div>
                         <div class="post-title">
-                            <a [routerLink]="['/post-detail', post.postid]">{{ post.title }}</a>
+                            <a [routerLink]="['/post-detail', post.postid]" (click)="$event.stopPropagation()">{{ post.title }}</a>
                         </div>
                         <div class="post-sneak" [innerHTML]="post.content | slice:0:100"></div>
                         <div class="post-meta">
@@ -133,11 +134,10 @@
                             <span><i class="ti-comment"></i> {{ post.commentCount }}</span>
                         </div>
                     </div>
-                    <a [routerLink]="['/post-detail', post.postid]">
+                    <a [routerLink]="['/post-detail', post.postid]" (click)="$event.stopPropagation()">
                         <img [src]="post.coverImage || 'https://picsum.photos/200'" class="post-img-thumb" alt="Preview">
                     </a>
                 </div>
-                <!-- Cần sửa thêm để có thể ấn vào bất kỳ chỗ nào ngoài ảnh và tên author cũng có thể routerLink tới post detail -->
 
                 <!-- Post 1 -->
                 <div class="post-item">
@@ -233,7 +233,7 @@
                 <div class="sidebar-section">
                     <h6>Top Picks</h6>
 
-                    <div *ngFor="let post of trendingPreviewPosts" class="mb-3">
+                    <div *ngFor="let post of trendingPreviewPosts" class="mb-3" (click)="goToPost(post.postid)" style="cursor: pointer;">
                         <div class="d-flex align-items-center mb-1">
                             <img
                                 [src]="post.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'"
@@ -241,12 +241,12 @@
                                 alt="Author"
                             />
                             <span class="author-name">
-                                <a routerLink="#">{{ post.User?.firstname }} {{ post.User?.lastname }}</a>
+                                <a routerLink="#" (click)="$event.stopPropagation()">{{ post.User?.firstname }} {{ post.User?.lastname }}</a>
                             </span>
                         </div>
 
                         <div class="sidebar-post-title">
-                            <a routerLink="#">{{ post.title }}</a>
+                            <a [routerLink]="['/post-detail', post.postid]" (click)="$event.stopPropagation()">{{ post.title }}</a>
                         </div>
 
                         <span class="text-secondary" style="font-size: 11px;">
@@ -265,7 +265,7 @@
                         <li>Expert writing advice</li>
                         <li>Grow your readership</li>
                     </ul>
-                    <a routerLink="blogWriting.html"><button class="btn btn-dark btn-sm rounded-pill">Start writing</button></a>
+                    <a routerLink="/blog-owner/create"><button class="btn btn-dark btn-sm rounded-pill">Start writing</button></a>
                 </div>
                 <div class="sidebar-section">
                     <h6>Recommended categories</h6>

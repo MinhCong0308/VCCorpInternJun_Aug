@@ -25,18 +25,12 @@ const authService = {
       ],
     });
     if (!user) {
-      return {
-        status: config.config.statuscode.UNAUTHORIZED,
-        success: false,
-      };
+      throw new Error("Username or password is not correct");
     }
     // check password
     let isMatch = await bcrypt.compare(password, user.hashed_password);
     if (!isMatch) {
-      return {
-        status: config.config.statuscode.UNAUTHORIZED,
-        success: false,
-      };
+      throw new Error("Username or password is not correct");
     }
     const accessToken = sign(user.userid, user.Role.rolename);
     const refreshToken = signRefreshToken(user.userid, user.Role.rolename);

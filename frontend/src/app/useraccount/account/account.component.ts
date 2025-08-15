@@ -68,7 +68,7 @@ export class AccountComponent implements OnInit {
   }
 
   cancelEdit(type: 'username' | 'fullname'): void {
-    if (!this.userProfile) return; // ✅ Add null check
+    if (!this.userProfile) return; 
     this.editMode[type] = false;
     this.editValues[type] = this.userProfile[type] ?? '';
     this.clearMessages();
@@ -77,7 +77,7 @@ export class AccountComponent implements OnInit {
   saveEdit(type: 'username' | 'fullname', event: Event): void {
     event.preventDefault();
     
-    if (!this.userProfile) return; // ✅ Add null check
+    if (!this.userProfile) return; 
     
     const value = this.editValues[type].trim();
     this.isLoading = true;
@@ -89,7 +89,7 @@ export class AccountComponent implements OnInit {
       
     req$.subscribe({
       next: () => {
-        if (this.userProfile) { // ✅ Add null check before assignment
+        if (this.userProfile) { 
           this.userProfile[type] = value;
         }
         this.editMode[type] = false;
@@ -110,7 +110,7 @@ export class AccountComponent implements OnInit {
   async handleAvatarChange(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-    if (!file || !this.userProfile) return; // ✅ Add null check
+    if (!file || !this.userProfile) return;
     
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
     if (!allowedTypes.includes(file.type)) {
@@ -124,12 +124,12 @@ export class AccountComponent implements OnInit {
       return;
     }
     
-    this.isUploading = true; // ✅ Use isUploading instead of isLoading
+    this.isUploading = true; 
     this.clearMessages();
     
     this.profileService.updateAvatar(file).subscribe({
       next: ({ avatarUrl }) => {
-        if (this.userProfile) { // ✅ Add null check
+        if (this.userProfile) { 
           this.userProfile.avatarUrl = avatarUrl;
         }
         this.successMessage = 'Profile photo updated successfully!';
@@ -141,7 +141,7 @@ export class AccountComponent implements OnInit {
         this.errorMessage = error.message || 'Failed to update profile photo.';
       },
       complete: () => {
-        this.isUploading = false; // ✅ Use isUploading
+        this.isUploading = false; 
         input.value = '';
       }
     });
@@ -175,7 +175,6 @@ export class AccountComponent implements OnInit {
       },
       error: (error) => {
         console.error('Logout error:', error);
-        // ✅ Navigate to login even if logout fails
         this.router.navigate(['/auth/login']);
       }
     });

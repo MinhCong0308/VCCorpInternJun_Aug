@@ -25,7 +25,7 @@ const authController = {
       });
       return responseUtils.ok(res, data.user);
     } catch (error) {
-      console.error("Login error: ", error);
+      console.error("Login error: ", error.message);
       return responseUtils.unauthorized(res, error.message);
     }
   },

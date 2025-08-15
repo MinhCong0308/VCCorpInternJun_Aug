@@ -8,21 +8,34 @@ import { authGuard } from './core/guards/auth.guard';
 import { PostModule } from './post/post.module';
 import { BlogLayoutComponent } from './layouts/blog-layout/blog-layout.component';
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
+import { LoginComponent as AdminLoginComponent } from './admin/login/login.component';
 
 export const routes: Routes = [
-  { path: '',
+  // Admin login should NOT use AdminLayout; define it before the AdminLayout route
+  { path: 'admin/login', component: AdminLoginComponent },
+  {
+    path: '',
     component: BlogLayoutComponent,
     children: [
       { path: '', loadChildren: () => HomeModule },
       { path: 'post-detail', loadChildren: () => PostModule },
       { path: 'auth', loadChildren: () => AuthModule },
-      { path: 'useraccount', loadChildren: () => UseraccountModule, canActivate: [authGuard] },
-      { path: 'blog-owner', loadChildren: () => BlogOwnerModule, canActivate: [authGuard] },
+      {
+        path: 'useraccount',
+        loadChildren: () => UseraccountModule,
+        canActivate: [authGuard],
+      },
+      {
+        path: 'blog-owner',
+        loadChildren: () => BlogOwnerModule,
+        canActivate: [authGuard],
+      },
     ],
   },
-  { path: 'admin',
+  {
+    path: 'admin',
     component: AdminLayoutComponent,
-    loadChildren: () => AdminModule
+    loadChildren: () => AdminModule,
   },
   { path: '**', redirectTo: '' }, // Redirect any unknown paths to home
 ];

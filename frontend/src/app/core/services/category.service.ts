@@ -1,8 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Injectable } from '@angular/core';
 
 // Interface cho một Category
 export interface Category {
@@ -10,15 +9,15 @@ export interface Category {
   categoryname: string;
   createdAt: string;
   updatedAt: string;
-  totalPost: string;
+  totalPost?: number | string;
 }
 
-interface CategoriesResponse<T> { data: T }
+// Generic API response is defined by ApiResponse<T>
 
 // Interface cho API Response
-export interface ApiResponse {
+export interface ApiResponse<T = any> {
   success: boolean;
-  data: PaginatedCategoryResponse;
+  data: T;
   status: number;
   message: string;
 }
@@ -38,18 +37,15 @@ export class CategoryService {
   private baseUrl = 'http://localhost:3000';
   private readonly ITEMS_PER_PAGE = 5;
 
-  constructor(
-    private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+  constructor(private http: HttpClient) {}
 
   /**
    * Lấy danh sách tất cả categories không phân trang
    */
   getCategories(): Observable<Category[]> {
-    return this.http.get<CategoriesResponse<Category[]>>(`${this.baseUrl}/categories/list-all`).pipe(
-      map(response => response.data)
-    );
+    return this.http
+      .get<ApiResponse<Category[]>>(`${this.baseUrl}/categories/list-all`)
+      .pipe(map((response) => response.data));
   }
 
   /**
@@ -64,14 +60,18 @@ export class CategoryService {
       .set('limit', this.ITEMS_PER_PAGE.toString());
 
     if (keyword && keyword.trim()) {
-      params = params.set('keyword', keyword.trim());
+      // Backend expects `search` query for full-text search
+      params = params.set('search', keyword.trim());
     }
 
     return this.http
-      .get<ApiResponse>(`${this.baseUrl}/categories`, {
-        headers: this.getHeaders(),
-        params: params,
-      })
+      .get<ApiResponse<PaginatedCategoryResponse>>(
+        `${this.baseUrl}/categories`,
+        {
+          headers: this.getHeaders(),
+          params: params,
+        }
+      )
       .pipe(map((response) => response.data));
   }
 
@@ -80,18 +80,14 @@ export class CategoryService {
    */
   createCategory(data: { categoryname: string }): Observable<Category> {
     return this.http
-      .post<ApiResponse>(`${this.baseUrl}/categories`, data, {
+      .post<ApiResponse<Category>>(`${this.baseUrl}/categories`, data, {
         headers: this.getHeaders(),
         withCredentials: true,
       })
       .pipe(
         map((response) => {
-          if (
-            response.success &&
-            response.data.categories &&
-            response.data.categories.length > 0
-          ) {
-            return response.data.categories[0];
+          if (response.success && response.data) {
+            return response.data;
           }
           throw new Error('Create category failed');
         })
@@ -106,18 +102,14 @@ export class CategoryService {
     data: { categoryname: string }
   ): Observable<Category> {
     return this.http
-      .put<ApiResponse>(`${this.baseUrl}/categories/${id}`, data, {
+      .put<ApiResponse<Category>>(`${this.baseUrl}/categories/${id}`, data, {
         headers: this.getHeaders(),
         withCredentials: true,
       })
       .pipe(
         map((response) => {
-          if (
-            response.success &&
-            response.data.categories &&
-            response.data.categories.length > 0
-          ) {
-            return response.data.categories[0];
+          if (response.success && response.data) {
+            return response.data;
           }
           throw new Error('Update category failed');
         })
@@ -127,12 +119,15 @@ export class CategoryService {
   /**
    * Xóa category (yêu cầu quyền admin)
    */
-  deleteCategory(id: number): Observable<any> {
+  deleteCategory(id: number): Observable<{ message: string }> {
     return this.http
-      .delete<ApiResponse>(`${this.baseUrl}/categories/${id}`, {
-        headers: this.getHeaders(),
-        withCredentials: true,
-      })
+      .delete<ApiResponse<{ message: string }>>(
+        `${this.baseUrl}/categories/${id}`,
+        {
+          headers: this.getHeaders(),
+          withCredentials: true,
+        }
+      )
       .pipe(
         map((response) => {
           if (response.success) {

@@ -1,9 +1,15 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CategoryComponent } from './category/category.component';
+import { adminGuard } from '../core/guards/admin.guard';
 
 const routes: Routes = [
-  { path: 'categories', component: CategoryComponent },
+  {
+    path: '',
+    canActivateChild: [adminGuard],
+    children: [{ path: 'categories', component: CategoryComponent }],
+  },
+
   // Thêm các path đến các trang vào đây, đừng thêm vào app.routes.ts nhé
 ];
 

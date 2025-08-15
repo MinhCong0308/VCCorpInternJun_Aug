@@ -4,8 +4,12 @@ import { AdminRoutingModule } from './admin-routing.module';
 import { AdminLayoutComponent } from '../layouts/admin-layout/admin-layout.component';
 import { CategoryComponent } from './category/category.component';
 
-
 @NgModule({
-  imports: [CommonModule, AdminRoutingModule, AdminLayoutComponent, CategoryComponent],
+  imports: [
+    CommonModule,
+    AdminRoutingModule,
+    AdminLayoutComponent,
+    CategoryComponent,
+  ],
 })
 export class AdminModule {}

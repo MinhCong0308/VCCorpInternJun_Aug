@@ -69,6 +69,7 @@ const accountService = {
     },
     async getProfile(user) {
         return {
+            userid: user.userid,
             email: user.email,
             username: user.username,
             fullname: `${user.firstname} ${user.lastname}`,

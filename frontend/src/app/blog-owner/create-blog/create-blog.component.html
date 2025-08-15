@@ -21,12 +21,12 @@
             </button>
             <div class="dropdown">
               <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
-                <span style="font-size: 1.2em;">{{ selectedLanguageFlag }}</span>
+                <span style="font-size: 1.2em;">{{ uiLanguage.flag }}</span>
                 <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
               </button>
               <ul class="dropdown-menu">
                 <li *ngFor="let lang of languages">
-                  <a class="dropdown-item" href="#" (click)="selectLanguage(lang, $event)">
+                  <a class="dropdown-item" href="#" (click)="selectUILanguage(lang, $event)">
                     <span style="font-size:1.2em;">{{ lang.flag }}</span>
                   </a>
                 </li>
@@ -56,29 +56,8 @@
       <div class="container-fluid px-4 main-content">
         <main class="col-12 d-flex justify-content-center">
           <div class="editor-wrapper mt-5 w-100 px-0">
-            <div class="dropdown d-flex justify-content-end mb-3">
-              <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
-                <span style="font-size:0.8em;">{{ selectedLanguageName }}</span>
-                <i class="ti-angle-down ms-1" style="font-size:0.8em;"></i>
-              </button>
-              <ul class="dropdown-menu">
-                <li *ngFor="let lang of languages">
-                  <a class="dropdown-item" href="#" (click)="selectLanguage(lang, $event)">
-                    <span style="font-size:0.8em;">{{ lang.name }}</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <!-- Title -->
-            <textarea
-              id="blogTitle"
-              formControlName="title"
-              class="form-control editor-title mb-4"
-              placeholder="Enter Title"
-              rows="1"
-            ></textarea>
-
+            <!-- <div class="dropdown d-flex justify-content-end mb-3">
+            </div> -->
             <!-- Tags -->
             <div class="tag-selection-wrapper mb-4">
               <div class="d-flex align-items-start gap-3">
@@ -103,7 +82,14 @@
                 </div>
               </div>
             </div>
-
+            <textarea
+              id="blogTitle"
+              formControlName="title"
+              class="form-control editor-title mb-4"
+              placeholder="Enter Title"
+              rows="1"
+            ></textarea>
+            <!--Language Label-->
             <!-- Quill Editor -->
             <quill-editor formControlName="content" [modules]="quillModules" class="bg-white border rounded" placeholder="Tell your story..."></quill-editor>
           </div>

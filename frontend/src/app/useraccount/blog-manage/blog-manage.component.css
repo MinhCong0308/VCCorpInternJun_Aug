@@ -26,12 +26,12 @@
   border: 1px solid #f1aeb5;
 }
 #home-content {
-  min-height: 52vh;
+  min-height: 53vh;
   display: flex;
   flex-direction: column;
 }
 #about-content {
-    min-height: 52vh;
-    display: flex;
-    flex-direction: column;
+  min-height: 53vh;
+  display: flex;
+  flex-direction: column;
 }

@@ -10,6 +10,8 @@ import { AssetLoaderService } from '../../core/services/asset-loader.service';
   standalone: false,
 })
 export class BlogLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
+  cssLoaded: Boolean = false;
+  fontsLoaded: Boolean = false;
   private urls = {
     fonts: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap',
     themify: 'assets/fonts/themify-icons/themify-icons.css',
@@ -39,6 +41,8 @@ export class BlogLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     this.assets.loadCss(this.urls.blogcss);
     // JS Bootstrap 5 (chỉ blog mới nạp)
     await this.assets.loadJs(this.urls.bs5js);
+    this.cssLoaded = true;
+    this.fontsLoaded = true;
   }
 
   ngOnDestroy() {

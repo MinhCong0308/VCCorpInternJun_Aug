@@ -1,2 +1,13 @@
-<!-- Khung layout blog -->
-<router-outlet></router-outlet>
+<!-- Preload critical resources to prevent FOUC -->
+<ng-container *ngIf="!cssLoaded">
+  <!-- Loading overlay -->
+  <div class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Loading blog editor...</p>
+  </div>
+</ng-container>
+
+<!-- Blog layout content - hidden until CSS is loaded -->
+<div class="blog-layout-wrapper" [class.loaded]="cssLoaded" [class.fonts-loaded]="fontsLoaded">
+  <router-outlet></router-outlet>
+</div>

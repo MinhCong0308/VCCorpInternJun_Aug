@@ -1,0 +1,154 @@
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Dashboard</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item active"><a href="#">Home</a></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main content -->
+<section class="content">
+  <div class="container-fluid">
+    <!-- Admin widgets demo: Tổng số bài, user, bình luận... -->
+    <div class="row">
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+          <div class="inner">
+            <h3>{{ totals.posts }}</h3>
+            <p>Posts</p>
+          </div>
+          <a routerLink="/admin/dashboard">
+            <div class="icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-success">
+          <div class="inner">
+            <h3>{{ totals.categories }}</h3>
+            <p>Categories</p>
+          </div>
+          <a routerLink="/admin/categories"
+            ><div class="icon">
+              <i class="fas fa-tags"></i></div
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-warning">
+          <div class="inner">
+            <h3>{{ totals.users }}</h3>
+            <p>Users</p>
+          </div>
+          <a routerLink="/admin/dashboard"
+            ><div class="icon">
+              <i class="fas fa-users"></i></div
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-danger">
+          <div class="inner">
+            <h3>{{ totals.languages }}</h3>
+            <p>Languages</p>
+          </div>
+          <a routerLink="/admin/dashboard"
+            ><div class="icon">
+              <i class="fas fa-language"></i></div
+          ></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Thêm các bảng quản lý (bài viết mới, user mới, v.v.) ở đây -->
+
+    <div class="row">
+      <!-- Cột bên trái: Bài viết gần đây -->
+      <div class="col-md-8">
+        <!-- PRODUCT LIST - Đã chuyển đổi thành RECENT POSTS -->
+        <div class="card h-100">
+          <div class="card-header">
+            <h3 class="card-title">Recently Added Posts</h3>
+          </div>
+          <!-- /.card-header -->
+          <div class="card-body p-0" *ngIf="latestPosts?.length; else noPosts">
+            <ul class="products-list product-list-in-card pl-2 pr-2">
+              <li class="item" *ngFor="let p of latestPosts">
+                <div class="product-img">
+                  <img
+                    src="/assets/img/logo.png"
+                    alt="Post Image"
+                    class="img-size-50"
+                  />
+                </div>
+                <div class="product-info">
+                  <a class="product-title">{{ p.title }}</a>
+                  <span class="product-description">
+                    by {{ p.author?.username || "Unknown" }} •
+                    {{ p.createdAt | date : "medium" }}
+                  </span>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <ng-template #noPosts>
+            <div class="p-3 text-center text-muted">No recent posts</div>
+          </ng-template>
+
+          <div class="card-footer text-center">
+            <a routerLink="/admin/dashboard" class="uppercase"
+              >View All Posts</a
+            >
+          </div>
+        </div>
+        <!-- /.card -->
+      </div>
+      <!-- /.col-md-8 -->
+
+      <!-- Cột bên phải: Thành viên mới -->
+      <div class="col-md-4">
+        <!-- USERS LIST  -->
+        <div class="card h-100">
+          <div class="card-header">
+            <h3 class="card-title">New Members</h3>
+          </div>
+          <!-- /.card-header -->
+          <div class="card-body p-0" *ngIf="latestUsers?.length; else noUsers">
+            <ul class="users-list clearfix">
+              <li *ngFor="let u of latestUsers">
+                <img
+                  [src]="avatarUrl(u.avatar)"
+                  alt="User Image"
+                  class="img-fluid rounded-circle"
+                  style="width: 64px; height: 64px; object-fit: cover"
+                />
+                <a class="users-list-name" href="#">{{ fullName(u) }}</a>
+                <span class="users-list-date">{{
+                  u.createdAt | date : "shortDate"
+                }}</span>
+              </li>
+            </ul>
+          </div>
+          <ng-template #noUsers>
+            <div class="p-3 text-center text-muted">No new members</div>
+          </ng-template>
+
+          <div class="card-footer text-center">
+            <a routerLink="/admin/dashboard">View All Users</a>
+          </div>
+        </div>
+      </div>
+      <!-- /.col-md-4 -->
+    </div>
+    <!-- /.row -->
+  </div>
+</section>

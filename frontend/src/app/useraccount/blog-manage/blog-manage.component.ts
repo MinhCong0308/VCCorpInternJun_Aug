@@ -4,6 +4,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { PostBlogOwnerService, Post } from '../../core/services/postowner.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ProfileService, UserProfile} from '../../core/services/profile.service';
+import { PostService } from '../../core/services/post.service';
 
 interface Language {
   id: number;
@@ -33,7 +34,7 @@ export class BlogManageComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService) {
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService, private postOnlyService: PostService) {
     this.posts = []; // Ensure posts is always initialized as an empty array
   }
   async ngOnInit(): Promise<void> {
@@ -63,8 +64,6 @@ export class BlogManageComponent implements OnInit {
       }
     });
   }
-    // if no post then content in home-content will be No post loaded.
-
   loadPosts(): void {
     if (!this.userProfile) {
       this.posts = [];
@@ -124,12 +123,27 @@ export class BlogManageComponent implements OnInit {
   }
 
   truncateContent(content: string, maxLength: number = 100): string {
-    if (!content || content.length <= maxLength) {
-      return content || '';
+    if (!content) return '';
+    const filteredContent: string = new DOMParser().parseFromString(content, "text/html").body.textContent || '';
+    if (!filteredContent || filteredContent.length <= maxLength) {
+      return filteredContent || '';
     }
-    return content.substring(0, maxLength) + '...';
+    return filteredContent.substring(0, maxLength) + '...';
   }
-
+  viewPost(postId: number, event: Event): void {
+    event.preventDefault();
+    this.postOnlyService.getPostDetail(postId).subscribe({
+      next: () => {
+        this.router.navigate(['/post-detail'], { queryParams: { postId } });
+        // print the router path
+        console.log('Navigated to:', this.router.url);
+      },
+      error: (error) => {
+        console.error('Error fetching post details:', error);
+        this.errorMessage = 'Failed to load post details. Please try again later.';
+      }
+    });
+  }
   editPost(postId: number, event: Event): void {
     event.preventDefault();
     // check post status

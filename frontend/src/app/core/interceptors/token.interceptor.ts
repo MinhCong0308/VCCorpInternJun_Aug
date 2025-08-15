@@ -36,7 +36,7 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
           refreshTokenSubject.next(null);
           // Clear any stored tokens and redirect to login
           if (error.status === 401) {
-            console.log('Refresh token expired, redirecting to login');
+            // console.log('Refresh token expired, redirecting to login');
             // router.navigate(['/auth/login']);
           }
           return throwError(() => error);
@@ -56,7 +56,6 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
             return next(req);
           }),
           catchError((refreshError) => {
-            // Don't retry if refresh failed with 401 - user needs to login
             if (refreshError.status === 401) {
               return throwError(() => new Error('Authentication required'));
             }

@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { QuillModule } from 'ngx-quill';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
 
 
 @NgModule({
@@ -14,6 +15,7 @@ import { HttpClientModule } from '@angular/common/http';
     CommonModule,
     QuillModule,
     ReactiveFormsModule,
+    RouterModule,
     FormsModule,
     BlogOwnerRoutingModule,
     HttpClientModule

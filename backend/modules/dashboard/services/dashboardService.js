@@ -26,7 +26,6 @@ const dashboardService = {
           "createdAt",
         ],
       }),
-      ,
       db.Post.findAll({
         limit: 5,
         order: [["createdAt", "DESC"]],

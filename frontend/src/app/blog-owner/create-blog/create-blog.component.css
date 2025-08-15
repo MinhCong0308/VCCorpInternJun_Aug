@@ -1,4 +1,3 @@
-/* create-blog.component.css */
 
 /* Reset layout */
 html, body {
@@ -159,7 +158,9 @@ quill-editor + .editor-divider {
 :host ::ng-deep .ql-container.ql-snow {
   border: none !important;
   border-top: none !important;
+  height: auto;
 }
+
 #blogTitle {
     border: 1px solid #e0e0e0 !important; /* Xám nhạt */
     border-radius: 4px;

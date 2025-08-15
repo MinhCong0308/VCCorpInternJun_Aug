@@ -26,7 +26,6 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
     } else {
       isRefreshing = true;
       refreshTokenSubject.next(null);
-      
       return http.post(`${API_BASE}/auth/refresh`, {}, { withCredentials: true }).pipe(
         tap((response: any) => {
           isRefreshing = false;
@@ -35,11 +34,10 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
         catchError((error) => {
           isRefreshing = false;
           refreshTokenSubject.next(null);
-          
           // Clear any stored tokens and redirect to login
           if (error.status === 401) {
             console.log('Refresh token expired, redirecting to login');
-            router.navigate(['/auth/login']);
+            // router.navigate(['/auth/login']);
           }
           return throwError(() => error);
         }),

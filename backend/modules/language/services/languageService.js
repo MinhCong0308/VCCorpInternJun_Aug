@@ -2,7 +2,7 @@ const db = require("models/index");
 const { Sequelize } = require("sequelize");
 
 const languageService = {
-  getAllLanguages: async (limit = 5, page = 1, search = "") => {
+  getAllLanguages: async (status, limit = 5, page = 1, search = "") => {
     const offset = (page - 1) * limit;
 
     const options = {
@@ -15,6 +15,9 @@ const languageService = {
       options.where = Sequelize.literal(
         `MATCH(languagename) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`
       );
+    };
+    if (status) {
+      options.where = { ...options.where, status };
     }
 
     const { count, rows } = await db.Language.findAndCountAll(options);

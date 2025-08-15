@@ -1,121 +1,130 @@
-<form [formGroup]="blogForm" (ngSubmit)="submitBlog()" class="d-flex flex-column min-vh-100 overflow-hidden">
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2 fixed-top">
-    <div class="container-fluid px-4">
-      <a class="navbar-brand logo" routerLink="/home">
-        <img src="assets/img/logo.png" class="logo-img" alt="logo-image">
-        BlogBlogBlog
-      </a>
-      <span class="text-muted">Draft in Nguyen Cong Minh</span>
-      <div class="collapse navbar-collapse">
-        <div class="d-flex align-items-center gap-3 ms-auto">
-          <button class="btn btn-success btn-sm rounded-pill px-3" type="submit">
-            {{ isEditMode ? 'Update' : 'Publish' }}
-          </button>
-          <div class="dropdown">
-            <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
-              <span style="font-size: 1.2em;">{{ selectedLanguageFlag }}</span>
-              <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+<div class="d-flex flex-column min-vh-100">
+  <!-- Loading Container -->
+  <div *ngIf="isInitializing || isLoading" class="loading-container">
+    <div class="loading-spinner">
+      <p>Loading your profile...</p>
+    </div>
+  </div>
+  <form [formGroup]="blogForm" (ngSubmit)="submitBlog()" class="d-flex flex-column min-vh-100 overflow-hidden">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2 fixed-top">
+      <div class="container-fluid px-4">
+        <a class="navbar-brand logo" routerLink="/home">
+          <img src="assets/img/logo.png" class="logo-img" alt="logo-image">
+          BlogBlogBlog
+        </a>
+        <span class="text-muted">Draft in {{ userProfile?.fullname }}</span>
+        <div class="collapse navbar-collapse">
+          <div class="d-flex align-items-center gap-3 ms-auto">
+            <button class="btn btn-success btn-sm rounded-pill px-3" type="submit">
+              {{ isEditMode ? 'Update' : 'Publish' }}
             </button>
-            <ul class="dropdown-menu">
-              <li *ngFor="let lang of languages">
-                <a class="dropdown-item" href="#" (click)="selectLanguage(lang, $event)">
-                  <span style="font-size:1.2em;">{{ lang.flag }}</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-          <a href="#" class="text-secondary text-decoration-none ms-2 me-1">
-            <i class="ti-bell fs-5"></i>
-          </a>
-          <div class="dropdown">
-            <a href="#" class="d-block" data-bs-toggle="dropdown">
-              <img src="https://upload.wikimedia.org/wikipedia/en/1/1e/Him%C5%8Dto%21_Umaru-chan_volume_1_cover.jpg" class="rounded-circle" width="32" height="32" alt="Profile">
+            <div class="dropdown">
+              <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
+                <span style="font-size: 1.2em;">{{ selectedLanguageFlag }}</span>
+                <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+              </button>
+              <ul class="dropdown-menu">
+                <li *ngFor="let lang of languages">
+                  <a class="dropdown-item" href="#" (click)="selectLanguage(lang, $event)">
+                    <span style="font-size:1.2em;">{{ lang.flag }}</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <a href="#" class="text-secondary text-decoration-none ms-2 me-1">
+              <i class="ti-bell fs-5"></i>
             </a>
-            <ul class="dropdown-menu dropdown-menu-end mt-2">
-              <li><a class="dropdown-item" routerLink="/profile">Profile</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" routerLink="/login">Sign out</a></li>
-            </ul>
+            <div class="dropdown">
+              <a href="#" class="d-block" data-bs-toggle="dropdown" aria-expanded="false">
+                <img [src]="userProfile?.avatarUrl" class="rounded-circle" 
+                     width="32" height="32" alt="Profile" />
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end mt-2">
+                <li><a class="dropdown-item" routerLink="/useraccount/profile">Profile</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" routerLink="/auth/login">Sign out</a></li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </nav>
+    </nav>
 
-  <!-- Scrollable Main Content -->
-  <div class="scrollable-main-content flex-grow-1 overflow-auto pt-5 mt-4">
-    <div class="container-fluid px-4 main-content">
-      <main class="col-12 d-flex justify-content-center">
-        <div class="editor-wrapper mt-5 w-100 px-0">
-          <div class="dropdown d-flex justify-content-end mb-3">
-            <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
-              <span style="font-size:0.8em;">{{ selectedLanguageName }}</span>
-              <i class="ti-angle-down ms-1" style="font-size:0.8em;"></i>
-            </button>
-            <ul class="dropdown-menu">
-              <li *ngFor="let lang of languages">
-                <a class="dropdown-item" href="#" (click)="selectLanguage(lang, $event)">
-                  <span style="font-size:0.8em;">{{ lang.name }}</span>
-                </a>
-              </li>
-            </ul>
-          </div>
+    <!-- Scrollable Main Content -->
+    <div class="scrollable-main-content flex-grow-1 overflow-auto pt-5 mt-4">
+      <div class="container-fluid px-4 main-content">
+        <main class="col-12 d-flex justify-content-center">
+          <div class="editor-wrapper mt-5 w-100 px-0">
+            <div class="dropdown d-flex justify-content-end mb-3">
+              <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
+                <span style="font-size:0.8em;">{{ selectedLanguageName }}</span>
+                <i class="ti-angle-down ms-1" style="font-size:0.8em;"></i>
+              </button>
+              <ul class="dropdown-menu">
+                <li *ngFor="let lang of languages">
+                  <a class="dropdown-item" href="#" (click)="selectLanguage(lang, $event)">
+                    <span style="font-size:0.8em;">{{ lang.name }}</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
 
-          <!-- Title -->
-          <textarea
-            id="blogTitle"
-            formControlName="title"
-            class="form-control editor-title mb-4"
-            placeholder="Enter Title"
-            rows="1"
-          ></textarea>
+            <!-- Title -->
+            <textarea
+              id="blogTitle"
+              formControlName="title"
+              class="form-control editor-title mb-4"
+              placeholder="Enter Title"
+              rows="1"
+            ></textarea>
 
-          <!-- Tags -->
-          <div class="tag-selection-wrapper mb-4">
-            <div class="d-flex align-items-start gap-3">
-              <div class="dropdown">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                  Select Tags
-                </button>
-                <div class="dropdown-menu p-3 checkbox-dropdown" (click)="$event.stopPropagation()">
-                  <label class="checkbox-item d-block mb-2" *ngFor="let tag of availableTags" (click)="toggleTag(tag, $event)">
-                    <input type="checkbox" [checked]="selectedTags.has(tag)" (click)="$event.stopPropagation()" class="me-2">
-                    <span>{{ tag }}</span>
-                  </label>
+            <!-- Tags -->
+            <div class="tag-selection-wrapper mb-4">
+              <div class="d-flex align-items-start gap-3">
+                <div class="dropdown">
+                  <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    Select Tags
+                  </button>
+                  <div class="dropdown-menu p-3 checkbox-dropdown" (click)="$event.stopPropagation()">
+                    <label class="checkbox-item d-block mb-2" *ngFor="let tag of availableTags" (click)="toggleTag(tag, $event)">
+                      <input type="checkbox" [checked]="selectedTags.has(tag)" (click)="$event.stopPropagation()" class="me-2">
+                      <span>{{ tag }}</span>
+                    </label>
+                  </div>
                 </div>
-              </div>
-              <div class="selected-tags-container flex-grow-1">
-                <div class="d-flex flex-wrap gap-2">
-                  <div *ngFor="let tag of getSelectedTagsArray()" class="tag-chip" [attr.data-tag]="tag">
-                    <span>{{ tag }}</span>
-                    <button type="button" class="remove-tag" (click)="removeTag(tag)">&times;</button>
+                <div class="selected-tags-container flex-grow-1">
+                  <div class="d-flex flex-wrap gap-2">
+                    <div *ngFor="let tag of getSelectedTagsArray()" class="tag-chip" [attr.data-tag]="tag">
+                      <span>{{ tag }}</span>
+                      <button type="button" class="remove-tag" (click)="removeTag(tag)">&times;</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+
+            <!-- Quill Editor -->
+            <quill-editor formControlName="content" [modules]="quillModules" class="bg-white border rounded" placeholder="Tell your story..."></quill-editor>
           </div>
-
-          <!-- Quill Editor -->
-          <quill-editor formControlName="content" [modules]="quillModules" class="bg-white border rounded" placeholder="Tell your story..."></quill-editor>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
-  </div>
 
-  <!-- Footer -->
-  <footer class="main-footer border-top bg-white py-3">
-    <div class="footer-links text-center small">
-      <a href="#">Help</a>
-      <a href="#">Status</a>
-      <a href="#">About</a>
-      <a href="#">Careers</a>
-      <a href="#">Press</a>
-      <a href="#">Blog</a>
-      <a href="#">Privacy</a>
-      <a href="#">Rules</a>
-      <a href="#">Terms</a>
-      <a href="#">Text to speech</a>
-    </div>
-  </footer>
-</form>
+    <!-- Footer -->
+    <footer class="main-footer border-top bg-white py-3">
+      <div class="footer-links text-center small">
+        <a href="#">Help</a>
+        <a href="#">Status</a>
+        <a href="#">About</a>
+        <a href="#">Careers</a>
+        <a href="#">Press</a>
+        <a href="#">Blog</a>
+        <a href="#">Privacy</a>
+        <a href="#">Rules</a>
+        <a href="#">Terms</a>
+        <a href="#">Text to speech</a>
+      </div>
+    </footer>
+  </form>
+</div>

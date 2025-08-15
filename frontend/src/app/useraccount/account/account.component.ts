@@ -36,17 +36,17 @@ export class AccountComponent implements OnInit {
       this.isInitializing = false;
       return;
     }
-    console.log('ACCOUNT COMPONENT: Starting profile load...');
+    // console.log('ACCOUNT COMPONENT: Starting profile load...');
     this.isLoading = true;
     this.profileService.getUserProfile().subscribe({
       next: (profile) => {
-        console.log('Account component: User profile loaded successfully');
+        // console.log('Account component: User profile loaded successfully');
         this.userProfile = profile;
         this.isLoading = false; 
         this.isInitializing = false;
       },
       error: (error) => {
-        console.error('Error fetching user profile:', error);
+        // console.error('Error fetching user profile:', error);
         this.isLoading = false; 
         this.isInitializing = false;
         if (error.status === 401) {
@@ -97,7 +97,7 @@ export class AccountComponent implements OnInit {
         setTimeout(() => this.successMessage = '', 1500);
       },
       error: (error) => {
-        console.error('Error updating user profile:', error);
+        // console.error('Error updating user profile:', error);
         this.errorMessage = 'Failed to update user profile.';
       },
       complete: () => {
@@ -174,7 +174,7 @@ export class AccountComponent implements OnInit {
         this.router.navigate(['/auth/login']);
       },
       error: (error) => {
-        console.error('Logout error:', error);
+        // console.error('Logout error:', error);
         this.router.navigate(['/auth/login']);
       }
     });

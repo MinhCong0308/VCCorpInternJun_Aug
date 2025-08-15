@@ -5,9 +5,10 @@ import { ActivatedRoute } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
-import { PostBlogOwnerService , Post} from '../../core/services/postowner.service';
+import { PostBlogOwnerService , Post } from '../../core/services/postowner.service';
 import { QuillEditorComponent } from 'ngx-quill';
 import { ProfileService, UserProfile} from '../../core/services/profile.service';
+import { CategoryService, Category } from '../../core/services/category.service';
 
 @Component({
   selector: 'app-create-blog',
@@ -30,13 +31,24 @@ export class CreateBlogComponent implements OnInit {
   successMessage: string = '';
   userProfile: UserProfile | null = null;
 
+  languageTabs: { language: { id: number; name: string; flag: string }; content: string }[] = [];
+
   languages = [
     { id: 1, name: 'English', flag: '🇺🇸' },
     { id: 2, name: 'Vietnamese', flag: '🇻🇳' },
     { id: 3, name: 'French', flag: '🇫🇷' }
   ];
-  selectedLanguageName: string = 'English';
-  selectedLanguageFlag: string = '🇺🇸';
+  postLanguage = {
+    id: 1,
+    name: 'English',
+    flag: '🇺🇸'
+  };
+
+  uiLanguage = {
+    id: 1,
+    name: 'English',
+    flag: '🇺🇸'
+  };
 
   quillModules = {
     toolbar: [
@@ -55,7 +67,8 @@ export class CreateBlogComponent implements OnInit {
     private router: Router, 
     @Inject(PLATFORM_ID) private platformId: Object, 
     private postService: PostBlogOwnerService,
-    private profileService: ProfileService
+    private profileService: ProfileService,
+    private categoryService: CategoryService
   ) {}
 
   ngOnInit(): void {
@@ -65,8 +78,16 @@ export class CreateBlogComponent implements OnInit {
       languageid: [1, Validators.required],
       tags: [[]]
     });
-    
-    this.availableTags = this.getAllTagsFromDB();
+
+    this.categoryService.getAllCategories().subscribe({
+      next: (response) => {
+        this.availableTags = response.categories.map((category: Category) => category.categoryname);
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+      }
+    });
+
     this.route.queryParams.subscribe(params => {
       const editPostId = params['edit'];
       if( editPostId) {
@@ -98,7 +119,7 @@ export class CreateBlogComponent implements OnInit {
 
     this.postService.getSpecificPost(postId).subscribe({
       next: (post) => {
-        console.log('Post loaded for editing:', post);
+        // console.log('Post loaded for editing:', post);
         this.post = post;
         this.blogForm.patchValue({
           title: post.title,
@@ -107,10 +128,10 @@ export class CreateBlogComponent implements OnInit {
           tags: post.tags
         });
         this.selectedTags = new Set(post.tags);
-        this.selectedLanguageName = this.languages.find(lang => lang.id === post.languageid)?.name || 'English';
-        this.selectedLanguageFlag = this.languages.find(lang => lang.id === post.languageid)?.flag || '🇺🇸';
-        
-        // Clear loading state
+        const foundLang = this.languages.find(lang => lang.id === post.languageid);
+        if (foundLang) {
+          this.postLanguage = foundLang;
+        }
         this.isLoading = false;
       },
       error: (error) => {
@@ -120,14 +141,17 @@ export class CreateBlogComponent implements OnInit {
       }
     });
   }
-
-  selectLanguage(lang: { id: number; name: string; flag: string }, event: Event): void {
+  selectPostLanguage(lang: {id: number; name: string; flag: string}, event: Event): void {
     event.preventDefault();
+    this.postLanguage = { ...lang };
     this.blogForm.patchValue({ languageid: lang.id });
-    this.selectedLanguageName = lang.name;
-    this.selectedLanguageFlag = lang.flag;
   }
 
+  // Select language for UI/page display
+  selectUILanguage(lang: {id: number; name: string; flag: string}, event: Event): void {
+    event.preventDefault();
+    this.uiLanguage = { ...lang };
+  }
   toggleTag(tag: string, event: Event): void {
     event.preventDefault();
     if (this.selectedTags.has(tag)) {
@@ -145,10 +169,6 @@ export class CreateBlogComponent implements OnInit {
   removeTag(tag: string): void {
     this.selectedTags.delete(tag);
     this.blogForm.patchValue({ tags: Array.from(this.selectedTags) });
-  }
-
-  getAllTagsFromDB(): string[] {
-    return ['Technology', 'Romantic', 'Natural Language Processing'];
   }
 
   submitBlog(): void {

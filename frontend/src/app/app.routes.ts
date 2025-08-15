@@ -21,13 +21,13 @@ export const routes: Routes = [
       { path: 'post-detail', loadChildren: () => PostModule },
       { path: 'auth', loadChildren: () => AuthModule },
       {
-        path: 'blog-owner',
-        loadChildren: () => BlogOwnerModule,
+        path: 'useraccount',
+        loadChildren: () => UseraccountModule,
         canActivate: [authGuard],
       },
       {
-        path: 'useraccount',
-        loadChildren: () => UseraccountModule,
+        path: 'blog-owner',
+        loadChildren: () => BlogOwnerModule,
         canActivate: [authGuard],
       },
     ],

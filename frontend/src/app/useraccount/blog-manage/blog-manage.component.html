@@ -81,7 +81,7 @@
                 <a class="nav-link" 
                    [class.active]="activeTab === 'home'"
                    href="#" 
-                   (click)="switchTab('home', $event)">Home</a>
+                   (click)="switchTab('home', $event)">Your Blogs</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" 
@@ -107,7 +107,7 @@
                 <div class="flex-grow-1">
                   <div class="d-flex justify-content-between align-items-center mb-2">
                     <h2 class="mb-0">
-                      <a [routerLink]="['/post', post.postid]" class="blog-title">{{ post.title }}</a>
+                      <a [routerLink]="['/post-detail', post.postid]" (click)="$event.stopPropagation()" class="blog-title">{{ post.title }}</a>
                     </h2>
                     <span class="blog-status" 
                           [ngClass]="{

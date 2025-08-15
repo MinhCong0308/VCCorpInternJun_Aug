@@ -4,6 +4,7 @@ import { map, Observable } from 'rxjs';
 
 
 export interface UserProfile {
+  userid: number;
   email: string;
   username: string;
   fullname: string;

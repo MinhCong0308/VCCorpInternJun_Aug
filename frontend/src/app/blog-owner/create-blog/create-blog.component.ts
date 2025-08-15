@@ -7,6 +7,8 @@ import { Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { PostBlogOwnerService , Post} from '../../core/services/postowner.service';
 import { QuillEditorComponent } from 'ngx-quill';
+import { ProfileService, UserProfile} from '../../core/services/profile.service';
+
 @Component({
   selector: 'app-create-blog',
   templateUrl: './create-blog.component.html',
@@ -15,12 +17,18 @@ import { QuillEditorComponent } from 'ngx-quill';
 })
 export class CreateBlogComponent implements OnInit {
   blogForm!: FormGroup;
-  @ViewChild('quillEditor', { static: false }) quillEditor!: QuillEditorComponent; // Dùng QuillEditorComponent
+  @ViewChild('quillEditor', { static: false }) quillEditor!: QuillEditorComponent;
   selectedTags: Set<string> = new Set();
   availableTags: string[] = [];
   isEditMode : boolean = false;
   editPostId: number | null = null;
   post: Post | null = null;
+
+  isInitializing: boolean = true;
+  isLoading: boolean = false;
+  errorMessage: string = '';
+  successMessage: string = '';
+  userProfile: UserProfile | null = null;
 
   languages = [
     { id: 1, name: 'English', flag: '🇺🇸' },
@@ -41,7 +49,14 @@ export class CreateBlogComponent implements OnInit {
     ]
   };
 
-  constructor(private fb: FormBuilder, private http: HttpClient, private route: ActivatedRoute, private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService) {}
+  constructor(private fb: FormBuilder, 
+    private http: HttpClient, 
+    private route: ActivatedRoute, 
+    private router: Router, 
+    @Inject(PLATFORM_ID) private platformId: Object, 
+    private postService: PostBlogOwnerService,
+    private profileService: ProfileService
+  ) {}
 
   ngOnInit(): void {
     this.blogForm = this.fb.group({
@@ -50,24 +65,40 @@ export class CreateBlogComponent implements OnInit {
       languageid: [1, Validators.required],
       tags: [[]]
     });
+    
     this.availableTags = this.getAllTagsFromDB();
     this.route.queryParams.subscribe(params => {
       const editPostId = params['edit'];
       if( editPostId) {
         this.isEditMode = true;
-        this.editPostId = +editPostId; // Convert to number
+        this.editPostId = +editPostId;
         this.loadPostForEditing(this.editPostId);
       }
     });
+    this.profileService.getUserProfile().subscribe({
+      next: (profile) => {
+        this.userProfile = profile;
+      },
+      error: (error) => {
+        console.error('Error loading user profile:', error);
+      }
+    });
+    this.isInitializing = false;
   }
+
   loadPostForEditing(postId: number): void {
     if (!isPlatformBrowser(this.platformId)) {
-      alert('This feature is only available in the browser.');
+      this.errorMessage = 'This feature is only available in the browser.';
       return;
     }
+
+    // Set loading state
+    this.isLoading = true;
+    this.errorMessage = '';
+
     this.postService.getSpecificPost(postId).subscribe({
       next: (post) => {
-        // console.log('Post loaded for editing:', post);
+        console.log('Post loaded for editing:', post);
         this.post = post;
         this.blogForm.patchValue({
           title: post.title,
@@ -78,13 +109,18 @@ export class CreateBlogComponent implements OnInit {
         this.selectedTags = new Set(post.tags);
         this.selectedLanguageName = this.languages.find(lang => lang.id === post.languageid)?.name || 'English';
         this.selectedLanguageFlag = this.languages.find(lang => lang.id === post.languageid)?.flag || '🇺🇸';
+        
+        // Clear loading state
+        this.isLoading = false;
       },
       error: (error) => {
-        console.error(error);
-        alert('Failed to load post for editing.');
+        console.error('Error loading post:', error);
+        this.errorMessage = 'Failed to load post for editing.';
+        this.isLoading = false;
       }
     });
   }
+
   selectLanguage(lang: { id: number; name: string; flag: string }, event: Event): void {
     event.preventDefault();
     this.blogForm.patchValue({ languageid: lang.id });
@@ -110,18 +146,27 @@ export class CreateBlogComponent implements OnInit {
     this.selectedTags.delete(tag);
     this.blogForm.patchValue({ tags: Array.from(this.selectedTags) });
   }
+
   getAllTagsFromDB(): string[] {
     return ['Technology', 'Romantic', 'Natural Language Processing'];
   }
+
   submitBlog(): void {
     if(!isPlatformBrowser(this.platformId)) {
-      alert('This feature is only available in the browser.');
+      this.errorMessage = 'This feature is only available in the browser.';
       return;
     }
+    
     if (this.blogForm.invalid) {
-      alert('Please fill in all required fields.');
+      this.errorMessage = 'Please fill in all required fields.';
       return;
     }
+
+    // Set loading state
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
     const payload = this.blogForm.value;
 
     if (this.isEditMode && this.editPostId !== null) {
@@ -130,27 +175,39 @@ export class CreateBlogComponent implements OnInit {
       // Perform UPDATE
       this.http.put('http://localhost:3000/post-owner/update-post', payload, { withCredentials: true }).subscribe({
         next: () => {
-          alert(`Your blog "${payload.title}" was updated successfully.`);
-          this.router.navigate(['/home']);
+          this.successMessage = `Your blog "${payload.title}" was updated successfully! Redirecting...`;
+          this.isLoading = false;
+          setTimeout(() => {
+            this.router.navigate(['/home']);
+          }, 2000);
         },
         error: err => {
-          console.error(err);
-          alert('Failed to update blog.');
+          console.error('Update error:', err);
+          this.errorMessage = 'Failed to update blog. Please try again.';
+          this.isLoading = false;
         }
       });
     } else {
       // Perform CREATE
       this.http.post('http://localhost:3000/post-owner/create-post', payload, { withCredentials: true }).subscribe({
         next: () => {
-          alert(`Your blog "${payload.title}" was submitted successfully.`);
-          this.router.navigate(['/home']);
+          this.successMessage = `Your blog "${payload.title}" was submitted successfully! Redirecting...`;
+          this.isLoading = false;
+          setTimeout(() => {
+            this.router.navigate(['/home']);
+          }, 2000);
         },
         error: err => {
-          console.error(err);
-          alert('Failed to submit blog.');
+          console.error('Create error:', err);
+          this.errorMessage = 'Failed to submit blog. Please try again.';
+          this.isLoading = false;
         }
       });
     }
   }
 
+  clearMessages(): void {
+    this.successMessage = '';
+    this.errorMessage = '';
+  }
 }

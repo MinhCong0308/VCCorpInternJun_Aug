@@ -23,6 +23,8 @@ export class PostDetailComponent implements OnInit {
   isLiked: boolean = false;
   isAnimating: boolean = false;
   showPlusOne: boolean = false;
+  coverImageUrl: string = '';
+  defaultCoverImage: string = 'https://picsum.photos/1000';
 
   constructor(
     private route: ActivatedRoute,
@@ -82,6 +84,7 @@ export class PostDetailComponent implements OnInit {
       next: (res: any) => {
         this.post = res.data;
         // console.log("this.post=", this.post)
+        this.coverImageUrl = res?.data?.coverImage || this.defaultCoverImage;
       },
       error: (err) => console.error('Failed to load post', err)
     });

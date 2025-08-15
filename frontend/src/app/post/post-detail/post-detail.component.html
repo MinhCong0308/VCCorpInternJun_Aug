@@ -99,7 +99,7 @@
             </div>
 
             <!-- Cover image -->
-            <img *ngIf="post?.coverImage" class="cover-img" [src]="post.coverImage || 'https://picsum.photos/200'" alt="Cover" />
+            <img class="cover-img" [src]="coverImageUrl" alt="Cover" />
             
             <!-- Main post content -->
             <article class="post-content" [innerHTML]="post?.content">
@@ -115,7 +115,15 @@
 
             <!-- Actions: Like, Bookmark, Share -->
             <div class="post-actions">
-                <button class="icon-btn"><i class="ti-thumb-up"></i> {{ post?.like_cnt }}</button>
+                <div class="like-wrapper">
+                    <button 
+                    class="icon-btn" 
+                    (click)="like(post.postid)" 
+                    [class.liked]="isLiked" 
+                    [class.animating]="isAnimating">
+                    <i class="ti-thumb-up"></i> {{ post?.like_cnt }}</button>
+                    <span class="plus-one" *ngIf="showPlusOne">+1</span>
+                </div>
                 <button class="icon-btn"><i class="ti-comment"></i> {{ post?.commentCount }}</button>
             </div>
 

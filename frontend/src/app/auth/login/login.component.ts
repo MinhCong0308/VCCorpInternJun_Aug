@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import e from 'express';
 
 @Component({
   selector: 'app-login',
@@ -61,7 +62,6 @@ export class LoginComponent implements OnInit {
       this.markAllFieldsAsTouched();
       return;
     }
-
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
@@ -69,17 +69,21 @@ export class LoginComponent implements OnInit {
     this.authService.login(email, password).subscribe({
       next: (response) => {
         if (response.success) {
+          console.log('Login successful:', response);
           this.successMessage = 'Login successful! Redirecting...';
           setTimeout(() => {
             this.router.navigate(['/home']);
           }, 1000);
         } else {
+          console.log("Jump here");
+          console.log('Response:', response);
           this.errorMessage = response.message || 'Login failed!';
         }
       },
       error: (error) => {
-        this.errorMessage = 'Network error. Please try again.';
-        console.error('Login error:', error);
+        console.log("Error: ", error)
+        this.errorMessage = error.message || 'Login failed!';
+        console.error('Login error:', error.message || error);
       },
       complete: () => {
         this.isLoading = false;

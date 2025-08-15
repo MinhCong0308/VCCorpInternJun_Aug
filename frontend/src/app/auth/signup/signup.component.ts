@@ -30,20 +30,6 @@ export class SignupComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeForm();    
-    if(this.isBrowser) {
-      this.authService.checkSession().subscribe(valid => {
-        if (valid) {
-          this.router.navigate(['/home']);
-        }
-      });
-    }
-    if(this.isBrowser && window.location.search.includes('oauth=success')) { 
-      this.authService.checkSession().subscribe(valid => {
-        if (valid) {
-          this.router.navigate(['/home']);
-        }
-      });
-    }
   }
 
   private initializeForm(): void {

@@ -44,12 +44,15 @@ export class AuthService {
     const url = `${this.baseUrl}/login`;
     return this.http.post<LogInWrapper>(url, { email, password }, {withCredentials: true}).pipe(
       tap(() => {
-        this.clearSessionCache(); // ✅ Use the method
+        this.clearSessionCache(); 
         console.log('Login successful - cleared session cache');
       }),
       catchError((error) => {
-        console.error('Login error:', error);
-        return of({ success: false, data: { userid: 0, email: '', username: '', role: '' }, status: error.status, message: error.message });
+        console.error('Login error:', error.message || error);
+        if(error.status === 401) {
+          return of({ success: false, data: { userid: 0, email: '', username: '', role: '' }, status: error.status, message: 'Username or password is not correct' });
+        }
+        return of({ success: false, data: { userid: 0, email: '', username: '', role: '' }, status: error.status, message: error.message || 'Login failed!' });
       })
     );
   }

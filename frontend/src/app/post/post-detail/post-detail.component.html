@@ -149,7 +149,7 @@
                 <!-- Danh sách bình luận -->
                 <div id="response-list">
                     <div *ngFor="let c of comments | slice:0:visibleCount; trackBy: trackByCommentId" class="response mb-4 pb-3 border-bottom">
-                        <div class="d-flex align-items-center mb-2" [style.marginLeft.px]="c.depth * 20">
+                        <div class="d-flex align-items-center mb-2" [style.marginLeft.px]="c.depth * 30">
                             <a routerLink="/">
                                 <img [src]="c.User.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'"
                                     class="rounded-circle"
@@ -158,12 +158,12 @@
                             <a routerLink="/"><span class="me-2" style="font-size: 14px;">{{ c.User.firstname }} {{ c.User.lastname }}</span></a>
                             <span style="font-size:13px;color:#888;">·  {{ c.createdAt | date:'mediumDate' }}</span>
                         </div>
-                        <div [style.marginLeft.px]="c.depth * 20" style="font-size:14px;">{{ c.content }}</div>
-                        <div class="interact d-flex align-items-center mt-1" [style.marginLeft.px]="c.depth * 20" style="font-size: 13px;">
+                        <div [style.marginLeft.px]="c.depth * 30" style="font-size:14px;">{{ c.content }}</div>
+                        <div class="interact d-flex align-items-center mt-1" [style.marginLeft.px]="c.depth * 30" style="font-size: 13px;">
                             <button *ngIf="isLoggedIn" class="btn btn-link px-0 me-2 text-decoration-underline btn-reply"
                             (click)="openReplyForm(c)">Reply</button>
                         </div>
-                        <div *ngIf="replyTo === c.commentid" class="mt-2" [style.marginLeft.px]="c.depth * 20 + 32">
+                        <div *ngIf="replyTo === c.commentid" class="mt-2" [style.marginLeft.px]="c.depth * 30 + 32">
                             <textarea [(ngModel)]="replyContent" class="form-control" rows="2" placeholder="Write a reply..." style="resize:none;"></textarea>
                             <div class="text-end mt-2">
                                 <button class="btn btn-white btn-sm rounded-pill px-3 me-2" (click)="cancelReply()">Cancel</button>
@@ -261,7 +261,7 @@
                     <!-- ... Thêm bình luận khác nếu muốn ... -->
                 </div>
                 <button class="btn btn-more-res px-4" *ngIf="comments.length > visibleCount" (click)="showMore()">See more responses</button>
-                <button class="btn btn-hide-res px-4 d-none" *ngIf="visibleCount > 4" (click)="hide()">Hide responses</button>
+                <button class="btn btn-hide-res px-4" *ngIf="visibleCount > 4" (click)="hide()">Hide responses</button>
             </section>
 
             <!-- Recommendation -->

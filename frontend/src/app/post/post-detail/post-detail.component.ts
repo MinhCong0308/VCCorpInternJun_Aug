@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { LanguageService } from '../../core/services/language.service';
-import { ProfileService } from '../../core/services/profile.service';
+import { ProfileService, UserProfile } from '../../core/services/profile.service';
 
 interface Language {
   languageid: number;
@@ -49,6 +49,7 @@ export class PostDetailComponent implements OnInit {
   userid: any;
   languages: Language[] = [];
   currentLanguage: Language | null = null;
+  userProfile: UserProfile | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -95,11 +96,10 @@ export class PostDetailComponent implements OnInit {
 
   loadProfile(): void {
     this.profileService.getUserProfile().subscribe({
-      next: (res: any) => {
-        this.userid = res?.data?.userid;
-        console.log("this.userid:", this.userid);
-        this.avatarUrl = res?.data?.avatarUrl || this.defaultAvatar;
-        console.log("this.avatarUrl:", this.avatarUrl);
+      next: (profile) => {
+        this.userProfile = profile;
+        this.userid = profile.userid;
+        this.avatarUrl = profile.avatarUrl || this.defaultAvatar;
       },
       error: (err) => {
         console.error('Failed to load profile', err);
@@ -148,7 +148,7 @@ export class PostDetailComponent implements OnInit {
 
   showMore() {
     this.visibleCount += 4;
-  }
+   }
 
   hide() {
     this.visibleCount = 4;

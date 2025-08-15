@@ -10,6 +10,12 @@ import { QuillEditorComponent } from 'ngx-quill';
 import { ProfileService, UserProfile} from '../../core/services/profile.service';
 import { CategoryService, Category } from '../../core/services/category.service';
 
+interface LanguageTab {
+  language: { id: number; name: string; flag: string };
+  title: string;
+  content: string;
+}
+
 @Component({
   selector: 'app-create-blog',
   templateUrl: './create-blog.component.html',
@@ -24,13 +30,11 @@ export class CreateBlogComponent implements OnInit {
   isEditMode : boolean = false;
   editPostId: number | null = null;
   post: Post | null = null;
-
   isInitializing: boolean = true;
   isLoading: boolean = false;
   errorMessage: string = '';
   successMessage: string = '';
   userProfile: UserProfile | null = null;
-
   languageTabs: { language: { id: number; name: string; flag: string }; content: string }[] = [];
 
   languages = [
@@ -101,12 +105,20 @@ export class CreateBlogComponent implements OnInit {
         this.userProfile = profile;
       },
       error: (error) => {
-        console.error('Error loading user profile:', error);
+        // console.error('Error loading user profile:', error);
       }
     });
     this.isInitializing = false;
   }
 
+  initializeDefaultTab(): void {
+    const defaultTab: LanguageTab = {
+      language: this.postLanguage,
+      title: this.blogForm.get('title')?.value || '',
+      content: this.blogForm.get('content')?.value || ''
+    };
+    this.languageTabs.push(defaultTab);
+  }
   loadPostForEditing(postId: number): void {
     if (!isPlatformBrowser(this.platformId)) {
       this.errorMessage = 'This feature is only available in the browser.';

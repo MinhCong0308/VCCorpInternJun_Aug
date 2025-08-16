@@ -2,17 +2,19 @@ const { BodyWithLocale } = require("kernels/rules");
 
 const postValidation = {
     createPost: [
-        new BodyWithLocale("title").notEmpty().isString(),
-        new BodyWithLocale("content").notEmpty(),
-        new BodyWithLocale("languageid").notEmpty()
+        new BodyWithLocale("originalPost").notEmpty(),
+        new BodyWithLocale("originalPost.title").notEmpty(),
+        new BodyWithLocale("originalPost.content").notEmpty(),
+        new BodyWithLocale("originalPost.languageid").notEmpty(),
     ],
     deletePost: [
         new BodyWithLocale("postid").notEmpty().isNumberic()
     ],
     updatePost: [
-        new BodyWithLocale("postid").notEmpty().isNumberic(),
-        new BodyWithLocale("title").notEmpty(),
-        new BodyWithLocale("content").notEmpty()
+        new BodyWithLocale("originalPost").notEmpty(),
+        new BodyWithLocale("originalPost.title").notEmpty(),
+        new BodyWithLocale("originalPost.content").notEmpty(),
+        new BodyWithLocale("originalPost.languageid").notEmpty(),
     ],
     // getSpecificPost: [
     //     new BodyWithLocale("postid").notEmpty().isNumberic()

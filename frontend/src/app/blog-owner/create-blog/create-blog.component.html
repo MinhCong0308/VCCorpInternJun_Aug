@@ -19,17 +19,26 @@
             <button class="btn btn-success btn-sm rounded-pill px-3" type="submit">
               {{ isEditMode ? 'Update' : 'Publish' }}
             </button>
+            <!-- UI Language Dropdown -->
             <div class="dropdown">
-              <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
-                <span style="font-size: 1.2em;">{{ uiLanguage.flag }}</span>
-                <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+              <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
+                  type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  <ng-container *ngIf="currentLanguage as lang; else noLang">
+                      <img [src]="lang.flag_image" class="flag-icon me-1" alt="{{ lang.locale_code }}" />
+                  </ng-container>
+                  <ng-template #noLang>
+                      <span class="d-none d-lg-inline">Language</span>
+                  </ng-template>
+                  <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
               </button>
-              <ul class="dropdown-menu">
-                <li *ngFor="let lang of languages">
-                  <a class="dropdown-item" href="#" (click)="selectUILanguage(lang, $event)">
-                    <span style="font-size:1.2em;">{{ lang.flag }}</span>
-                  </a>
-                </li>
+              <ul class="dropdown-menu" aria-labelledby="langDropdown">
+                  <li *ngFor="let lang of languages">
+                      <a class="dropdown-item d-flex align-items-center gap-2" (click)="selectLanguage(lang)" style="cursor: pointer;">
+                          <img [src]="lang.flag_image" class="flag-icon" alt="{{ lang.locale_code }}" />
+                          <span class="flex-grow-1">{{ lang.languagename }}</span>
+                          <i *ngIf="currentLanguage?.languageid === lang.languageid" class="ti-check text-success" aria-hidden="true"></i>
+                      </a>
+                  </li>
               </ul>
             </div>
             <a href="#" class="text-secondary text-decoration-none ms-2 me-1">
@@ -56,9 +65,8 @@
       <div class="container-fluid px-4 main-content">
         <main class="col-12 d-flex justify-content-center">
           <div class="editor-wrapper mt-5 w-100 px-0">
-            <!-- <div class="dropdown d-flex justify-content-end mb-3">
-            </div> -->
-            <!-- Tags -->
+            
+            <!-- Tags Section (shared across all languages) -->
             <div class="tag-selection-wrapper mb-4">
               <div class="d-flex align-items-start gap-3">
                 <div class="dropdown">
@@ -82,16 +90,110 @@
                 </div>
               </div>
             </div>
-            <textarea
-              id="blogTitle"
-              formControlName="title"
-              class="form-control editor-title mb-4"
-              placeholder="Enter Title"
-              rows="1"
-            ></textarea>
-            <!--Language Label-->
-            <!-- Quill Editor -->
-            <quill-editor formControlName="content" [modules]="quillModules" class="bg-white border rounded" placeholder="Tell your story..."></quill-editor>
+
+            <!-- Language Tabs Container -->
+            <div class="language-tabs-container mb-4" *ngIf="languageTabs.length > 0">
+              <!-- Tab Navigation -->
+              <div class="d-flex align-items-center gap-2 mb-3">
+                <!-- Language Tabs -->
+                <div class="d-flex gap-1">
+                  <button 
+                    *ngFor="let tab of languageTabs; let i = index" 
+                    type="button"
+                    class="btn btn-sm d-flex align-items-center gap-2 position-relative"
+                    [class.btn-primary]="i === activeTabIndex"
+                    [class.btn-outline-secondary]="i !== activeTabIndex"
+                    [disabled]="tab.isTranslating"
+                    (click)="switchTab(i)">
+                    
+                    <!-- Loading spinner for translating tabs -->
+                    <div *ngIf="tab.isTranslating" class="spinner-border spinner-border-sm me-1" role="status">
+                      <span class="visually-hidden">Translating...</span>
+                    </div>
+                    
+                    <img [src]="tab.language.flag_image" class="flag-icon" [alt]="tab.language.locale_code" width="20" height="15" />
+                    <span>{{ tab.language.languagename }}</span>
+                    
+                    <!-- Original badge -->
+                    <span *ngIf="tab.isOriginal" class="badge bg-success ms-1" style="font-size: 0.6em;">Original</span>
+                    
+                    <!-- Remove button (only for translations) -->
+                    <button 
+                      *ngIf="!tab.isOriginal" 
+                      type="button" 
+                      class="btn-close btn-close-sm ms-2" 
+                      (click)="removeTab(i); $event.stopPropagation()"
+                      style="font-size: 0.6em;">
+                    </button>
+                  </button>
+                </div>
+                
+                <!-- Add Translation Button -->
+                <div class="dropdown" *ngIf="getAvailableTranslationLanguages().length > 0">
+                  <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="ti-world"></i> Translate
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li class="dropdown-header">Translate to:</li>
+                    <li *ngFor="let lang of getAvailableTranslationLanguages()">
+                      <a class="dropdown-item d-flex align-items-center gap-2" href="#" (click)="addTranslationTab(lang); $event.preventDefault()">
+                        <img [src]="lang.flag_image" class="flag-icon" [alt]="lang.locale_code" width="20" height="15" />
+                        <span>{{ lang.languagename }}</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Tab Content -->
+              <div class="tab-content-container border rounded p-3">
+                <!-- Language Info Bar -->
+                <div class="mb-3 d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center gap-2">
+                    <img 
+                      [src]="languageTabs[activeTabIndex].language.flag_image" 
+                      class="flag-icon" 
+                      [alt]="languageTabs[activeTabIndex].language.locale_code"
+                      width="24" 
+                      height="18" />
+                    <span class="fw-bold">{{ languageTabs[activeTabIndex].language.languagename }}</span>
+                    <span *ngIf="languageTabs[activeTabIndex]?.isOriginal" class="badge bg-success">Original</span>
+                    <span *ngIf="!languageTabs[activeTabIndex]?.isOriginal" class="badge bg-info">Translation</span>
+                  </div>
+                  
+                  <div *ngIf="languageTabs[activeTabIndex]?.isTranslating" class="d-flex align-items-center gap-2 text-primary">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                      <span class="visually-hidden">Translating...</span>
+                    </div>
+                    <small>Translating content...</small>
+                  </div>
+                  
+                  <small *ngIf="!languageTabs[activeTabIndex]?.isOriginal && !languageTabs[activeTabIndex]?.isTranslating" class="text-muted">
+                    Translation (read-only)
+                  </small>
+                </div>
+
+                <!-- Title Input -->
+                <textarea
+                  id="blogTitle"
+                  formControlName="title"
+                  class="form-control editor-title mb-4"
+                  [placeholder]="languageTabs[activeTabIndex].isOriginal ? 'Enter Title' : 'Translated Title (read-only)'"
+                  [readonly]="!languageTabs[activeTabIndex].isOriginal"
+                  rows="1"
+                ></textarea>
+
+                <!-- Quill Editor -->
+                <quill-editor 
+                  formControlName="content" 
+                  [modules]="quillModules" 
+                  class="bg-white border rounded" 
+                  [placeholder]="languageTabs[activeTabIndex].isOriginal ? 'Tell your story...' : 'Translated content (read-only)'"
+                  [readOnly]="!languageTabs[activeTabIndex].isOriginal">
+                </quill-editor>
+              </div>
+            </div>
+            
           </div>
         </main>
       </div>

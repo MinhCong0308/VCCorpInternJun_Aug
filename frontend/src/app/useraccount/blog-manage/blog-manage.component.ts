@@ -16,12 +16,13 @@ export class BlogManageComponent implements OnInit {
   posts: Post[] = [];
   userProfile: UserProfile | null = null;
   isInitializing = true;
-  languages : Language[] | null = null;
+  languages : Language[] = [];
   activeTab = 'home';
   isLoading = false;
   errorMessage = '';
   successMessage = '';
   defaultLanguage: Language | null = null;
+  currentLanguage: Language | null = null;
 
   constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService, private postOnlyService: PostService, private languageService: LanguageService) {
     this.posts = []; // Ensure posts is always initialized as an empty array
@@ -38,7 +39,6 @@ export class BlogManageComponent implements OnInit {
         this.isInitializing = false;
         this.loadPosts();
         this.loadLanguages();
-        this.defaultLanguage = this.languages?.find(lang => lang.is_default) || null;
         this.isInitializing = false;
       },
       error: (error) => {
@@ -84,8 +84,10 @@ export class BlogManageComponent implements OnInit {
     this.isLoading = true;
     this.languageService.getLanguages().subscribe({
       next: (response) => {
-        console.log('Languages loaded:', response);
-        this.languages = response.languages || [];
+        // console.log('Languages loaded:', response);
+        this.languages = response.data.languages || [];
+        this.defaultLanguage = this.languages?.find(lang => lang.is_default) || null;
+        this.currentLanguage = this.defaultLanguage;
       },
       error: (error) => {
         // console.error('Error loading languages:', error);
@@ -189,5 +191,8 @@ export class BlogManageComponent implements OnInit {
   private clearMessages(): void {
     this.errorMessage = '';
     this.successMessage = '';
+  }
+  selectLanguage(language: Language): void {
+    this.currentLanguage = language;
   }
 }

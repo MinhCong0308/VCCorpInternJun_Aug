@@ -488,7 +488,7 @@ export class CreateBlogComponent implements OnInit {
     if (this.isEditMode && this.editPostId !== null) {
       payload['postid'] = this.editPostId;
 
-      this.http.put('http://localhost:3000/post-owner/update-post-with-translations', payload, { withCredentials: true }).subscribe({
+      this.http.put('http://localhost:3000/post-owner/update-post', payload, { withCredentials: true }).subscribe({
         next: (response) => {
           this.successMessage = `Your blog "${payload.originalPost.title}" and its ${payload.translations.length} translation(s) were updated successfully! Redirecting...`;
           this.isLoading = false;
@@ -503,7 +503,7 @@ export class CreateBlogComponent implements OnInit {
         }
       });
     } else {
-      this.http.post('http://localhost:3000/post-owner/create-post-with-translations', payload, { withCredentials: true }).subscribe({
+      this.http.post('http://localhost:3000/post-owner/create-post', payload, { withCredentials: true }).subscribe({
         next: (response) => {
           this.successMessage = `Your blog "${payload.originalPost.title}" and its ${payload.translations.length} translation(s) were submitted successfully! Redirecting...`;
           this.isLoading = false;

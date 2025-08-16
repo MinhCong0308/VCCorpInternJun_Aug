@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class TranslateService {
   private apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-  private apiKey: string = 'xxxxxxxxxxxx';
+  private apiKey: string = 'xxxxxxxxx';
   constructor(private http: HttpClient) { }
   translate(text: string, sourceLanguage: string, targetLanguage: string): Observable<any> {
     const prompt = sourceLanguage === 'auto' ? `Translate the following text to ${targetLanguage}: ${text}. Just the translation, no explanations.` : `Translate the following text from ${sourceLanguage} to ${targetLanguage}: ${text}. Just the translation, no explanations.`;

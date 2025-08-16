@@ -3,21 +3,39 @@ const config = require("configs/index");
 const { Op } = require("sequelize");
 
 const postService = {
-    createPost: async (title, content, userid, languageid, tags) => {
+    createPost: async (originalPost, translations, userid) => {
         try {
             const post = await db.Post.create({
                 userid,
-                languageid,
-                title,
-                content,
+                languageid: originalPost.languageid,
+                title: originalPost.title,
+                content: originalPost.content,
                 status: config.config.statuspostenum.PENDING
             });
-            post.original_postid = post.postid;
-            if (tags && tags.length > 0) {
-                await postService.setTagsForPost(post.postid, tags);
-            }
-            console.log("Post created successfully:", post);    
             await post.save();
+            post.original_postid = post.postid;
+            await post.save();
+            if (originalPost.tags && originalPost.tags.length > 0) {
+                await postService.setTagsForPost(post.postid, originalPost.tags);
+            }
+            // create translations
+            if (translations && translations.length > 0) {
+                // console.log("Post: ", post.postid)
+                // console.log("Translations: ", translations);
+                for(const translation of translations) {
+                    const translationCreated = await db.Post.create({
+                        userid,
+                        languageid: translation.languageid,
+                        title: translation.title,
+                        content: translation.content,
+                        status: config.config.statuspostenum.PENDING,
+                        original_postid: post.postid
+                    });
+                    if (translation.tags && translation.tags.length > 0) {
+                        await postService.setTagsForPost(translationCreated.postid, translation.tags);
+                    }
+                }
+            }
             return { message: "Post created successfully", post };
         } catch (error) {
             console.log("Error creating post:", error.message);
@@ -54,15 +72,21 @@ const postService = {
         return { message: "Post updated successfully", post };
     },
     getAllPosts: async (userid) => {
+        // I mean that only get original post of user, that has postid == original_postid.
         try {
             const posts = await db.Post.findAll({
-                where: { userid: userid },
+                where: { userid: userid,
+                        postid: {
+                            [Op.col]: 'original_postid'
+                        }
+                    },
                 include : [{
                     model: db.Category,
                     as: 'Categories',
                     through: { attributes: [] }  
                 }]
             });
+            console.log("Posts retrieved successfully:", posts);
             if (!posts || posts.length === 0) {
                 return { message: "No posts found for this user" };
             }
@@ -113,20 +137,41 @@ const postService = {
                 through: { attributes: [] } 
             }]
         });
+        // get translations
+        const translations = await db.Post.findAll({
+            where: {
+                original_postid: postid
+            },
+            include: [{
+                model: db.Category,
+                as: 'Categories',
+                through: { attributes: [] }
+            }]
+        });
+        // filter translations without original post
+        const filteredTranslations = translations.filter(translation => translation.postid !== postid); // get only translations, not original post
         if (!post) {
             throw new Error("Post not found or you are not authorized to view this post");
         }
         return {
-            post: {
+            originalPost: {
                 postid: post.postid,
                 title: post.title,
                 content: post.content,
                 languageid: post.languageid,
                 tags: post.Categories.map(category => category.categoryname),
-                // how to map the statusenum => status name
                 status: config.config.StatusNameById[post.status],
                 createdAt: post.createdAt,
-            }
+            },
+            translations: filteredTranslations.map(translation => ({
+                postid: translation.postid,
+                title: translation.title,
+                content: translation.content,
+                languageid: translation.languageid,
+                tags: translation.Categories.map(category => category.categoryname),
+                status: config.config.StatusNameById[translation.status],
+                createdAt: translation.createdAt,
+            }))
         };
     }
 };

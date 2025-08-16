@@ -7,9 +7,9 @@ const db = require("models/index");
 const postsController = {   
     createPost: async (req, res) => {
         try {
-            const {title, content, languageid, tags} = req.body;
+            const {originalPost, translations} = req.body;
             const userid = req.user.userid; // Get userid from authenticated user
-            const data = await postService.createPost(title, content, userid, languageid, tags);
+            const data = await postService.createPost(originalPost, translations, userid);
             return responseUtils.ok(res, data);
         } catch (error) {
             console.error("Error creating post:", error);

@@ -5,12 +5,7 @@ import { PostBlogOwnerService, Post } from '../../core/services/postowner.servic
 import { AuthService } from '../../core/services/auth.service';
 import { ProfileService, UserProfile} from '../../core/services/profile.service';
 import { PostService } from '../../core/services/post.service';
-
-interface Language {
-  id: number;
-  flag: string;
-}
-
+import { LanguageService, Language } from '../../core/services/language.service';
 @Component({
   selector: 'app-blog-manage',
   templateUrl: './blog-manage.component.html',
@@ -18,23 +13,18 @@ interface Language {
   standalone: false
 })
 export class BlogManageComponent implements OnInit {
-  
   posts: Post[] = [];
   userProfile: UserProfile | null = null;
   isInitializing = true;
-
-  languages: Language[] = [
-    { id: 1, flag: '🇺🇸' },
-    { id: 2, flag: '🇻🇳' },
-    { id: 3, flag: '🇫🇷' }
-  ];
-
-  selectedLanguage = 1;
+  languages : Language[] = [];
   activeTab = 'home';
   isLoading = false;
   errorMessage = '';
   successMessage = '';
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService, private postOnlyService: PostService) {
+  defaultLanguage: Language | null = null;
+  currentLanguage: Language | null = null;
+
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService, private postOnlyService: PostService, private languageService: LanguageService) {
     this.posts = []; // Ensure posts is always initialized as an empty array
   }
   async ngOnInit(): Promise<void> {
@@ -48,6 +38,8 @@ export class BlogManageComponent implements OnInit {
         this.userProfile = profile;
         this.isInitializing = false;
         this.loadPosts();
+        this.loadLanguages();
+        this.isInitializing = false;
       },
       error: (error) => {
         console.error('Error fetching user profile:', error);
@@ -69,7 +61,6 @@ export class BlogManageComponent implements OnInit {
       this.posts = [];
       return;
     }
-    
     this.isLoading = true;
     this.postService.getAllPosts().subscribe({
       next: (posts) => {
@@ -89,17 +80,22 @@ export class BlogManageComponent implements OnInit {
     this.activeTab = tab;
     this.clearMessages();
   }
-
-  selectLanguage(languageId: number, event: Event): void {
-    event.preventDefault();
-    this.selectedLanguage = languageId;
+  loadLanguages(): void {
+    this.isLoading = true;
+    this.languageService.getLanguages().subscribe({
+      next: (response) => {
+        // console.log('Languages loaded:', response);
+        this.languages = response.data.languages || [];
+        this.defaultLanguage = this.languages?.find(lang => lang.is_default) || null;
+        this.currentLanguage = this.defaultLanguage;
+      },
+      error: (error) => {
+        // console.error('Error loading languages:', error);
+        this.errorMessage = 'Failed to load languages. Please try again later.';
+        this.isLoading = false;
+      }
+    });
   }
-
-  getLanguageFlag(languageId: number): string {
-    const lang = this.languages.find(l => l.id === languageId);
-    return lang ? lang.flag : '🇺🇸';
-  }
-
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     const now = new Date();
@@ -195,5 +191,8 @@ export class BlogManageComponent implements OnInit {
   private clearMessages(): void {
     this.errorMessage = '';
     this.successMessage = '';
+  }
+  selectLanguage(language: Language): void {
+    this.currentLanguage = language;
   }
 }

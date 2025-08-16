@@ -34,23 +34,25 @@
             </a>
             <!-- Language Dropdown -->
             <div class="dropdown">
-              <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
-                      type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <span style="font-size: 1.2em;">🇺🇸</span>
-                <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
-              </button>
-              <ul class="dropdown-menu" aria-labelledby="langDropdown">
-                <li>
-                  <a class="dropdown-item d-flex align-items-center gap-2" href="#">
-                    <span style="font-size:1.2em;">🇻🇳</span>
-                  </a>
-                </li>
-                <li>
-                  <a class="dropdown-item d-flex align-items-center gap-2" href="#">
-                    <span style="font-size:1.2em;">🇫🇷</span>
-                  </a>
-                </li>
-              </ul>
+                <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
+                    type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <ng-container *ngIf="currentLanguage as lang; else noLang">
+                        <img [src]="lang.flag_image" class="flag-icon me-1" alt="{{ lang.locale_code }}" />
+                    </ng-container>
+                    <ng-template #noLang>
+                        <span class="d-none d-lg-inline">Language</span>
+                    </ng-template>
+                    <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="langDropdown">
+                    <li *ngFor="let lang of languages">
+                        <a class="dropdown-item d-flex align-items-center gap-2" (click)="selectLanguage(lang)" style="cursor: pointer;">
+                            <img [src]="lang.flag_image" class="flag-icon" alt="{{ lang.locale_code }}" />
+                            <span class="flex-grow-1">{{ lang.languagename }}</span>
+                            <i *ngIf="currentLanguage?.languageid === lang.languageid" class="ti-check text-success" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                </ul>
             </div>
             <a href="#" class="text-secondary text-decoration-none ms-2 me-1">
               <i class="ti-bell fs-5"></i>

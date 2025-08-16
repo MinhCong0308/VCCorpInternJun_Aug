@@ -188,3 +188,44 @@ quill-editor + .editor-divider {
   border-radius: 6px 6px 0 0;
   border: 1px solid #ddd;
 }
+
+
+/* Language tabs styling */
+.language-tabs-container {
+  margin-bottom: 2rem;
+}
+
+.flag-icon {
+  width: 20px;
+  height: 15px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.tab-content-container {
+  background-color: #fafafa;
+  min-height: 500px;
+}
+
+.tab-content-container .form-control[readonly] {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Readonly quill editor styling */
+:host ::ng-deep .ql-container.ql-snow.ql-disabled {
+  background-color: #f8f9fa !important;
+  cursor: not-allowed !important;
+}
+
+:host ::ng-deep .ql-toolbar.ql-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ...existing code... */

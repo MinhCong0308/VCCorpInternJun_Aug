@@ -16,7 +16,7 @@ export const authGuard: CanActivateFn = (route, state) => {
     return of(true);
   }
 
-  console.log('🔒 AUTH GUARD: Client-side - will check session after delay...');
+  // console.log('🔒 AUTH GUARD: Client-side - will check session after delay...');
   
   return timer(100).pipe(
     switchMap(() => authService.checkSession()),

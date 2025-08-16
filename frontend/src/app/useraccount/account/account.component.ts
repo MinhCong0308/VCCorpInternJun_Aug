@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ProfileService, UserProfile} from '../../core/services/profile.service';
 import { isPlatformBrowser } from '@angular/common';
+import { Language, LanguageService} from '../../core/services/language.service';
 
 @Component({
   selector: 'app-account',
@@ -28,8 +29,10 @@ export class AccountComponent implements OnInit {
   isUploading = false;
   errorMessage = '';
   successMessage = '';
-
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private authService: AuthService, private profileService: ProfileService) {}
+  defaultLanguage: Language | null = null;
+  currentLanguage: Language | null = null;
+  languages: Language[] = [];
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private authService: AuthService, private profileService: ProfileService, private languageService: LanguageService) {}
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) {
@@ -42,8 +45,14 @@ export class AccountComponent implements OnInit {
       next: (profile) => {
         // console.log('Account component: User profile loaded successfully');
         this.userProfile = profile;
-        this.isLoading = false; 
+        this.loadLanguage();
+        // console.log('Languages loaded:', this.languages);
+        // this.defaultLanguage = this.languages.find(lang => lang.is_default) || null;
+        // console.log('Default language:', this.defaultLanguage);
+        // this.currentLanguage = this.defaultLanguage;
         this.isInitializing = false;
+        this.isLoading = false; 
+
       },
       error: (error) => {
         // console.error('Error fetching user profile:', error);
@@ -183,5 +192,17 @@ export class AccountComponent implements OnInit {
   private clearMessages(): void {
     this.errorMessage = '';
     this.successMessage = '';
+  }
+  loadLanguage(): void {
+    this.languageService.getLanguages().subscribe({
+      next: (response) => {
+        this.languages = response.data.languages || [];
+        this.defaultLanguage = this.languages.find(lang => lang.is_default) || null;
+        this.currentLanguage = this.defaultLanguage;
+      }
+    })
+  }
+  selectLanguage(language: Language): void {
+    this.currentLanguage = language;
   }
 }

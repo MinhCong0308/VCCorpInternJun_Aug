@@ -5,18 +5,8 @@ import { AccountService } from '../../core/services/account.service';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
-import { LanguageService } from '../../core/services/language.service';
+import { LanguageService, Language} from '../../core/services/language.service';
 
-interface Language {
-  languageid: number;
-  languagename: string;
-  locale_code: string;
-  is_default: boolean;
-  flag_image: string;
-  status: number;
-  createdAt: string;
-  updatedAt: string;
-}
 
 @Component({
   selector: 'app-home-page',

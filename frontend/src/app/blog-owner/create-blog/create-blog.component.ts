@@ -90,7 +90,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       
     } catch (error) {
       console.error('Initialization error:', error);
-      this.errorMessage = 'Failed to initialize the page. Please refresh and try again.';
+      alert("Failed to initialize the page. Please refresh and try again.");
       this.isLoading = false;
       this.isInitializing = false;
     }
@@ -162,7 +162,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       console.log('Initialization completed successfully');
     } catch (error) {
       console.error('Error during initialization:', error);
-      this.errorMessage = 'Failed to load page data. Please try refreshing.';
+      alert("Failed to initialize the page. Please refresh and try again.");
       throw error;
     } finally {
       this.isLoading = false;
@@ -215,7 +215,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error loading languages:', error);
-          this.errorMessage = 'Failed to load languages. Please refresh the page.';
+          alert("Failed to load languages. Please refresh the page.");
           reject(error);
         }
       });
@@ -345,8 +345,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
   removeTab(index: number): void {
     const tab = this.languageTabs[index];
     if (tab.isOriginal) {
-      this.errorMessage = 'Cannot remove the original language tab.';
-      setTimeout(() => this.errorMessage = '', 3000);
+      alert('Cannot remove the original language tab.');
       return;
     }
 
@@ -389,30 +388,22 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       // Set tags
       if (post.tags && Array.isArray(post.tags)) {
         this.selectedTags = new Set(post.tags);
-      }
-      
-      // Update form
+      }      
       this.blogForm.patchValue({
         title: post.title,
         content: post.content,
         languageid: post.languageid,
         tags: post.tags || []
       });
-      
-      // Convert HTML to Delta
       await this.convertHtmlToDelta(originalTab, post.content);
-      
-      // Load translations
-      await this.loadTranslations(editPostId);
-      
-      // Final update
+      await this.loadTranslations(editPostId);      
       this.updateFormWithActiveTab();
       
       console.log('Post loaded successfully for editing');
       
     } catch (error) {
       console.error('Error loading post for editing:', error);
-      this.errorMessage = 'Failed to load post for editing. Please try again.';
+      alert("Failed to load post for editing. Please try again.");
       throw error;
     }
   }
@@ -502,13 +493,9 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     
     const originalTab = this.languageTabs.find(tab => tab.isOriginal);
     if (!originalTab || !originalTab.content.trim() || !originalTab.title.trim()) {
-      this.errorMessage = 'Please fill in the original content before adding a translation.';
-      setTimeout(() => {
-        this.errorMessage = '';
-      }, 3000);
+      alert("Please fill in the original content before adding a translation.");
       return;
     }
-    
     const translationTab: PostLanguageTab = {
       language: language,
       title: '',
@@ -517,7 +504,6 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       isOriginal: false,
       isTranslating: true
     };
-    
     this.languageTabs.push(translationTab);
     this.activeTabIndex = this.languageTabs.length - 1;
     this.translateContent(originalTab, translationTab);
@@ -531,13 +517,10 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     if (!originalDelta || !originalDelta.ops) {
       return Promise.resolve(this.createEmptyDelta());
     }
-
     const translatedOps = [...originalDelta.ops];
     const translationPromises: Promise<void>[] = [];
-
     for (let i = 0; i < translatedOps.length; i++) {
       const op = { ...translatedOps[i] };
-      
       if (typeof op.insert === 'string') {
         if (this.isFormattingOnlyString(op.insert)) {
           translatedOps[i] = op;
@@ -576,7 +559,6 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
         translatedOps[i] = op;
       }
     }
-
     await Promise.all(translationPromises);
     return { ops: translatedOps };
   }
@@ -585,7 +567,6 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     targetTab.isTranslating = true;
     this.updateFormWithActiveTab();
     const targetLanguage = targetTab.language;
-
     const titleSub = this.translateService.translate(
       originalTab.title,
       this.defaultLanguage?.languagename ?? 'auto',
@@ -598,39 +579,33 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
           console.error('Error translating title:', error);
           targetTab.title = `[${targetLanguage?.languagename}] ${originalTab.title}`;
         }
-
         this.translateDeltaOps(originalTab.delta, targetLanguage).then((translatedDelta) => {
-          targetTab.delta = translatedDelta;
-          
+          targetTab.delta = translatedDelta;   
           if (this.quillEditor && this.quillEditor.quillEditor) {
             const currentContents = this.quillEditor.quillEditor.getContents();
             this.quillEditor.quillEditor.setContents(targetTab.delta);
             targetTab.content = this.quillEditor.quillEditor.root.innerHTML;
             this.quillEditor.quillEditor.setContents(currentContents);
           }
-
           targetTab.isTranslating = false;
           this.updateFormWithActiveTab();
         }).catch((error) => {
           console.error('Translation failed:', error);
           targetTab.isTranslating = false;
-          this.errorMessage = 'Translation failed. Please try again.';
+          alert('Translation failed. Please try again.');
         });
       },
       error: (error) => {
         console.error('Title translation error:', error);
         targetTab.title = `[${targetLanguage?.languagename}] ${originalTab.title}`;
-        
         this.translateDeltaOps(originalTab.delta, targetLanguage).then((translatedDelta) => {
-          targetTab.delta = translatedDelta;
-          
+          targetTab.delta = translatedDelta;  
           if (this.quillEditor && this.quillEditor.quillEditor) {
             const currentContents = this.quillEditor.quillEditor.getContents();
             this.quillEditor.quillEditor.setContents(targetTab.delta);
             targetTab.content = this.quillEditor.quillEditor.root.innerHTML;
             this.quillEditor.quillEditor.setContents(currentContents);
           }
-
           targetTab.isTranslating = false;
           this.updateFormWithActiveTab();
         });
@@ -681,7 +656,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
 
   submitBlog(): void {
     if (!isPlatformBrowser(this.platformId)) {
-      this.errorMessage = 'This feature is only available in the browser.';
+      // this.errorMessage = 'This feature is only available in the browser.';
       return;
     }
     
@@ -689,13 +664,13 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     
     const originalTab = this.languageTabs.find(tab => tab.isOriginal);
     if (!originalTab || !originalTab.title.trim() || !originalTab.content.trim()) {
-      this.errorMessage = 'Please fill in the original title and content.';
+      alert("Please fill in the original title and content.");
       return;
     }
 
     const hasTranslatingTabs = this.languageTabs.some(tab => tab.isTranslating);
     if (hasTranslatingTabs) {
-      this.errorMessage = 'Please wait for all translations to complete before submitting.';
+      alert("Please wait for all translations to complete before submitting.");
       return;
     }
 
@@ -747,7 +722,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     const sub = this.http[method](endpoint, payload, { withCredentials: true }).subscribe({
       next: (response) => {
         const action = this.isEditMode ? 'updated' : 'submitted';
-        this.successMessage = `Your blog "${payload.originalPost.title}" and its ${payload.translations.length} translation(s) were ${action} successfully! Redirecting...`;
+        alert(`Your blog "${payload.originalPost.title}" and its ${payload.translations.length} translation(s) were ${action} successfully! Redirecting...`);
         this.isLoading = false;
         setTimeout(() => {
           this.router.navigate(['/home']);
@@ -756,7 +731,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Submit error:', err);
         const action = this.isEditMode ? 'update' : 'submit';
-        this.errorMessage = `Failed to ${action} blog. Please try again.`;
+        alert(`Failed to ${action} blog. Please try again.`);
         this.isLoading = false;
       }
     });

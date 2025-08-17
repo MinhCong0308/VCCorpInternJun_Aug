@@ -79,13 +79,8 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     try {
-      // Reset everything first
       this.resetAllState();
-      
-      // Initialize form
-      this.initializeForm();
-      
-      // Load everything sequentially
+      this.initializeForm();      
       await this.initializeEverything();
       
     } catch (error) {
@@ -101,8 +96,6 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
     this.resetQuillEditor();
   }
-
-  // ============ INITIALIZATION METHODS ============
 
   resetAllState(): void {
     // Reset all component state
@@ -120,12 +113,9 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     this.languages = [];
     this.languageTabs = [];
     this.activeTabIndex = 0;
-    this.translations = [];
-    
-    // Clear subscriptions
+    this.translations = [];    
     this.subscriptions.forEach(sub => sub.unsubscribe());
     this.subscriptions = [];
-    
     console.log('All state reset successfully');
   }
 

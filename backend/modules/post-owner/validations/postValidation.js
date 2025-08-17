@@ -16,6 +16,11 @@ const postValidation = {
         new BodyWithLocale("originalPost.content").notEmpty(),
         new BodyWithLocale("originalPost.languageid").notEmpty(),
     ],
+    translatePost: [
+        new BodyWithLocale("text").notEmpty(),
+        new BodyWithLocale("sourceLanguage").notEmpty(),
+        new BodyWithLocale("targetLanguage").notEmpty()
+    ]
     // getSpecificPost: [
     //     new BodyWithLocale("postid").notEmpty().isNumberic()
     // ]

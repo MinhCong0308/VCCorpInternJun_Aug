@@ -30,8 +30,9 @@ const postsController = {
     updatePost: async (req, res) => {
         try {
             const userid = req.user.userid; // Get userid from authenticated user
-            const {postid, title, content, languageid, tags} = req.body;
-            const data = await postService.updatePost(postid, title, content, userid, languageid, tags);
+            console.log("Userid:", userid);
+            const {originalPost, translations, postid} = req.body;
+            const data = await postService.updatePost(originalPost, translations, userid, postid);
             return responseUtils.ok(res, data);
         } catch (error) {
             return responseUtils.error(res, error.message);
@@ -61,5 +62,26 @@ const postsController = {
             return responseUtils.error(res, error.message);
         }
     },
+    translatePost: async (req, res) => {    
+        try{
+            const userid = req.user.userid;
+            const { text, sourceLanguage, targetLanguage} = req.body;
+            const translatedText = await postService.translate(text, sourceLanguage, targetLanguage);
+            return responseUtils.ok(res, translatedText);
+        } catch (error) {
+            console.error("Error translating post:", error);
+            return responseUtils.error(res, error.message);
+        }
+    },
+    getTranslationForPost: async (req, res) => {
+        const { postid } = req.params;
+        try {
+            const data = await postService.getTranslationForPost(postid);
+            return responseUtils.ok(res, data);
+        } catch (error) {
+            console.error("Error retrieving translations for post:", error);
+            return responseUtils.error(res, error.message);
+        }
+    }
 };
 module.exports = postsController;

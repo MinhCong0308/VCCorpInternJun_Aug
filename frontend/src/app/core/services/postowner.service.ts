@@ -52,4 +52,16 @@ export class PostBlogOwnerService {
       })
     );
   }
+  getTranslationPost(postid: number): Observable<Post[]> {
+    return this.http.get<{data: {translations: Post[]}}>(
+      `${this.baseUrl}/get-translation-for-post/${postid}`,
+      { withCredentials: true }
+    ).pipe(
+      map(response => response.data.translations),
+      catchError(error => {
+        console.error('Error fetching translation posts:', error);
+        return throwError(() => new Error(error.message || 'Fetch translation posts error'));
+      })
+    );
+  }
 }

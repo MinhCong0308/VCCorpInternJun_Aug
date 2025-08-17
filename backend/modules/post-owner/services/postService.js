@@ -1,7 +1,8 @@
 const db = require("models/index");
 const config = require("configs/index");
 const { Op } = require("sequelize");
-
+const axios = require("axios");
+const language = require("models/language");
 const postService = {
     createPost: async (originalPost, translations, userid) => {
         try {
@@ -53,26 +54,56 @@ const postService = {
         await post.destroy();
         return { message: "Post deleted successfully" };
     },
-    updatePost: async (postid, title, content, userid, languageid, tags) => {
-        const post = await db.Post.findByPk(postid);
-        if (!post) {
-            throw new Error("Post not found");
+    updatePost: async (originalPost, translations, userid, postid) => {
+        try {
+            const post = await db.Post.findByPk(postid);
+            console.log("Updating post with ID:", postid, "for user ID:", userid);
+            if (!post) {
+                throw new Error("Post not found");
+            }
+            if (post.userid !== userid) {
+                throw new Error("You are not authorized to update this post");
+            }
+            if (post.status !== config.config.statuspostenum.PENDING) {
+                throw new Error("Only pending posts can be updated");
+            }
+            post.title = originalPost.title;
+            post.content = originalPost.content;
+            post.languageid = originalPost.languageid;
+            await post.save();
+            await postService.setTagsForPost(post.postid, originalPost.tags);
+            // Update translations
+            if (translations && translations.length > 0) {
+                for (const translation of translations) {
+                    const trans = await db.Post.findOne({ where: { original_postid: postid, languageid: translation.languageid } });
+                    if (trans) {
+                        trans.title = translation.title;
+                        trans.content = translation.content;
+                        trans.languageid = translation.languageid;
+                        await trans.save();
+                        await postService.setTagsForPost(trans.postid, translation.tags);
+                    }
+                    else {
+                        // create new trans
+                        const newTrans = await db.Post.create({
+                            userid,
+                            languageid: translation.languageid,
+                            title: translation.title,
+                            content: translation.content,
+                            status: config.config.statuspostenum.PENDING,
+                            original_postid: postid
+                        });
+                        await postService.setTagsForPost(newTrans.postid, translation.tags);
+                    }
+                }
+            }
+            return { message: "Post updated successfully", post };
+        } catch (error) {
+            console.error("Error updating post:", error);
+            throw new Error("Error updating post");
         }
-        if (post.userid !== userid) {
-            throw new Error("You are not authorized to update this post");
-        }
-        if (post.status !== config.config.statuspostenum.PENDING) {
-            throw new Error("Only pending posts can be updated");
-        }
-        post.title = title;
-        post.content = content;
-        post.languageid = languageid;
-        await post.save();
-        await postService.setTagsForPost(postid, tags);
-        return { message: "Post updated successfully", post };
     },
     getAllPosts: async (userid) => {
-        // I mean that only get original post of user, that has postid == original_postid.
         try {
             const posts = await db.Post.findAll({
                 where: { userid: userid,
@@ -137,7 +168,22 @@ const postService = {
                 through: { attributes: [] } 
             }]
         });
-        // get translations
+        if (!post) {
+            throw new Error("Post not found or you are not authorized to view this post");
+        }
+        return {
+            post: {
+                postid: post.postid,
+                title: post.title,
+                content: post.content,
+                languageid: post.languageid,
+                tags: post.Categories.map(category => category.categoryname),
+                status: config.config.StatusNameById[post.status],
+                createdAt: post.createdAt
+            }
+        };
+    },
+    getTranslationForPost: async (postid) => {
         const translations = await db.Post.findAll({
             where: {
                 original_postid: postid
@@ -148,21 +194,9 @@ const postService = {
                 through: { attributes: [] }
             }]
         });
-        // filter translations without original post
-        const filteredTranslations = translations.filter(translation => translation.postid !== postid); // get only translations, not original post
-        if (!post) {
-            throw new Error("Post not found or you are not authorized to view this post");
-        }
+        const filteredTranslations = translations.filter(translation => translation.postid !== translation.original_postid); // get only translations, not original post
+        console.log("Filtered Translations:", filteredTranslations);
         return {
-            originalPost: {
-                postid: post.postid,
-                title: post.title,
-                content: post.content,
-                languageid: post.languageid,
-                tags: post.Categories.map(category => category.categoryname),
-                status: config.config.StatusNameById[post.status],
-                createdAt: post.createdAt,
-            },
             translations: filteredTranslations.map(translation => ({
                 postid: translation.postid,
                 title: translation.title,
@@ -170,9 +204,39 @@ const postService = {
                 languageid: translation.languageid,
                 tags: translation.Categories.map(category => category.categoryname),
                 status: config.config.StatusNameById[translation.status],
-                createdAt: translation.createdAt,
+                createdAt: translation.createdAt
             }))
         };
+    },
+    translate: async (text, sourceLanguage, targetLanguage) => {
+        const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+        const apiKey = process.env.GOOGLE_API_KEY;
+        const prompt = sourceLanguage === 'auto' 
+            ? `Translate the following text to ${targetLanguage}: ${text}. Just the translation, no explanations.` 
+            : `Translate the following text from ${sourceLanguage} to ${targetLanguage}: ${text}. Just the translation, no explanations.`;
+        const payload = {
+            contents: [
+                {
+                    parts: [
+                        {
+                            text: prompt
+                        }
+                    ]
+                }
+            ]
+        };
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-goog-api-key': apiKey
+        };
+        try {
+            const response = await axios.post(url, payload, { headers });
+            const translatedText = response.data.candidates[0].content.parts[0].text;
+            return translatedText.trim();
+        } catch(error) {
+            console.error("Error translating text:", error);
+            throw new Error("Error translating text");
+        }
     }
 };
 

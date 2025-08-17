@@ -116,6 +116,11 @@ router.group(
       "/get-specific-post/:postid",
       postController.getSpecificPost
     );
+    router.get(
+      "/get-translation-for-post/:postid",
+      postController.getTranslationForPost
+    );
+    router.post("/translate", validate([postValidation.translatePost]), postController.translatePost);
   }
 );
 

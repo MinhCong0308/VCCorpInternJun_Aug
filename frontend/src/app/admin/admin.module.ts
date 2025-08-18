@@ -4,6 +4,7 @@ import { AdminRoutingModule } from './admin-routing.module';
 import { AdminLayoutComponent } from '../layouts/admin-layout/admin-layout.component';
 import { CategoryComponent } from './category/category.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { LanguageComponent } from './language/language.component';
 
 @NgModule({
   imports: [
@@ -12,6 +13,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     AdminLayoutComponent,
     CategoryComponent,
     DashboardComponent,
+    LanguageComponent,
   ],
 })
 export class AdminModule {}

@@ -58,13 +58,20 @@ const languageController = {
       return responseUtils.error(res, error.message);
     }
   },
-  delete: async (req, res) => {
+  enable: async (req, res) => {
     try {
       const { languageId } = req.params;
-      await languageService.deleteLanguage(languageId);
-      return responseUtils.ok(res, {
-        message: "Language deleted successfully",
-      });
+      const updated = await languageService.enableLanguage(languageId);
+      return responseUtils.ok(res, updated);
+    } catch (error) {
+      return responseUtils.error(res, error.message);
+    }
+  },
+  disable: async (req, res) => {
+    try {
+      const { languageId } = req.params;
+      const updated = await languageService.disableLanguage(languageId);
+      return responseUtils.ok(res, updated);
     } catch (error) {
       return responseUtils.error(res, error.message);
     }

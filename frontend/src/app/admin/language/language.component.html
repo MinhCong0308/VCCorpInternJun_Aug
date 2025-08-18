@@ -1,0 +1,326 @@
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Manage Languages</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item">
+            <a routerLink="/admin/dashboard">Home</a>
+          </li>
+          <li class="breadcrumb-item active">Languages</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card card-default">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-search"></i>
+          Search
+        </h3>
+      </div>
+      <div class="card-body">
+        <form (submit)="onSearch($event, kw.value)">
+          <div class="row">
+            <!-- Search by Keyword -->
+            <div class="col-md-10">
+              <div class="form-group">
+                <input
+                  type="text"
+                  #kw
+                  [value]="keyword || ''"
+                  class="form-control"
+                  placeholder="Search by name or locale code..."
+                />
+              </div>
+            </div>
+            <!-- Submit Button -->
+            <div class="col-md-2">
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block">
+                  <i class="fas fa-search"></i> Search
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Language Table -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Language List</h3>
+        <div class="card-tools">
+          <a
+            href="#"
+            class="btn btn-primary"
+            (click)="$event.preventDefault(); openAddModal()"
+          >
+            <i class="fas fa-plus-circle mr-1"></i>
+            Add New Language
+          </a>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-striped" id="language-table">
+          <thead>
+            <tr>
+              <th style="width: 60px">#</th>
+              <th>Name</th>
+              <th style="width: 80">Locale Code</th>
+              <th style="width: 150px; text-align: center">Flag</th>
+              <th style="width: 150px; text-align: center">Status</th>
+              <th style="width: 120px; text-align: center">Default</th>
+              <th style="width: 150px; text-align: center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let lang of languages; let i = index">
+              <td>{{ (currentPage - 1) * 5 + i + 1 }}.</td>
+              <td>{{ lang.languagename }}</td>
+              <td>{{ lang.locale_code }}</td>
+              <td style="text-align: center">
+                <img
+                  [src]="flagUrl(lang.flag_image)"
+                  [alt]="lang.languagename + ' Flag'"
+                  style="width: 40px; height: auto"
+                />
+              </td>
+              <td style="text-align: center" class="lang-status">
+                <span
+                  class="badge"
+                  [ngClass]="lang.status ? 'badge-success' : 'badge-secondary'"
+                  >{{ lang.status ? "Active" : "Inactive" }}</span
+                >
+              </td>
+              <td style="text-align: center">
+                <span *ngIf="lang.is_default" class="badge badge-primary"
+                  ><i class="fas fa-star"></i> Default</span
+                >
+              </td>
+              <td style="text-align: center">
+                <a
+                  href="#"
+                  class="btn btn-sm btn-primary"
+                  title="Edit"
+                  (click)="$event.preventDefault(); onEdit(lang)"
+                >
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a
+                  href="#"
+                  class="btn btn-sm"
+                  [ngClass]="lang.status ? 'btn-danger' : 'btn-success'"
+                  (click)="$event.preventDefault(); onToggleStatus(lang)"
+                  [attr.title]="lang.status ? 'Disable' : 'Enable'"
+                >
+                  <i
+                    class="fas"
+                    [ngClass]="lang.status ? 'fa-ban' : 'fa-check'"
+                  ></i>
+                </a>
+              </td>
+            </tr>
+            <tr *ngIf="languages.length === 0">
+              <td colspan="7" class="text-center text-muted p-3">
+                No languages found
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer clearfix">
+        <ul class="pagination pagination-sm m-0 float-right">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" (click)="onPageChange(currentPage - 1)">«</a>
+          </li>
+          <li
+            class="page-item"
+            *ngFor="let p of getPagesArray()"
+            [class.active]="p === currentPage"
+          >
+            <a class="page-link" (click)="onPageChange(p)">{{ p }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a class="page-link" (click)="onPageChange(currentPage + 1)">»</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Add Language Modal -->
+<div
+  class="modal fade"
+  id="addLanguageModal"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Language</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="languageForm" (ngSubmit)="onSubmitAdd()">
+          <div class="form-group">
+            <label>Name</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="languagename"
+            />
+          </div>
+          <div class="form-group">
+            <label>Locale code</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="locale_code"
+            />
+          </div>
+          <div class="form-group">
+            <label>Flag image (required)</label>
+            <input
+              type="file"
+              class="form-control-file"
+              (change)="onFileChange($event)"
+              accept="image/*"
+            />
+          </div>
+          <div class="form-check">
+            <input
+              id="langStatusAdd"
+              type="checkbox"
+              class="form-check-input"
+              formControlName="status"
+            />
+            <label for="langStatusAdd" class="form-check-label">Active</label>
+          </div>
+          <div class="form-check">
+            <input
+              id="langDefaultAdd"
+              type="checkbox"
+              class="form-check-input"
+              formControlName="is_default"
+            />
+            <label for="langDefaultAdd" class="form-check-label">Default</label>
+          </div>
+        </form>
+        <div *ngIf="errorMsg" class="alert alert-danger mt-2">
+          {{ errorMsg }}
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          Close
+        </button>
+        <button type="button" class="btn btn-primary" (click)="onSubmitAdd()">
+          Save changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Language Modal -->
+<div
+  class="modal fade"
+  id="editLanguageModal"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Language</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="languageForm" (ngSubmit)="onSubmitEdit()">
+          <div class="form-group">
+            <label>Name</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="languagename"
+            />
+          </div>
+          <div class="form-group">
+            <label>Locale code</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="locale_code"
+            />
+          </div>
+          <div class="form-group">
+            <label>Flag image (optional)</label>
+            <input
+              type="file"
+              class="form-control-file"
+              (change)="onFileChange($event)"
+              accept="image/*"
+            />
+          </div>
+          <div class="form-check">
+            <input
+              id="langStatusEdit"
+              type="checkbox"
+              class="form-check-input"
+              formControlName="status"
+            />
+            <label for="langStatusEdit" class="form-check-label">Active</label>
+          </div>
+          <div class="form-check">
+            <input
+              id="langDefaultEdit"
+              type="checkbox"
+              class="form-check-input"
+              formControlName="is_default"
+            />
+            <label for="langDefaultEdit" class="form-check-label"
+              >Default</label
+            >
+          </div>
+        </form>
+        <div *ngIf="errorMsg" class="alert alert-danger mt-2">
+          {{ errorMsg }}
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          Close
+        </button>
+        <button type="button" class="btn btn-primary" (click)="onSubmitEdit()">
+          Save changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

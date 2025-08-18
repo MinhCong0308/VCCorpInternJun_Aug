@@ -59,7 +59,11 @@ router.group("/auth", (router) => {
     validate([authValidation.verifyOTP]),
     authController.verifyOTP
   );
-  router.get("/me", middlewares([authenticated]), authController.getSessionInfo);
+  router.get(
+    "/me",
+    middlewares([authenticated]),
+    authController.getSessionInfo
+  );
   router.post("/logout", middlewares([authenticated]), authController.logout);
   router.post("/refresh", manageTokenController.refreshToken);
   router.group("/oauth", (router) => {
@@ -102,74 +106,78 @@ router.group(
       validate([postValidation.createPost]),
       postController.createPost
     );
-    router.delete(
-      "/delete-post/:postid",
-      postController.deletePost
-    );
+    router.delete("/delete-post/:postid", postController.deletePost);
     router.put(
       "/update-post",
       validate([postValidation.updatePost]),
       postController.updatePost
     );
     router.get("/get-all-posts", postController.getAllPosts);
-    router.get(
-      "/get-specific-post/:postid",
-      postController.getSpecificPost
-    );
+    router.get("/get-specific-post/:postid", postController.getSpecificPost);
     router.get(
       "/get-translation-for-post/:postid",
       postController.getTranslationForPost
     );
-    router.post("/translate", validate([postValidation.translatePost]), postController.translatePost);
+    router.post(
+      "/translate",
+      validate([postValidation.translatePost]),
+      postController.translatePost
+    );
   }
 );
 
 // ===== CATEGORY =====
-router.group(
-  "/categories",
-  (router) => {
-    router.get("/", categoryController.getAll);
-    router.get("/list-all", categoryController.getAllNoPaging);
-    router.post(
-      "/",
-      middlewares([authenticated, checkRole(["admin"])]),
-      validate([categoryValidation.create]),
-      categoryController.create
-    );
-    router.put(
-      "/:categoryId",
-      middlewares([authenticated, checkRole(["admin"])]),
-      validate([categoryValidation.update]),
-      categoryController.update
-    );
-    router.delete("/:categoryId", middlewares([authenticated, checkRole(["admin"])]), categoryController.delete);
-  }
-);
+router.group("/categories", (router) => {
+  router.get("/", categoryController.getAll);
+  router.get("/list-all", categoryController.getAllNoPaging);
+  router.post(
+    "/",
+    middlewares([authenticated, checkRole(["admin"])]),
+    validate([categoryValidation.create]),
+    categoryController.create
+  );
+  router.put(
+    "/:categoryId",
+    middlewares([authenticated, checkRole(["admin"])]),
+    validate([categoryValidation.update]),
+    categoryController.update
+  );
+  router.delete(
+    "/:categoryId",
+    middlewares([authenticated, checkRole(["admin"])]),
+    categoryController.delete
+  );
+});
 
-router.group(
-  "/languages",
-  (router) => {
-    router.get("/", languageController.getAll);
-    router.post(
-      "/",
-      middlewares([authenticated, checkRole(["admin"])]),
-      uploads.single("flag_image"),
-      validate([languageValidation.create]),
-      languageController.create
-    );
-    router.put(
-      "/:languageId",
-      middlewares([authenticated, checkRole(["admin"])]),
-      uploads.single("flag_image"),
-      validate([languageValidation.update]),
-      languageController.update
-    );
-    router.delete("/:languageId", middlewares([authenticated, checkRole(["admin"])]), languageController.delete);
-  }
-);
+router.group("/languages", (router) => {
+  router.get("/", languageController.getAll);
+  router.post(
+    "/",
+    middlewares([authenticated, checkRole(["admin"])]),
+    uploads.single("flag_image"),
+    validate([languageValidation.create]),
+    languageController.create
+  );
+  router.put(
+    "/:languageId",
+    middlewares([authenticated, checkRole(["admin"])]),
+    uploads.single("flag_image"),
+    validate([languageValidation.update]),
+    languageController.update
+  );
+  router.put(
+    "/:languageId/disable",
+    middlewares([authenticated, checkRole(["admin"])]),
+    languageController.disable
+  );
+  router.put(
+    "/:languageId/enable",
+    middlewares([authenticated, checkRole(["admin"])]),
+    languageController.enable
+  );
+});
 
 router.group("/comments", (router) => {
-
   router.get("/", commentController.getAll);
   router.post(
     "/",
@@ -201,8 +209,16 @@ router.group("/posts", (router) => {
   router.get("/", postsController.getPublishedPosts);
   router.get("/trending", postsController.getPublishedPostsTrending);
   router.get("/:postId", postsController.getPublishedPostDetail);
-  router.put("/:postId/like", middlewares([authenticated, checkRole(["user"])]), postsController.likePost);
-  router.put("/:postId/unlike", middlewares([authenticated, checkRole(["user"])]), postsController.unlikePost);
+  router.put(
+    "/:postId/like",
+    middlewares([authenticated, checkRole(["user"])]),
+    postsController.likePost
+  );
+  router.put(
+    "/:postId/unlike",
+    middlewares([authenticated, checkRole(["user"])]),
+    postsController.unlikePost
+  );
 });
 
 router.group(

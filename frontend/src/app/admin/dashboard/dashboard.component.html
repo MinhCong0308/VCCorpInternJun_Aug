@@ -83,16 +83,12 @@
           <div class="card-body p-0" *ngIf="latestPosts?.length; else noPosts">
             <ul class="products-list product-list-in-card pl-2 pr-2">
               <li class="item" *ngFor="let p of latestPosts">
-                <div class="product-img">
-                  <img
-                    src="/assets/img/logo.png"
-                    alt="Post Image"
-                    class="img-size-50"
-                  />
-                </div>
                 <div class="product-info">
                   <a class="product-title">{{ p.title }}</a>
-                  <span class="product-description">
+                  <span class="product-snippet line-clamp-2">{{
+                    snippet(p)
+                  }}</span>
+                  <span class="product-description text-muted d-block mt-1">
                     by {{ p.author?.username || "Unknown" }} •
                     {{ p.createdAt | date : "medium" }}
                   </span>

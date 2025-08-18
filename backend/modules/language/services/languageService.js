@@ -15,7 +15,7 @@ const languageService = {
       options.where = Sequelize.literal(
         `MATCH(languagename) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`
       );
-    };
+    }
     if (status) {
       options.where = { ...options.where, status };
     }
@@ -36,17 +36,24 @@ const languageService = {
   updateLanguage: async (languageId, languageData) => {
     const language = await db.Language.findByPk(languageId);
     try {
-        return await language.update(languageData);
+      return await language.update(languageData);
     } catch (error) {
       throw new Error("Failed to update language: " + error.message);
     }
   },
-  deleteLanguage: async (languageId) => {
+  enableLanguage: async (languageId) => {
     const language = await db.Language.findByPk(languageId);
     if (!language) {
       throw new Error("Language not found");
     }
-    await language.destroy();
+    return await language.update({ status: 1 });
+  },
+  disableLanguage: async (languageId) => {
+    const language = await db.Language.findByPk(languageId);
+    if (!language) {
+      throw new Error("Language not found");
+    }
+    return await language.update({ status: 0 });
   },
 };
 

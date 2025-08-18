@@ -1,0 +1,7 @@
+/* Basic spacing for actions */
+.table td {
+  vertical-align: middle;
+}
+.modal .form-group {
+  margin-bottom: 12px;
+}

@@ -60,4 +60,15 @@ export class DashboardComponent implements OnInit {
     const path = avatar.startsWith('/') ? avatar : `/${avatar}`;
     return `${this.apiBase}${path}`;
   }
+
+  // Create a readable snippet from post content, strip HTML, limit length
+  snippet(p: DashboardPost, maxLen = 220): string {
+    const raw = (p?.content || '').toString();
+    const text = raw
+      .replace(/<[^>]+>/g, ' ') // strip HTML tags
+      .replace(/\s+/g, ' ') // collapse whitespace
+      .trim();
+    if (text.length <= maxLen) return text;
+    return text.slice(0, maxLen).trimEnd() + '…';
+  }
 }

@@ -15,7 +15,7 @@ const dashboardService = {
       db.Category.count(),
       db.Language.count(),
       db.User.findAll({
-        limit: 5,
+        limit: 12,
         order: [["createdAt", "DESC"]],
         attributes: [
           "userid",

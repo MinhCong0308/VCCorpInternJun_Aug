@@ -7,7 +7,9 @@
       </div>
       <div class="col-sm-6">
         <ol class="breadcrumb float-sm-right">
-          <li class="breadcrumb-item"><a href="#">Home</a></li>
+          <li class="breadcrumb-item">
+            <a routerLink="/admin/dashboard">Home</a>
+          </li>
           <li class="breadcrumb-item active">Posts</li>
         </ol>
       </div>
@@ -27,7 +29,7 @@
       </div>
       <!-- /.card-header -->
       <div class="card-body">
-        <form action="" method="GET">
+        <form (submit)="onSearch($event, kw.value)">
           <div class="row">
             <!-- Search by Keyword -->
             <div class="col-md-5">
@@ -35,7 +37,8 @@
                 <label>Search by Title:</label>
                 <input
                   type="text"
-                  name="keyword"
+                  #kw
+                  [value]="keyword || ''"
                   class="form-control"
                   placeholder="Enter post title..."
                 />
@@ -46,13 +49,15 @@
             <div class="col-md-5">
               <div class="form-group">
                 <label>Category:</label>
-                <select name="category" class="form-control">
+                <select
+                  class="form-control"
+                  [value]="categoryId || ''"
+                  (change)="onCategoryChange($event)"
+                >
                   <option value="">-- All Categories --</option>
-                  <!-- Ví dụ dữ liệu, bạn sẽ load từ DB vào đây -->
-                  <option value="1">Technology</option>
-                  <option value="2">Lifestyle</option>
-                  <option value="3">Backend</option>
-                  <option value="4">Frontend</option>
+                  <option *ngFor="let c of categories" [value]="c.categoryid">
+                    {{ c.categoryname }}
+                  </option>
                 </select>
               </div>
             </div>
@@ -94,13 +99,15 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>1.</td>
-                  <td>10 CSS Tricks You Need to Know</td>
-                  <td>Alex Mount</td>
-                  <td>English</td>
+                <tr *ngFor="let p of posts; let i = index">
+                  <td>{{ (currentPage - 1) * 5 + i + 1 }}.</td>
+                  <td>{{ p.title }}</td>
+                  <td>{{ authorName(p) }}</td>
+                  <td>{{ languageName(p) }}</td>
                   <td style="text-align: center">
-                    <span class="badge bg-warning">Draft</span>
+                    <span class="badge" [ngClass]="statusBadge(p).cls">{{
+                      statusBadge(p).text
+                    }}</span>
                   </td>
                   <td style="text-align: center">
                     <a
@@ -108,144 +115,34 @@
                       class="btn btn-sm btn-primary"
                       data-toggle="tooltip"
                       title="View"
+                      (click)="$event.preventDefault()"
                       ><i class="fas fa-eye"></i
                     ></a>
                     <a
+                      *ngIf="p.status === 1"
                       href="#"
                       class="btn btn-sm btn-success"
                       data-toggle="tooltip"
-                      title="Approve"
+                      title="Publish"
+                      (click)="$event.preventDefault(); onApprove(p)"
                     >
                       <i class="fas fa-check-circle"></i>
                     </a>
                     <a
+                      *ngIf="p.status === 1 || p.status === 2"
                       href="#"
                       class="btn btn-sm btn-danger"
                       data-toggle="tooltip"
                       title="Reject"
+                      (click)="$event.preventDefault(); onReject(p)"
                     >
                       <i class="fas fa-ban"></i>
                     </a>
                   </td>
                 </tr>
-                <tr>
-                  <td>2.</td>
-                  <td>Understanding JavaScript Closures</td>
-                  <td>Jane Boss</td>
-                  <td>English</td>
-                  <td style="text-align: center">
-                    <span class="badge bg-warning">Draft</span>
-                  </td>
-                  <td style="text-align: center">
-                    <a
-                      href="#"
-                      class="btn btn-sm btn-primary"
-                      data-toggle="tooltip"
-                      title="View"
-                      ><i class="fas fa-eye"></i
-                    ></a>
-                    <a
-                      href="#"
-                      class="btn btn-sm btn-success"
-                      data-toggle="tooltip"
-                      title="Approve"
-                    >
-                      <i class="fas fa-check-circle"></i>
-                    </a>
-                    <a
-                      href="#"
-                      class="btn btn-sm btn-danger"
-                      data-toggle="tooltip"
-                      title="Reject"
-                    >
-                      <i class="fas fa-ban"></i>
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>3.</td>
-                  <td>Node.js Streams Explained</td>
-                  <td>John Hart</td>
-                  <td>English</td>
-                  <td style="text-align: center">
-                    <span class="badge bg-warning">Draft</span>
-                  </td>
-                  <td style="text-align: center">
-                    <a
-                      href="#"
-                      class="btn btn-sm btn-primary"
-                      data-toggle="tooltip"
-                      title="View"
-                      ><i class="fas fa-eye"></i
-                    ></a>
-                    <a
-                      href="#"
-                      class="btn btn-sm btn-success"
-                      data-toggle="tooltip"
-                      title="Approve"
-                    >
-                      <i class="fas fa-check-circle"></i>
-                    </a>
-                    <a
-                      href="#"
-                      class="btn btn-sm btn-danger"
-                      data-toggle="tooltip"
-                      title="Reject"
-                    >
-                      <i class="fas fa-ban"></i>
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>4.</td>
-                  <td>The Ultimate Guide to React Hooks</td>
-                  <td>Jan Doe</td>
-                  <td>English</td>
-                  <td style="text-align: center">
-                    <span class="badge bg-success">Published</span>
-                  </td>
-                  <td style="text-align: center">
-                    <a
-                      href="#"
-                      class="btn btn-sm btn-primary"
-                      data-toggle="tooltip"
-                      title="View"
-                      ><i class="fas fa-eye"></i
-                    ></a>
-                    <a
-                      href="#"
-                      class="btn btn-sm btn-danger"
-                      data-toggle="tooltip"
-                      title="Unpublish"
-                    >
-                      <i class="fas fa-ban"></i>
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>5.</td>
-                  <td>Getting Started with Docker</td>
-                  <td>Ohn Hon</td>
-                  <td>English</td>
-                  <td style="text-align: center">
-                    <span class="badge bg-success">Published</span>
-                  </td>
-                  <td style="text-align: center">
-                    <a
-                      href="#"
-                      class="btn btn-sm btn-primary"
-                      data-toggle="tooltip"
-                      title="View"
-                      ><i class="fas fa-eye"></i
-                    ></a>
-                    <a
-                      href="#"
-                      class="btn btn-sm btn-danger"
-                      data-toggle="tooltip"
-                      title="Unpublish"
-                    >
-                      <i class="fas fa-ban"></i>
-                    </a>
+                <tr *ngIf="posts.length === 0">
+                  <td colspan="6" class="text-center text-muted p-3">
+                    No posts found
                   </td>
                 </tr>
               </tbody>
@@ -254,13 +151,26 @@
           <!-- /.card-body -->
           <div class="card-footer clearfix">
             <ul class="pagination pagination-sm m-0 float-right">
-              <li class="page-item"><a class="page-link" href="#">«</a></li>
-              <li class="page-item active">
-                <a class="page-link" href="#">1</a>
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <a class="page-link" (click)="onPageChange(currentPage - 1)"
+                  >«</a
+                >
               </li>
-              <li class="page-item"><a class="page-link" href="#">2</a></li>
-              <li class="page-item"><a class="page-link" href="#">3</a></li>
-              <li class="page-item"><a class="page-link" href="#">»</a></li>
+              <li
+                class="page-item"
+                *ngFor="let p of getPagesArray()"
+                [class.active]="p === currentPage"
+              >
+                <a class="page-link" (click)="onPageChange(p)">{{ p }}</a>
+              </li>
+              <li
+                class="page-item"
+                [class.disabled]="currentPage === totalPages"
+              >
+                <a class="page-link" (click)="onPageChange(currentPage + 1)"
+                  >»</a
+                >
+              </li>
             </ul>
           </div>
         </div>

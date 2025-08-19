@@ -238,6 +238,7 @@ router.group(
       validate([userValidation.update]),
       userController.update
     );
+    router.put("/:userid/change-role", userController.changeRole);
     router.put("/:userid/disable", userController.disable);
     router.put("/:userid/enable", userController.enable);
   }

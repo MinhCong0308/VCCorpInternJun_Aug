@@ -1,5 +1,5 @@
 const db = require("models/index");
-const { Sequelize } = require("sequelize");
+const { Op } = require("sequelize");
 const bcrypt = require("bcryptjs");
 const config = require("configs/index");
 const userService = {
@@ -13,9 +13,20 @@ const userService = {
     };
 
     if (search && search.trim() !== "") {
-      options.where = Sequelize.literal(
-        `MATCH(firstname, lastname, username, email) AGAINST('${search.trim()}' IN NATURAL LANGUAGE MODE)`
-      );
+      const q = search.trim();
+      const qLower = q.toLowerCase();
+      // Escape LIKE wildcards in user input
+      const escapeLike = (s) => s.replace(/[\\%_]/g, "\\$&");
+      const likePattern = `%${escapeLike(qLower)}%`;
+      const lower = (col) => db.sequelize.fn("LOWER", db.sequelize.col(col));
+
+      // Full-text (contains) search only on username and email
+      options.where = {
+        [Op.or]: [
+          db.sequelize.where(lower("username"), { [Op.like]: likePattern }),
+          db.sequelize.where(lower("email"), { [Op.like]: likePattern }),
+        ],
+      };
     }
 
     const { count, rows } = await db.User.findAndCountAll(options);
@@ -33,10 +44,19 @@ const userService = {
     return await db.User.create(userData);
   },
   updateUser: async (userid, userData) => {
-    const hashPassWord = await bcrypt.hash(userData.hashed_password, 10);
-    userData.hashed_password = hashPassWord;
+    if (userData.hashed_password) {
+      const hashPassWord = await bcrypt.hash(userData.hashed_password, 10);
+      userData.hashed_password = hashPassWord;
+    } else {
+      delete userData.hashed_password;
+    }
     const user = await db.User.findByPk(userid);
     return user.update(userData);
+  },
+  updateUserRole: async (userid, roleid) => {
+    const user = await db.User.findByPk(userid);
+    if (!user) throw new Error("User not found");
+    return await user.update({ roleid });
   },
   disableUser: async (userid) => {
     const user = await db.User.findByPk(userid);

@@ -1,0 +1,280 @@
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Manage Users</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item">
+            <a routerLink="/admin/dashboard">Home</a>
+          </li>
+          <li class="breadcrumb-item active">Users</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main content -->
+<section class="content">
+  <div class="container-fluid">
+    <div class="card card-default">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-search"></i>
+          Search
+        </h3>
+      </div>
+      <div class="card-body">
+        <form (submit)="onSearch($event, kw.value)">
+          <div class="row">
+            <!-- Search by Keyword -->
+            <div class="col-md-10">
+              <div class="form-group">
+                <input
+                  type="text"
+                  #kw
+                  [value]="keyword || ''"
+                  class="form-control"
+                  placeholder="Enter username or email..."
+                />
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="col-md-2">
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block">
+                  <i class="fas fa-search"></i> Search
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- /.card -->
+
+    <div class="row">
+      <div class="col-12">
+        <!-- Bảng quản lý Users với các nút hành động -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">User List</h3>
+            <!-- Add New User  -->
+            <div class="card-tools">
+              <a
+                href="#"
+                class="btn btn-primary"
+                data-toggle="modal"
+                data-target="#addUserModal"
+              >
+                <i class="fas fa-plus-circle mr-1"></i>
+                Add New User
+              </a>
+            </div>
+          </div>
+          <!-- /.card-header -->
+          <div class="card-body p-0">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th style="width: 60px">#</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th style="width: 150px; text-align: center">Avatar</th>
+
+                  <th style="width: 150px; text-align: center">Status</th>
+
+                  <th style="width: 150px; text-align: center">Role</th>
+                  <th style="width: 150px; text-align: center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let u of users; let i = index">
+                  <td>{{ (currentPage - 1) * 5 + i + 1 }}.</td>
+                  <td>{{ u.username }}</td>
+                  <td>{{ u.email }}</td>
+                  <td style="text-align: center">
+                    <img
+                      [src]="avatarUrl(u.avatar)"
+                      alt="avt"
+                      style="width: 40px; height: 40px; object-fit: cover"
+                    />
+                  </td>
+                  <td style="text-align: center">
+                    <span
+                      class="badge"
+                      [ngClass]="u.status === 1 ? 'bg-success' : 'bg-danger'"
+                    >
+                      {{ u.status === 1 ? "Active" : "Disabled" }}
+                    </span>
+                  </td>
+                  <td style="text-align: center">
+                    <span
+                      class="badge"
+                      [ngClass]="u.roleid === 2 ? 'bg-primary' : 'bg-secondary'"
+                    >
+                      {{ u.roleid === 2 ? "Admin" : "User" }}
+                    </span>
+                  </td>
+                  <td style="text-align: center">
+                    <a
+                      href="#"
+                      class="btn btn-sm mr-1"
+                      [ngClass]="
+                        u.roleid === 2 ? 'btn-secondary' : 'btn-success'
+                      "
+                      title="Change Role"
+                      (click)="$event.preventDefault(); onChangeRole(u)"
+                    >
+                      <i class="fas fa-user"></i>
+                    </a>
+                    <a
+                      href="#"
+                      class="btn btn-sm"
+                      [ngClass]="u.status === 1 ? 'btn-danger' : 'btn-success'"
+                      (click)="$event.preventDefault(); onToggleStatus(u)"
+                      [attr.title]="
+                        u.status === 1 ? 'Disable User' : 'Enable User'
+                      "
+                    >
+                      <i
+                        class="fas"
+                        [ngClass]="u.status === 1 ? 'fa-ban' : 'fa-check'"
+                      ></i>
+                    </a>
+                  </td>
+                </tr>
+                <tr *ngIf="users.length === 0">
+                  <td colspan="7" class="text-center text-muted p-3">
+                    No users found
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- /.card-body -->
+          <div class="card-footer clearfix">
+            <ul class="pagination pagination-sm m-0 float-right">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <a class="page-link" (click)="onPageChange(currentPage - 1)"
+                  >«</a
+                >
+              </li>
+              <li
+                class="page-item"
+                *ngFor="let p of getPagesArray()"
+                [class.active]="p === currentPage"
+              >
+                <a class="page-link" (click)="onPageChange(p)">{{ p }}</a>
+              </li>
+              <li
+                class="page-item"
+                [class.disabled]="currentPage === totalPages"
+              >
+                <a class="page-link" (click)="onPageChange(currentPage + 1)"
+                  >»</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!-- /.card -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Add User Modal -->
+<div
+  class="modal fade"
+  id="addUserModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="addUserModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form
+        (submit)="onCreateUser($event)"
+        enctype="multipart/form-data"
+        autocomplete="off"
+      >
+        <div class="modal-body">
+          <div class="form-group">
+            <label>First name</label>
+            <input type="text" class="form-control" name="firstname" required />
+          </div>
+          <div class="form-group">
+            <label>Last name</label>
+            <input type="text" class="form-control" name="lastname" required />
+          </div>
+          <div class="form-group">
+            <label>Username</label>
+            <input
+              type="text"
+              class="form-control"
+              name="account_username"
+              required
+              autocomplete="off"
+              autocapitalize="none"
+              autocorrect="off"
+              spellcheck="false"
+            />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-control" name="email" required />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              class="form-control"
+              name="plain_password"
+              required
+              autocomplete="new-password"
+            />
+          </div>
+          <div class="form-group">
+            <label>Role</label>
+            <select class="form-control" name="roleid" required>
+              <option value="1">User</option>
+              <option value="2">Admin</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Avatar</label>
+            <input
+              type="file"
+              class="form-control-file"
+              name="avatar"
+              accept="image/*"
+              required
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -50,6 +50,20 @@ const userController = {
       return responseUtils.error(res, error.message);
     }
   },
+  changeRole: async (req, res) => {
+    try {
+      const { userid } = req.params;
+      const { roleid } = req.body;
+      const rid = Number(roleid);
+      if (rid !== 1 && rid !== 2) {
+        return responseUtils.badRequest(res, "Invalid role");
+      }
+      const updated = await userService.updateUserRole(userid, rid);
+      return responseUtils.ok(res, updated);
+    } catch (error) {
+      return responseUtils.error(res, error.message);
+    }
+  },
   disable: async (req, res) => {
     try {
       const { userid } = req.params;

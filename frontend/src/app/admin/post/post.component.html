@@ -1,0 +1,271 @@
+<!-- Content Header (Page header) -->
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Manage Posts</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="#">Home</a></li>
+          <li class="breadcrumb-item active">Posts</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main content -->
+<section class="content">
+  <div class="container-fluid">
+    <div class="card card-default">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-filter"></i>
+          Filters
+        </h3>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <form action="" method="GET">
+          <div class="row">
+            <!-- Search by Keyword -->
+            <div class="col-md-5">
+              <div class="form-group">
+                <label>Search by Title:</label>
+                <input
+                  type="text"
+                  name="keyword"
+                  class="form-control"
+                  placeholder="Enter post title..."
+                />
+              </div>
+            </div>
+
+            <!-- Filter by Category -->
+            <div class="col-md-5">
+              <div class="form-group">
+                <label>Category:</label>
+                <select name="category" class="form-control">
+                  <option value="">-- All Categories --</option>
+                  <!-- Ví dụ dữ liệu, bạn sẽ load từ DB vào đây -->
+                  <option value="1">Technology</option>
+                  <option value="2">Lifestyle</option>
+                  <option value="3">Backend</option>
+                  <option value="4">Frontend</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="col-md-2">
+              <div class="form-group">
+                <label> </label>
+                <!-- Giữ khoảng trống để căn chỉnh -->
+                <button type="submit" class="btn btn-primary btn-block">
+                  <i class="fas fa-search"></i> Search
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Post List</h3>
+          </div>
+          <!-- /.card-header -->
+          <div class="card-body p-0">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th style="width: 60px">#</th>
+                  <th>Post</th>
+                  <th>Author</th>
+                  <th>Language</th>
+                  <th style="width: 150px; text-align: center">Status</th>
+                  <th style="width: 150px; text-align: center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1.</td>
+                  <td>10 CSS Tricks You Need to Know</td>
+                  <td>Alex Mount</td>
+                  <td>English</td>
+                  <td style="text-align: center">
+                    <span class="badge bg-warning">Draft</span>
+                  </td>
+                  <td style="text-align: center">
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-primary"
+                      data-toggle="tooltip"
+                      title="View"
+                      ><i class="fas fa-eye"></i
+                    ></a>
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-success"
+                      data-toggle="tooltip"
+                      title="Approve"
+                    >
+                      <i class="fas fa-check-circle"></i>
+                    </a>
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-danger"
+                      data-toggle="tooltip"
+                      title="Reject"
+                    >
+                      <i class="fas fa-ban"></i>
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2.</td>
+                  <td>Understanding JavaScript Closures</td>
+                  <td>Jane Boss</td>
+                  <td>English</td>
+                  <td style="text-align: center">
+                    <span class="badge bg-warning">Draft</span>
+                  </td>
+                  <td style="text-align: center">
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-primary"
+                      data-toggle="tooltip"
+                      title="View"
+                      ><i class="fas fa-eye"></i
+                    ></a>
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-success"
+                      data-toggle="tooltip"
+                      title="Approve"
+                    >
+                      <i class="fas fa-check-circle"></i>
+                    </a>
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-danger"
+                      data-toggle="tooltip"
+                      title="Reject"
+                    >
+                      <i class="fas fa-ban"></i>
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>3.</td>
+                  <td>Node.js Streams Explained</td>
+                  <td>John Hart</td>
+                  <td>English</td>
+                  <td style="text-align: center">
+                    <span class="badge bg-warning">Draft</span>
+                  </td>
+                  <td style="text-align: center">
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-primary"
+                      data-toggle="tooltip"
+                      title="View"
+                      ><i class="fas fa-eye"></i
+                    ></a>
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-success"
+                      data-toggle="tooltip"
+                      title="Approve"
+                    >
+                      <i class="fas fa-check-circle"></i>
+                    </a>
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-danger"
+                      data-toggle="tooltip"
+                      title="Reject"
+                    >
+                      <i class="fas fa-ban"></i>
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>4.</td>
+                  <td>The Ultimate Guide to React Hooks</td>
+                  <td>Jan Doe</td>
+                  <td>English</td>
+                  <td style="text-align: center">
+                    <span class="badge bg-success">Published</span>
+                  </td>
+                  <td style="text-align: center">
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-primary"
+                      data-toggle="tooltip"
+                      title="View"
+                      ><i class="fas fa-eye"></i
+                    ></a>
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-danger"
+                      data-toggle="tooltip"
+                      title="Unpublish"
+                    >
+                      <i class="fas fa-ban"></i>
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>5.</td>
+                  <td>Getting Started with Docker</td>
+                  <td>Ohn Hon</td>
+                  <td>English</td>
+                  <td style="text-align: center">
+                    <span class="badge bg-success">Published</span>
+                  </td>
+                  <td style="text-align: center">
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-primary"
+                      data-toggle="tooltip"
+                      title="View"
+                      ><i class="fas fa-eye"></i
+                    ></a>
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-danger"
+                      data-toggle="tooltip"
+                      title="Unpublish"
+                    >
+                      <i class="fas fa-ban"></i>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- /.card-body -->
+          <div class="card-footer clearfix">
+            <ul class="pagination pagination-sm m-0 float-right">
+              <li class="page-item"><a class="page-link" href="#">«</a></li>
+              <li class="page-item active">
+                <a class="page-link" href="#">1</a>
+              </li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">»</a></li>
+            </ul>
+          </div>
+        </div>
+        <!-- /.card -->
+      </div>
+    </div>
+  </div>
+</section>

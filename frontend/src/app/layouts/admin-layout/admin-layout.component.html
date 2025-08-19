@@ -52,6 +52,8 @@
           <li class="nav-item">
             <a
               routerLink="/admin/dashboard"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
               class="nav-link"
             >
               <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -61,6 +63,7 @@
           <li class="nav-item">
             <a
               routerLink="/admin/posts"
+              routerLinkActive="active"
               class="nav-link"
             >
               <i class="nav-icon fas fa-file-alt"></i>
@@ -70,7 +73,8 @@
           <li class="nav-item">
             <a
               routerLink="/admin/categories"
-              class="nav-link active"
+              routerLinkActive="active"
+              class="nav-link"
             >
               <i class="nav-icon fas fa-tags"></i>
               <p>Categories</p>
@@ -79,6 +83,7 @@
           <li class="nav-item">
             <a
               routerLink="/admin/users"
+              routerLinkActive="active"
               class="nav-link"
             >
               <i class="nav-icon fas fa-users"></i>
@@ -88,6 +93,7 @@
           <li class="nav-item">
             <a
               routerLink="/admin/languages"
+              routerLinkActive="active"
               class="nav-link"
             >
               <i class="nav-icon fas fa-language"></i>

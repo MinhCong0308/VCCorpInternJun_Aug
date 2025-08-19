@@ -4,6 +4,7 @@ import { CategoryComponent } from './category/category.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LanguageComponent } from './language/language.component';
 import { UserComponent } from './user/user.component';
+import { PostComponent } from './post/post.component';
 import { adminGuard } from '../core/guards/admin.guard';
 
 const routes: Routes = [
@@ -16,6 +17,7 @@ const routes: Routes = [
       { path: 'categories', component: CategoryComponent },
       { path: 'languages', component: LanguageComponent },
       { path: 'users', component: UserComponent },
+      { path: 'posts', component: PostComponent },
     ],
   },
 

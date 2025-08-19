@@ -6,7 +6,9 @@
       </div>
       <div class="col-sm-6">
         <ol class="breadcrumb float-sm-right">
-          <li class="breadcrumb-item active"><a href="#">Home</a></li>
+          <li class="breadcrumb-item active">
+            <a routerLink="/admin/dashboard">Home</a>
+          </li>
         </ol>
       </div>
     </div>
@@ -24,7 +26,7 @@
             <h3>{{ totals.posts }}</h3>
             <p>Posts</p>
           </div>
-          <a routerLink="/admin/dashboard">
+          <a routerLink="/admin/posts">
             <div class="icon">
               <i class="fas fa-file-alt"></i>
             </div>
@@ -49,7 +51,7 @@
             <h3>{{ totals.users }}</h3>
             <p>Users</p>
           </div>
-          <a routerLink="/admin/dashboard"
+          <a routerLink="/admin/users"
             ><div class="icon">
               <i class="fas fa-users"></i></div
           ></a>
@@ -61,7 +63,7 @@
             <h3>{{ totals.languages }}</h3>
             <p>Languages</p>
           </div>
-          <a routerLink="/admin/dashboard"
+          <a routerLink="/admin/languages"
             ><div class="icon">
               <i class="fas fa-language"></i></div
           ></a>
@@ -101,9 +103,7 @@
           </ng-template>
 
           <div class="card-footer text-center">
-            <a routerLink="/admin/dashboard" class="uppercase"
-              >View All Posts</a
-            >
+            <a routerLink="/admin/posts" class="uppercase">View All Posts</a>
           </div>
         </div>
         <!-- /.card -->
@@ -139,7 +139,7 @@
           </ng-template>
 
           <div class="card-footer text-center">
-            <a routerLink="/admin/dashboard">View All Users</a>
+            <a routerLink="/admin/users">View All Users</a>
           </div>
         </div>
       </div>

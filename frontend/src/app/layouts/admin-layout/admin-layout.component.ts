@@ -8,23 +8,29 @@ import {
   PLATFORM_ID,
 } from '@angular/core';
 import { AssetLoaderService } from '../../core/services/asset-loader.service';
-import { CommonModule, isPlatformBrowser, DOCUMENT, NgIf } from '@angular/common';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import {
+  CommonModule,
+  isPlatformBrowser,
+  DOCUMENT,
+  NgIf,
+} from '@angular/common';
+import { RouterLink, RouterOutlet, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-admin-layout',
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.css'],
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterOutlet, NgIf],
+  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, NgIf],
 })
 export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
   private urls = {
     // Fonts trước, để AdminLTE có font chuẩn của nó
     ssp: 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback',
-    fa:  'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css',
-    alcss: 'https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css',
-    jq:  'https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js',
+    fa: 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css',
+    alcss:
+      'https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css',
+    jq: 'https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js',
     bs4: 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js',
     aljs: 'https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js',
   };
@@ -33,7 +39,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     private renderer: Renderer2,
     private assets: AssetLoaderService,
     @Inject(PLATFORM_ID) private platformId: Object,
-    @Inject(DOCUMENT) private doc: Document,
+    @Inject(DOCUMENT) private doc: Document
   ) {}
 
   ngOnInit() {
@@ -47,7 +53,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async ngAfterViewInit() {
     if (!isPlatformBrowser(this.platformId)) return;
-    
+
     // 2) Nạp CSS theo đúng thứ tự: FA -> AdminLTE
     this.assets.loadCss(this.urls.ssp);
     this.assets.loadCss(this.urls.fa);
@@ -71,8 +77,12 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     this.renderer.removeClass(this.doc.body, 'layout-fixed');
 
     this.assets.removeMany([
-      this.urls.aljs, this.urls.bs4, this.urls.jq,
-      this.urls.alcss, this.urls.fa, this.urls.ssp
+      this.urls.aljs,
+      this.urls.bs4,
+      this.urls.jq,
+      this.urls.alcss,
+      this.urls.fa,
+      this.urls.ssp,
     ]);
   }
 }

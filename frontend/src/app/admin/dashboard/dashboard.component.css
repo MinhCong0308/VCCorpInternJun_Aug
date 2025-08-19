@@ -15,3 +15,11 @@
 .product-list-in-card .product-info {
   margin-left: 0 !important;
 }
+
+/* New Members: make usernames non-clickable and remove pointer cursor */
+.users-list .users-list-name {
+  cursor: default !important;
+  pointer-events: none; /* disable clicks */
+  text-decoration: none;
+  color: inherit;
+}

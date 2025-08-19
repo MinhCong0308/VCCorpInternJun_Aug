@@ -6,6 +6,7 @@ import { CategoryComponent } from './category/category.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LanguageComponent } from './language/language.component';
 import { UserComponent } from './user/user.component';
+import { PostComponent } from './post/post.component';
 
 @NgModule({
   imports: [
@@ -16,6 +17,7 @@ import { UserComponent } from './user/user.component';
     DashboardComponent,
     LanguageComponent,
     UserComponent,
+    PostComponent,
   ],
 })
 export class AdminModule {}

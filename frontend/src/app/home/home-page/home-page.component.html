@@ -1,5 +1,6 @@
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+<nav #navbar
+     class="navbar sticky-top smart-hide navbar-expand-lg navbar-light bg-white border-bottom py-2">
     <div class="container-fluid px-4">
         <a class="navbar-brand logo" (click)="onLogoClick()" style="cursor: pointer;">
             <img src="./assets/img/logo.png" class="logo-img" alt="logo-image">
@@ -101,19 +102,51 @@
                 </div>
 
                 <!-- Sticky Category Tabs -->
-                <div class="nav-category-bar">
-                    <div class="container-fluid px-0 nav-category-scroll">
-                        <nav id="nav-category-list">
-                            <a *ngFor="let cat of categories"
-                                class="nav-link"
-                                routerLink="#"
-                                [class.active]="cat.categoryid === selectedCategory"
-                                (click)="selectCategory(cat.categoryid)">
-                                {{ cat.categoryname }}
-                            </a>
-                        </nav>
+                <div class="nav-category-bar" #categoryBar>
+                    <div class="container-fluid px-0 nav-category-wrap">
+                        <button *ngIf="showLeftArrow"
+                        type="button"
+                        class="cat-scroll-btn left"
+                        (click)="scrollBy(-1)"
+                        aria-label="Scroll categories left">
+                        <i class="ti-angle-left" aria-hidden="true"></i>
+                        </button>
+
+                        <button class="current-pill me-2"
+                        type="button"
+                        (click)="scrollToStart()"
+                        aria-label="Scroll to beginning">
+                            <span class="current-label">Current: </span>
+                            <span class="current-name">{{ currentCategoryName || 'All' }}</span>
+                        </button>
+
+                        <div class="nav-category-scroll flex-grow-1" #navCategoryScroll
+                        (scroll)="onTabScroll()"
+                        (wheel)="onWheel($event)">
+                            <nav id="nav-category-list" role="tablist" aria-label="Categories">
+                                <a *ngFor="let cat of categories" #catLink
+                                    class="nav-link"
+                                    role="tab"
+                                    [attr.aria-selected]="cat.categoryid === selectedCategory"
+                                    [class.active]="cat.categoryid === selectedCategory"
+                                    (click)="onTabClick(cat)"
+                                    style="cursor: pointer;">
+                                    {{ cat.categoryname }}
+                                </a>
+                            </nav>
+                        </div>
+
+                        <button *ngIf="showRightArrow"
+                        type="button"
+                        class="cat-scroll-btn right"
+                        (click)="scrollBy(1)"
+                        aria-label="Scroll categories right">
+                        <i class="ti-angle-right" aria-hidden="true"></i>
+                        </button>
                     </div>
                 </div>
+
+                <div #postListTop aria-hidden="true"></div>
 
                 <!-- Danh sách bài viết động -->
                 <div class="post-item" *ngFor="let post of posts" (click)="goToPost(post.postid)" style="cursor:pointer">
@@ -127,7 +160,7 @@
                         <div class="post-title">
                             <a [routerLink]="['/post-detail', post.postid]" (click)="$event.stopPropagation()">{{ post.title }}</a>
                         </div>
-                        <div class="post-sneak" [innerHTML]="post.content | slice:0:100"></div>
+                        <div class="post-sneak">{{ post.content | excerpt: { limit: 130, by: 'chars' } }}</div>
                         <div class="post-meta">
                             <span>{{ post.createdAt | date: 'MMM d' }}</span>
                             <span><i class="ti-thumb-up"></i> {{ post.like_cnt }}</span>
@@ -135,7 +168,7 @@
                         </div>
                     </div>
                     <a [routerLink]="['/post-detail', post.postid]" (click)="$event.stopPropagation()">
-                        <img [src]="post.coverImage || 'https://picsum.photos/400'" class="post-img-thumb" alt="Preview">
+                        <img [src]="post.coverImage || 'https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg'" class="post-img-thumb" alt="Preview">
                     </a>
                 </div>
 

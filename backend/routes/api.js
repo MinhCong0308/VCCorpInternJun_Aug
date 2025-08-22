@@ -113,6 +113,7 @@ router.group(
       postController.updatePost
     );
     router.get("/get-all-posts", postController.getAllPosts);
+    router.get("/get-all-posts-paging", postController.getAllPostsPaging);
     router.get("/get-specific-post/:postid", postController.getSpecificPost);
     router.get(
       "/get-translation-for-post/:postid",

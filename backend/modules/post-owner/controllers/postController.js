@@ -49,6 +49,18 @@ const postsController = {
             return responseUtils.error(res, error.message);
         }
     },
+    getAllPostsPaging: async (req, res) => {
+        const userid = req.user.userid;
+        try {
+            const page  = Math.max(parseInt(req.query.page, 10) || 1, 1);
+            const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 10, 1), 100);
+
+            const data = await postService.getAllPostsPaging(userid, { page, limit });
+            return responseUtils.ok(res, data);
+        } catch (error) {
+            return responseUtils.error(res, error.message);
+        }
+    },
     getSpecificPost: async (req, res) => {
         const userid = req.user.userid;
         const { postid } = req.params;

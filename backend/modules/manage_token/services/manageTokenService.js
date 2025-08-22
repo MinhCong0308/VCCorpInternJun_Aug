@@ -15,7 +15,7 @@ const manageTokenServices = {
       }]
     });
     const accessToken = sign(user.userid, user.Role.rolename);
-    const refreshToken = signRefreshToken(user.userid);
+    const refreshToken = signRefreshToken(user.userid, user.Role.rolename);
     return {
         accessToken: accessToken,
         refreshToken: refreshToken

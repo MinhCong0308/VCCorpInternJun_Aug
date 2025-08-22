@@ -84,9 +84,9 @@
           <!-- /.card-header -->
           <div class="card-body p-0" *ngIf="latestPosts?.length; else noPosts">
             <ul class="products-list product-list-in-card pl-2 pr-2">
-              <li class="item" *ngFor="let p of latestPosts">
+              <li class="item clickable" *ngFor="let p of latestPosts" (click)="goToPost(p.postid)" tabindex="0">
                 <div class="product-info">
-                  <a class="product-title">{{ p.title }}</a>
+                  <a class="product-title" [routerLink]="['/admin/posts', p.postid]" (click)="$event.stopPropagation()">{{ p.title }}</a>
                   <span class="product-snippet line-clamp-2">{{
                     snippet(p)
                   }}</span>

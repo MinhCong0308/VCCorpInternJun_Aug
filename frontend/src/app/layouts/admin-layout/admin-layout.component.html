@@ -31,17 +31,27 @@
     </a>
     <div class="sidebar">
       <!-- Sidebar user panel -->
-      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-        <div class="image">
-          <img
-            src="https://yt3.ggpht.com/-VaLs3_hqTZI/AAAAAAAAAAI/AAAAAAAAAAA/ojQAzrdMHLQ/s900-c-k-no/photo.jpg"
-            class="img-circle elevation-2"
-            alt="User Image"
-          />
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex flex-column align-items-start">
+        <div class="d-flex align-items-center">
+          <div class="image mr-2">
+            <img
+              src="https://yt3.ggpht.com/-VaLs3_hqTZI/AAAAAAAAAAI/AAAAAAAAAAA/ojQAzrdMHLQ/s900-c-k-no/photo.jpg"
+              class="img-circle elevation-2"
+              alt="User Image"
+            />
+          </div>
+          <div class="info">
+            <a href="#" class="d-block">ADMIN</a>
+          </div>
         </div>
-        <div class="info">
-          <a href="#" class="d-block">ADMIN</a>
-        </div>
+
+        <button
+          type="button"
+          class="btn btn-sm btn-danger mt-3 ml-3"
+          (click)="logout()"
+        >
+          <i class="fas fa-sign-out-alt mr-1"></i> Log out
+        </button>
       </div>
       <nav class="mt-2">
         <ul

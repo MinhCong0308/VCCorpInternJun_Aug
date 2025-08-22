@@ -14,7 +14,9 @@ import {
   DOCUMENT,
   NgIf,
 } from '@angular/common';
-import { RouterLink, RouterOutlet, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterOutlet, RouterLinkActive, Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-admin-layout',
@@ -38,6 +40,8 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private renderer: Renderer2,
     private assets: AssetLoaderService,
+    private authService: AuthService,
+    private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DOCUMENT) private doc: Document
   ) {}
@@ -84,5 +88,14 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
       this.urls.fa,
       this.urls.ssp,
     ]);
+  }
+
+  logout(): void {
+    this.authService.logout()
+      .pipe(finalize(() => this.router.navigate(['/admin/login'])))
+      .subscribe({
+        next: () => {},
+        error: () => {}
+      });
   }
 }

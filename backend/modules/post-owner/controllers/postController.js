@@ -62,6 +62,9 @@ const postsController = {
             return responseUtils.error(res, error.message);
         }
     },
+    getPostForUpdating: async (req, res) => {
+        
+    },
     translatePost: async (req, res) => {    
         try{
             const userid = req.user.userid;

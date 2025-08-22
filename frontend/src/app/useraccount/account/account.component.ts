@@ -4,6 +4,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { ProfileService, UserProfile} from '../../core/services/profile.service';
 import { isPlatformBrowser } from '@angular/common';
 import { Language, LanguageService} from '../../core/services/language.service';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-account',
@@ -27,12 +28,10 @@ export class AccountComponent implements OnInit {
 
   isLoading = false;
   isUploading = false;
-  errorMessage = '';
-  successMessage = '';
   defaultLanguage: Language | null = null;
   currentLanguage: Language | null = null;
   languages: Language[] = [];
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private authService: AuthService, private profileService: ProfileService, private languageService: LanguageService) {}
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private authService: AuthService, private profileService: ProfileService, private languageService: LanguageService, private notificationService: NotificationService) {}
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) {
@@ -64,7 +63,7 @@ export class AccountComponent implements OnInit {
           this.router.navigate(['/auth/login'], {replaceUrl: true});
           return;
         }
-        this.errorMessage = 'Failed to load user profile.';
+        this.notificationService.error('Error', 'Failed to load user profile. Please try again later.');
       }
     }); 
   }
@@ -73,14 +72,12 @@ export class AccountComponent implements OnInit {
     if (!this.userProfile) return;
     this.editMode[type] = true;
     this.editValues[type] = this.userProfile[type] ?? '';
-    this.clearMessages();
   }
 
   cancelEdit(type: 'username' | 'fullname'): void {
     if (!this.userProfile) return; 
     this.editMode[type] = false;
     this.editValues[type] = this.userProfile[type] ?? '';
-    this.clearMessages();
   }
 
   saveEdit(type: 'username' | 'fullname', event: Event): void {
@@ -90,7 +87,6 @@ export class AccountComponent implements OnInit {
     
     const value = this.editValues[type].trim();
     this.isLoading = true;
-    this.clearMessages();
     
     const req$ = type === 'username'
       ? this.profileService.updateUsername(value)
@@ -102,12 +98,11 @@ export class AccountComponent implements OnInit {
           this.userProfile[type] = value;
         }
         this.editMode[type] = false;
-        this.successMessage = `${type[0].toUpperCase() + type.slice(1)} updated successfully!`;
-        setTimeout(() => this.successMessage = '', 1500);
+        this.notificationService.success('Success', `${type.charAt(0).toUpperCase() + type.slice(1)} updated successfully!`);
       },
       error: (error) => {
         // console.error('Error updating user profile:', error);
-        this.errorMessage = 'Failed to update user profile.';
+        this.notificationService.error('Error', 'Failed to update user profile.');
       },
       complete: () => {
         this.isLoading = false;
@@ -123,31 +118,27 @@ export class AccountComponent implements OnInit {
     
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
     if (!allowedTypes.includes(file.type)) {
-      this.errorMessage = 'Please select a valid image file (JPG, PNG, or GIF)';
+      this.notificationService.error('Error', 'Please select a valid image file (JPG, PNG, or GIF)');
       return;
     }
     
     const maxSize = 2 * 1024 * 1024;
     if (file.size > maxSize) {
-      this.errorMessage = 'File size must be less than 2MB';
+      this.notificationService.error('Error', 'File size must be less than 2MB');
       return;
     }
     
     this.isUploading = true; 
-    this.clearMessages();
     
     this.profileService.updateAvatar(file).subscribe({
       next: ({ avatarUrl }) => {
         if (this.userProfile) { 
           this.userProfile.avatarUrl = avatarUrl;
         }
-        this.successMessage = 'Profile photo updated successfully!';
-        setTimeout(() => {
-          this.successMessage = '';
-        }, 3000);
+        this.notificationService.success('Success', 'Profile photo updated successfully!');
       },
       error: (error) => {
-        this.errorMessage = error.message || 'Failed to update profile photo.';
+        this.notificationService.error('Error', error.message || 'Failed to update profile photo.');
       },
       complete: () => {
         this.isUploading = false; 
@@ -161,7 +152,6 @@ export class AccountComponent implements OnInit {
     if (!confirmed) return;
 
     this.isLoading = true;
-    this.clearMessages();
     
     this.profileService.deactivateAccount().subscribe({
       next: () => {
@@ -169,7 +159,7 @@ export class AccountComponent implements OnInit {
         this.router.navigate(['/auth/login']);
       },
       error: (error) => {
-        this.errorMessage = error.message || 'Failed to deactivate account.';
+        this.notificationService.error('Error', error.message || 'Failed to deactivate account.');
       },
       complete: () => {
         this.isLoading = false;
@@ -187,11 +177,6 @@ export class AccountComponent implements OnInit {
         this.router.navigate(['/auth/login']);
       }
     });
-  }
-
-  private clearMessages(): void {
-    this.errorMessage = '';
-    this.successMessage = '';
   }
   loadLanguage(): void {
     this.languageService.getLanguages().subscribe({

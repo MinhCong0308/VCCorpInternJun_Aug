@@ -11,6 +11,7 @@ import { ProfileService, UserProfile } from '../../core/services/profile.service
 import { CategoryService, Category } from '../../core/services/category.service';
 import { LanguageService, Language } from '../../core/services/language.service';
 import { TranslateService } from '../../core/services/translate.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { Subscription } from 'rxjs';
 
 interface PostLanguageTab {
@@ -76,7 +77,8 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     private profileService: ProfileService,
     private categoryService: CategoryService,
     private languageService: LanguageService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private notificationService: NotificationService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -92,7 +94,17 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       
     } catch (error) {
       console.error('Initialization error:', error);
-      alert("Failed to initialize the page. Please refresh and try again.");
+      this.notificationService.error(
+        'Initialization Failed',
+        'Failed to initialize the page. Please refresh and try again.',
+        [
+          {
+            label: 'Refresh Page',
+            action: () => window.location.reload(),
+            style: 'primary'
+          }
+        ]
+      );
       this.isLoading = false;
       this.isInitializing = false;
     }
@@ -210,7 +222,17 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       console.log('Initialization completed successfully');
     } catch (error) {
       console.error('Error during initialization:', error);
-      alert("Failed to initialize the page. Please refresh and try again.");
+      this.notificationService.error(
+        'Initialization Failed',
+        'Failed to initialize the page. Please refresh and try again.',
+        [
+          {
+            label: 'Refresh Page',
+            action: () => window.location.reload(),
+            style: 'primary'
+          }
+        ]
+      );
       throw error;
     } finally {
       this.isLoading = false;
@@ -263,7 +285,22 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error loading languages:', error);
-          alert("Failed to load languages. Please refresh the page.");
+          this.notificationService.error(
+            'Language Loading Failed',
+            'Failed to load languages. Please refresh the page.',
+            [
+              {
+                label: 'Refresh Page',
+                action: () => window.location.reload(),
+                style: 'primary'
+              },
+              {
+                label: 'Go to Home',
+                action: () => this.router.navigate(['/home']),
+                style: 'secondary'
+              }
+            ]
+          );
           reject(error);
         }
       });
@@ -394,7 +431,10 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
   removeTab(index: number): void {
     const tab = this.languageTabs[index];
     if (tab.isOriginal) {
-      alert('Cannot remove the original language tab.');
+      this.notificationService.warning(
+        'Cannot Remove Tab',
+        'Cannot remove the original language tab.'
+      );
       return;
     }
 
@@ -417,7 +457,6 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       this.selectedTags.clear();      
       const post = await this.getPost(editPostId);
       this.post = post;
-      
       const postLanguage = this.languages.find(lang => lang.languageid === post.languageid);
       if (!postLanguage) {
         throw new Error('Post language not found');
@@ -452,7 +491,17 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       
     } catch (error) {
       console.error('Error loading post for editing:', error);
-      alert("Failed to load post for editing. Please try again.");
+      this.notificationService.error(
+        'Post Loading Failed',
+        'Failed to load post for editing. Please try again.',
+        [
+          {
+            label: 'Go to Profile',
+            action: () => this.router.navigate(['/useraccount/profile']),
+            style: 'primary'
+          }
+        ]
+      );
       throw error;
     }
   }
@@ -542,7 +591,10 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     
     const originalTab = this.languageTabs.find(tab => tab.isOriginal);
     if (!originalTab || !originalTab.content.trim() || !originalTab.title.trim()) {
-      alert("Please fill in the original content before adding a translation.");
+      this.notificationService.warning(
+        'Missing Content',
+        'Please fill in the original content before adding a translation.'
+      );
       return;
     }
     const translationTab: PostLanguageTab = {
@@ -641,7 +693,17 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
         }).catch((error) => {
           console.error('Translation failed:', error);
           targetTab.isTranslating = false;
-          alert('Translation failed. Please try again.');
+          this.notificationService.error(
+            'Translation Failed',
+            'Translation failed. Please try again.',
+            [
+              {
+                label: 'Retry Translation',
+                action: () => this.translateContent(originalTab, targetTab),
+                style: 'primary'
+              }
+            ]
+          );
         });
       },
       error: (error) => {
@@ -713,13 +775,19 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     
     const originalTab = this.languageTabs.find(tab => tab.isOriginal);
     if (!originalTab || !originalTab.title.trim() || !originalTab.content.trim()) {
-      alert("Please fill in the original title and content.");
+      this.notificationService.warning(
+        'Missing Required Fields',
+        'Please fill in the original title and content.'
+      );
       return;
     }
 
     const hasTranslatingTabs = this.languageTabs.some(tab => tab.isTranslating);
     if (hasTranslatingTabs) {
-      alert("Please wait for all translations to complete before submitting.");
+      this.notificationService.info(
+        'Translation in Progress',
+        'Please wait for all translations to complete before submitting.'
+      );
       return;
     }
 
@@ -771,7 +839,10 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     const sub = this.http[method](endpoint, payload, { withCredentials: true }).subscribe({
       next: (response) => {
         const action = this.isEditMode ? 'updated' : 'submitted';
-        alert(`Your blog "${payload.originalPost.title}" and its ${payload.translations.length} translation(s) were ${action} successfully! Redirecting...`);
+        this.notificationService.success(
+          'Success!',
+          `Your blog "${payload.originalPost.title}" and its ${payload.translations.length} translation(s) were ${action} successfully! Redirecting...`
+        );
         this.isLoading = false;
         setTimeout(() => {
           this.router.navigate(['/home']);
@@ -780,7 +851,17 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Submit error:', err);
         const action = this.isEditMode ? 'update' : 'submit';
-        alert(`Failed to ${action} blog. Please try again.`);
+        this.notificationService.error(
+          'Submission Failed',
+          `Failed to ${action} blog. Please try again.`,
+          [
+            {
+              label: 'Try Again',
+              action: () => this.submitBlog(),
+              style: 'primary'
+            }
+          ]
+        );
         this.isLoading = false;
       }
     });

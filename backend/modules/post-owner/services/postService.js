@@ -171,6 +171,9 @@ const postService = {
         if (!post) {
             throw new Error("Post not found or you are not authorized to view this post");
         }
+        if(post.status !== config.config.statuspostenum.PENDING) {
+            throw new Error("Only pending posts can be updated");
+        }
         return {
             post: {
                 postid: post.postid,

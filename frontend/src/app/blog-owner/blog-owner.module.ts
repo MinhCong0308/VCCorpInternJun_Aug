@@ -7,6 +7,7 @@ import { QuillModule } from 'ngx-quill';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { NotificationComponent } from '../shared/components/notification/notification.component';
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import { RouterModule } from '@angular/router';
     RouterModule,
     FormsModule,
     BlogOwnerRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    NotificationComponent
   ]
 })
 export class BlogOwnerModule { }

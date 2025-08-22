@@ -50,11 +50,13 @@ nav.navbar.fixed-top {
 /* Scrollable main section */
 .scrollable-main-content {
   flex: 1 1 auto;
-  min-height: calc(100vh - 72px - 60px); /* Adjust for header and footer height */
-  overflow-y: auto;
+  height: calc(100vh - 72px - 60px); /* Adjust for header and footer height */
+  overflow-y: hidden;
   padding-top: 72px;
   padding-bottom: 20px;
+  display: flex;
   background-color: #fff;
+  flex-direction: column;
 }
 
 .scrollable-main-content > .row {
@@ -140,11 +142,6 @@ quill-editor {
   display: block;
 }
 
-/* Optional line below quill editor
-quill-editor + .editor-divider {
-  margin-top: 1.5rem;
-} */
-
 /* Responsive */
 @media (max-width: 768px) {
   .editor-title {
@@ -171,8 +168,9 @@ quill-editor + .editor-divider {
   color: #b3b3b1;
 }
 :host ::ng-deep .ql-container.ql-snow {
-  height: auto; /* Remove fixed height */
-  min-height: 400px; /* Set minimum height instead */
+  height: 400px !important;
+  min-height: 400px;
+  max-height: 400px; 
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border-color);
@@ -180,7 +178,7 @@ quill-editor + .editor-divider {
   background: white;
   overflow: hidden;
   position: relative;
-  margin-bottom: 2rem; /* Add margin for footer space */
+  /* margin-bottom: 2rem;  */
 }
 
 :host ::ng-deep .ql-toolbar {
@@ -193,6 +191,7 @@ quill-editor + .editor-divider {
 /* Language tabs styling */
 .language-tabs-container {
   margin-bottom: 2rem;
+  height: 100%;
 }
 
 .flag-icon {
@@ -228,4 +227,26 @@ quill-editor + .editor-divider {
   pointer-events: none;
 }
 
-/* ...existing code... */
+:host ::ng-deep .ql-editor {
+  scroll-behavior: smooth;
+  /* Ensure the editor has proper scrolling */
+  overflow-y: auto !important;
+  max-height: 500px; /* Adjust as needed */
+}
+:host ::ng-deep .ql-editor::-webkit-scrollbar {
+  width: 8px;
+}
+
+:host ::ng-deep .ql-editor::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+:host ::ng-deep .ql-editor::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+:host ::ng-deep .ql-editor::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

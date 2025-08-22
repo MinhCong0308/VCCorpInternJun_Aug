@@ -52,6 +52,8 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
 
   // Subscription management
   private subscriptions: Subscription[] = [];
+  private isUserScrolling = false;
+  private scrollTimeout: any;
 
   quillModules = {
     toolbar: [
@@ -98,12 +100,58 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     // Clean up subscriptions
+    if(this.scrollTimeout) {
+      clearTimeout(this.scrollTimeout);
+    }
     this.subscriptions.forEach(sub => sub.unsubscribe());
     this.resetQuillEditor();
   }
 
-  // ============ INITIALIZATION METHODS ============
-
+  setUpAutoScroll(): void {
+    if(!this.quillEditor || !this.quillEditor.quillEditor) return;
+    const quillEditor = this.quillEditor.quillEditor;
+    const editorElement = quillEditor.container.querySelector('.ql-editor');
+    if(!editorElement) return;
+    editorElement.addEventListener('scroll', () => {
+      this.isUserScrolling = true;
+      clearTimeout(this.scrollTimeout);
+      this.scrollTimeout = setTimeout(() => {
+        this.isUserScrolling = false;
+      }, 100);
+    });
+    quillEditor.on('selection-change', (range: any, oldRange: any, source: string) => {
+      if (source === 'user' && range && !this.isUserScrolling) {
+        setTimeout(() => {
+          this.scrollToCurrentCursor();
+        }, 10);
+      }
+    });
+  }
+  scrollToCurrentCursor(): void {
+      if (!this.quillEditor?.quillEditor) return;   
+      const quillEditor = this.quillEditor.quillEditor;
+      const selection = quillEditor.getSelection();
+      
+      if (!selection) return;
+      
+      const editorElement = quillEditor.container.querySelector('.ql-editor');
+      if (!editorElement) return;
+      const bounds = quillEditor.getBounds(selection.index);
+      if (!bounds) return;
+      const editorRect = editorElement.getBoundingClientRect();
+      const editorHeight = editorElement.clientHeight;      
+      const cursorPosition = bounds.top;
+      const scrollTop = editorElement.scrollTop;
+      const visibleBottom = scrollTop + editorHeight;
+      const bufferZone = 100; // Pixels from bottom to trigger scroll      
+      if (cursorPosition > editorHeight - bufferZone) {
+        const newScrollTop = scrollTop + (cursorPosition - (editorHeight - bufferZone));
+        editorElement.scrollTo({
+          top: newScrollTop,
+          behavior: 'smooth'
+        });
+      }
+  }
   resetAllState(): void {
     // Reset all component state
     this.selectedTags = new Set();
@@ -298,6 +346,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
           } else {
             this.quillEditor.quillEditor.setText('');
           }
+          this.setUpAutoScroll();
         }
       } catch (error) {
         console.error('Error updating Quill editor:', error);

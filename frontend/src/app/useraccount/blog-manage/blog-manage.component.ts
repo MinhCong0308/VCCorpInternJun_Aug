@@ -6,6 +6,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { ProfileService, UserProfile} from '../../core/services/profile.service';
 import { PostService } from '../../core/services/post.service';
 import { LanguageService, Language } from '../../core/services/language.service';
+import { NotificationService } from '../../core/services/notification.service';
 @Component({
   selector: 'app-blog-manage',
   templateUrl: './blog-manage.component.html',
@@ -19,12 +20,12 @@ export class BlogManageComponent implements OnInit {
   languages : Language[] = [];
   activeTab = 'home';
   isLoading = false;
-  errorMessage = '';
-  successMessage = '';
+  // errorMessage = '';
+  // successMessage = '';
   defaultLanguage: Language | null = null;
   currentLanguage: Language | null = null;
 
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService, private postOnlyService: PostService, private languageService: LanguageService) {
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService, private postOnlyService: PostService, private languageService: LanguageService, private notificationService: NotificationService) {
     this.posts = []; // Ensure posts is always initialized as an empty array
   }
   async ngOnInit(): Promise<void> {
@@ -46,12 +47,12 @@ export class BlogManageComponent implements OnInit {
         this.isInitializing = false;
         
         if (error.status === 401 || error.message === 'Authentication required') {
-          this.errorMessage = 'Session expired. Please log in again.';
+          this.notificationService.error('Error', 'Authentication required. Redirecting to login...');
           setTimeout(() => {
             this.router.navigate(['/auth/login']);
           }, 1000);
         } else {
-          this.errorMessage = 'Failed to load user profile. Please try again.';
+          this.notificationService.error('Error', 'Failed to load user profile. Please try again.');
         }
       }
     });
@@ -69,7 +70,7 @@ export class BlogManageComponent implements OnInit {
       },
       error: (error) => {
         this.posts = []; // Reset to empty array on error
-        this.errorMessage = 'Failed to load posts. Please try again later.';
+        this.notificationService.error('Error', 'Failed to load posts. Please try again later.');
         this.isLoading = false;
         console.error('Error loading posts:', error);
       }
@@ -78,7 +79,6 @@ export class BlogManageComponent implements OnInit {
   switchTab(tab: string, event: Event): void {
     event.preventDefault();
     this.activeTab = tab;
-    this.clearMessages();
   }
   loadLanguages(): void {
     this.isLoading = true;
@@ -91,7 +91,7 @@ export class BlogManageComponent implements OnInit {
       },
       error: (error) => {
         // console.error('Error loading languages:', error);
-        this.errorMessage = 'Failed to load languages. Please try again later.';
+        this.notificationService.error('Error', 'Failed to load languages. Please try again later.');
         this.isLoading = false;
       }
     });
@@ -136,7 +136,7 @@ export class BlogManageComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching post details:', error);
-        this.errorMessage = 'Failed to load post details. Please try again later.';
+        this.notificationService.error('Error', 'Failed to load post details. Please try again later.');
       }
     });
   }
@@ -148,10 +148,7 @@ export class BlogManageComponent implements OnInit {
     if (post && post.status === 'PENDING') {
       this.router.navigate(['/blog-owner/create'], { queryParams: { edit: postId } });
     } else {
-      this.errorMessage = 'You can only edit pending posts.';
-      setTimeout(() => {
-        this.errorMessage = '';
-      }, 3000);
+      this.notificationService.error('Error', 'You can only edit pending posts.');
     }
   }
   deletePost(postId: number, event: Event): void {
@@ -162,13 +159,10 @@ export class BlogManageComponent implements OnInit {
       next: (response) => {
         console.log('Post deleted successfully:', response);
         if (response.success) {
-          this.successMessage = 'Post deleted successfully.';
+          this.notificationService.success('Success', 'Post deleted successfully.');
           this.loadPosts(); // Reload posts after deletion
-          setTimeout(() => {
-            this.successMessage = '';
-          }, 3000);
         } else {
-          this.errorMessage = response.message || 'Failed to delete post.';
+          this.notificationService.error('Error', response.message || 'Failed to delete post.');
         }
       }
     });
@@ -186,11 +180,6 @@ export class BlogManageComponent implements OnInit {
 
   navigateToLogin(): void {
     this.router.navigate(['/auth/login']);
-  }
-
-  private clearMessages(): void {
-    this.errorMessage = '';
-    this.successMessage = '';
   }
   selectLanguage(language: Language): void {
     this.currentLanguage = language;

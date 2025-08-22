@@ -185,14 +185,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- Error/Success Messages -->
-            <div *ngIf="errorMessage" class="alert alert-danger mt-3">
-              {{ errorMessage }}
-            </div>
-            <div *ngIf="successMessage" class="alert alert-success mt-3">
-              {{ successMessage }}
-            </div>
           </div>
         </main>
         
@@ -231,8 +223,7 @@
   </div>
 
   <!-- Error Container -->
-  <div *ngIf="!isInitializing && !isLoading && !userProfile && errorMessage" class="error-container">
-    <p>{{ errorMessage }}</p>
+  <div *ngIf="!isInitializing && !isLoading && !userProfile" class="error-container">
     <button (click)="logout()">Go to Login</button>
   </div>
 </div>

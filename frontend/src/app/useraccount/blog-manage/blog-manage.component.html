@@ -150,13 +150,6 @@
               <p>{{ userProfile.bio || 'Write a short description about yourself' }}</p>
             </div>
           </div>
-          <!-- Error/Success Messages -->
-          <div *ngIf="errorMessage" class="alert alert-danger mt-3">
-            {{ errorMessage }}
-          </div>
-          <div *ngIf="successMessage" class="alert alert-success mt-3">
-            {{ successMessage }}
-          </div>
         </main>
 
         <!-- Sidebar -->
@@ -194,8 +187,7 @@
   </div>
 
   <!-- Error Container -->
-  <div *ngIf="!isInitializing && !userProfile && errorMessage" class="error-container">
-    <p>{{ errorMessage }}</p>
+  <div *ngIf="!isInitializing && !userProfile" class="error-container">
     <button (click)="navigateToLogin()">Go to Login</button>
   </div>
 </div>

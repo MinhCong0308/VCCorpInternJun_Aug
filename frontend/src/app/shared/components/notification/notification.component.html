@@ -1,0 +1,35 @@
+<div class="notification-container">
+  <div
+    *ngFor="let notification of activeNotifications"
+    class="notification"
+    [ngClass]="'notification-' + notification.type"
+  >
+    <div class="notification-icon">
+      <i [ngClass]="getIconClass(notification.type)"></i>
+    </div>
+    
+    <div class="notification-content">
+      <h4 class="notification-title">{{ notification.title }}</h4>
+      <p class="notification-message">{{ notification.message }}</p>
+      
+      <div *ngIf="notification.actions && notification.actions.length > 0" class="notification-actions">
+        <button
+          *ngFor="let action of notification.actions"
+          class="btn"
+          [ngClass]="'btn-' + (action.style || 'secondary')"
+          (click)="executeAction(action, notification.id)"
+        >
+          {{ action.label }}
+        </button>
+      </div>
+    </div>
+    
+    <button
+      class="notification-close"
+      (click)="dismissNotification(notification.id)"
+      aria-label="Close notification"
+    >
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+</div>

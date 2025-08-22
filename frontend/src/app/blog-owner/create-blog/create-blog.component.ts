@@ -241,9 +241,9 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
   }
   loadCategories(): Promise<void> {
     return new Promise((resolve) => {
-      const sub = this.categoryService.getAllCategories().subscribe({
+      const sub = this.categoryService.getCategories().subscribe({
         next: (response) => {
-          this.availableTags = response.categories.map((category: Category) => category.categoryname);
+          this.availableTags = (response || []).map((c) => c.categoryname);
           console.log('Categories loaded:', this.availableTags.length);
           resolve();
         },

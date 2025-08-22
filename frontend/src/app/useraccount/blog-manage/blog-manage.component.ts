@@ -24,6 +24,14 @@ export class BlogManageComponent implements OnInit {
   // successMessage = '';
   defaultLanguage: Language | null = null;
   currentLanguage: Language | null = null;
+  page = 1;
+  limit = 10;
+  total = 0;
+  Math = Math;
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.total / this.limit));
+  }
 
   constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService, private postOnlyService: PostService, private languageService: LanguageService, private notificationService: NotificationService) {
     this.posts = []; // Ensure posts is always initialized as an empty array
@@ -63,13 +71,17 @@ export class BlogManageComponent implements OnInit {
       return;
     }
     this.isLoading = true;
-    this.postService.getAllPosts().subscribe({
-      next: (posts) => {
-        this.posts = posts || []; // Ensure it's always an array
+    this.postService.getAllPostsPaging(this.page, this.limit).subscribe({
+      next: (res) => {
+        this.posts = res.items || []; // Ensure it's always an array
+        this.total = res.total || 0;
+        this.page  = res.page || this.page;
+        this.limit = res.limit || this.limit;
         this.isLoading = false;
       },
       error: (error) => {
         this.posts = []; // Reset to empty array on error
+        this.total = 0;
         this.notificationService.error('Error', 'Failed to load posts. Please try again later.');
         this.isLoading = false;
         console.error('Error loading posts:', error);
@@ -184,4 +196,19 @@ export class BlogManageComponent implements OnInit {
   selectLanguage(language: Language): void {
     this.currentLanguage = language;
   }
+
+  goToPage(p: number, ev?: Event) {
+    if (ev) ev.preventDefault();
+    if (p < 1 || p > this.totalPages || p === this.page) return;
+    this.page = p;
+    this.loadPosts();
+  }
+
+  changePageSize(newSize: number) {
+    this.limit = Number(newSize);
+    this.page = 1;
+    this.loadPosts();
+  }
+
+  trackByPostId = (_: number, p: Post) => p.postid;
 }

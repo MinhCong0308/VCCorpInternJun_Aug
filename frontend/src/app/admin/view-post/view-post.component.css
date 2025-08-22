@@ -1,7 +1,12 @@
 /* Tương thích các class Quill/Editor thường gặp */
-:host ::ng-deep .post-content img {
+:host ::ng-deep .post-content img,
+:host ::ng-deep .post-content video,
+:host ::ng-deep .post-content svg,
+:host ::ng-deep .post-content canvas {
   max-width: 100%;
   height: auto;
+  display: block; /* để margin auto có tác dụng */
+  margin: 1rem auto;
 }
 :host ::ng-deep .post-content .ql-align-center { text-align: center; }
 :host ::ng-deep .post-content .ql-align-justify { text-align: justify; }

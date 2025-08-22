@@ -137,6 +137,46 @@ const postService = {
             throw new Error("Error retrieving posts");
         }
     },
+    getAllPostsPaging: async (userid, { page = 1, limit = 10 } = {}) => {
+        try {
+            const offset = (page - 1) * limit;
+
+            const { rows, count } = await db.Post.findAndCountAll({
+            where: {
+                userid,
+                postid: { [Op.col]: 'original_postid' }
+            },
+            include: [{
+                model: db.Category,
+                as: 'Categories',
+                through: { attributes: [] }
+            }],
+            order: [['createdAt', 'DESC']],
+            limit,
+            offset
+            });
+
+            const items = rows.map(post => ({
+            postid: post.postid,
+            title: post.title,
+            content: post.content,
+            languageid: post.languageid,
+            tags: post.Categories.map(c => c.categoryname),
+            status: config.config.StatusNameById[post.status],
+            createdAt: post.createdAt,
+            }));
+
+            return {
+            items,
+            total: count,
+            page,
+            limit
+            };
+        } catch (error) {
+            console.error("Error retrieving posts:", error);
+            throw new Error("Error retrieving posts");
+        }
+    },
     setTagsForPost: async (postid, tags) => {
         const post = await db.Post.findByPk(postid);
         if (!post) {

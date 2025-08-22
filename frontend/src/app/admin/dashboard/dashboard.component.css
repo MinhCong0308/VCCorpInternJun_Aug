@@ -15,6 +15,14 @@
 .product-list-in-card .product-info {
   margin-left: 0 !important;
 }
+/* Clickable recent-post item */
+.products-list .item.clickable {
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+.products-list .item.clickable:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
 
 /* New Members: make usernames non-clickable and remove pointer cursor */
 .users-list .users-list-name {

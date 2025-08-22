@@ -6,7 +6,7 @@ import {
   DashboardUser,
   DashboardPost,
 } from '../../core/services/dashboard.service';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -23,7 +23,10 @@ export class DashboardComponent implements OnInit {
   latestPosts: DashboardPost[] = [];
   private apiBase = 'http://localhost:3000';
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(
+    private dashboardService: DashboardService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.fetch();
@@ -70,5 +73,10 @@ export class DashboardComponent implements OnInit {
       .trim();
     if (text.length <= maxLen) return text;
     return text.slice(0, maxLen).trimEnd() + '…';
+  }
+
+  goToPost(id: any) {
+    if(!id) return;
+    this.router.navigate(['/admin/posts', id]);
   }
 }

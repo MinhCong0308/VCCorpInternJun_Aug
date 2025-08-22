@@ -148,6 +148,17 @@ body {
 .recent-item span {
   flex: 1;
 }
+.clear-all {
+  padding-left: 80px;
+  font-size: 12px;
+  color: #888;
+  cursor: pointer;
+}
+
+.clear-all:hover {
+  color: #333;
+  text-decoration: underline;
+}
 .flag-icon {
   width: 25px;
   height: 18px;

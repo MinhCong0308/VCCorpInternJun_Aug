@@ -108,13 +108,62 @@ body {
 }
 .post-content {
     font-family: source-serif-pro, Georgia, Cambria, "Times New Roman", Times, serif;
-    max-width: auto;
+    max-width: 100%;
     margin: auto;
     font-size: 20px;
     line-height: 1.75;
     color: #232323;
     letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
+.post-content img,
+.post-content video,
+.post-content svg,
+.post-content canvas {
+  max-width: 100%;
+  height: auto;
+  display: block; /* để margin auto có tác dụng */
+  margin: 1rem auto;
+}
+.post-content iframe,
+.post-content .ql-video {
+  width: 100% !important;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto !important;
+  display: block;
+  margin: 1rem 0;
+  border: 0;
+}
+.post-content table {
+  width: 100%;
+  border-collapse: collapse;
+  display: block;              /* để overflow-x có tác dụng */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.post-content th,
+.post-content td {
+  border: 1px solid #eee;
+  padding: 0.5rem;
+}
+.post-content figure {
+  margin: 1.25rem 0;
+}
+.post-content figure img {
+  width: 100%;
+  height: auto;
+}
+.post-content figcaption {
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.95rem;
+  margin-top: 0.35rem;
+}
+.post-content .ql-align-center { text-align: center; }
+.post-content .ql-align-right { text-align: right; }
+.post-content .ql-align-justify { text-align: justify; }
 .post-content h2, .post-content h3, .post-content h4 {
     font-family: var(--heading-font);
     font-weight: 700;
@@ -132,12 +181,23 @@ body {
     margin: 2rem 0;
     padding: 0.7rem 1.5rem;
 }
-.post-content pre, .post-content code {
+.post-content pre {
     font-family: "Fira Mono", "Consolas", "Menlo", monospace;
     background: #f6f6f6;
     border-radius: 5px;
     padding: 0.35em 0.6em;
     font-size: 1rem;
+    white-space: pre-wrap;
+    overflow-x: auto;
+}
+.post-content code {
+    font-family: "Fira Mono", "Consolas", "Menlo", monospace;
+    background: #f6f6f6;
+    border-radius: 5px;
+    padding: 0.35em 0.6em;
+    font-size: 1rem;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 .post-tags {
     margin-top: 2.7rem;

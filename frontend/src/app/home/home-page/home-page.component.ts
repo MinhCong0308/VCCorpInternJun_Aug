@@ -2,11 +2,11 @@ import { AfterViewInit, ElementRef, ViewChild, ViewChildren, QueryList, HostList
 import { CategoryService } from '../../core/services/category.service';
 import { PostService } from '../../core/services/post.service';
 import { AccountService } from '../../core/services/account.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { LanguageService, Language} from '../../core/services/language.service';
-
+import { SearchService } from '../../core/services/search.service';
 
 @Component({
   selector: 'app-home-page',
@@ -23,7 +23,6 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   posts: any[] = [];
   searchQuery: string = '';
   searchTermDisplay: string | null = null;
-  recentSearches: string[] = [];
   showRecentSearches: boolean = false;
   isLoggedIn: boolean = false;
   isBrowser: boolean;
@@ -42,10 +41,9 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   @ViewChild('navbar') navbar!: ElementRef<HTMLElement>;
   isNavHidden = false;
   lastScrollY = 0;
-  scrollThreshold = 8;
-  navbarHeight = 0;
   suppressAutoHideUntil = 0;
   navSlide = 0;
+  pendingScrollActive = false;
 
   constructor(
     private categoryService: CategoryService,
@@ -54,6 +52,8 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     private router: Router,
     private authService: AuthService,
     private languageService: LanguageService,
+    private route: ActivatedRoute,
+    public searchService: SearchService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -68,7 +68,6 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         }
       },
     });
-    this.loadRecentSearches(); // Tải danh sách tìm kiếm gần đây từ localStorage
     this.getTrendingPreviewPosts(); // Tải danh sách post trending
     this.categoryService.getCategories().subscribe({
       next: (res: any) => {
@@ -88,7 +87,30 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     });
     this.loadLanguages();
     this.shouldScrollToTop = false;
-    this.loadPosts(); // Mặc định là
+    this.loadPosts();
+    this.searchService.query$.subscribe(q => this.searchQuery = q || '');
+    this.route.queryParamMap.subscribe(pm => {
+      const q = (pm.get('q') || '').trim();
+      const cat = pm.get('category');
+      const id = cat ? Number(cat) : null;
+      if (q) {
+        this.searchService.setQuery(q);
+        this.searchTermDisplay = q;
+        this.selectedCategory = 'latest';
+        this.shouldScrollToTop = true;
+        this.searchPosts(q);
+        return;
+      }
+      this.searchTermDisplay = '';
+      if (id && !Number.isNaN(id)) {
+        this.selectCategory(id); // đặt active tab + gọi API lọc
+        this.pendingScrollActive = true;
+        // this.cdr.detectChanges();
+      } else {
+        this.selectedCategory = 'latest';
+        this.loadPosts();
+      }
+    });
   }
 
   ngAfterViewInit() {
@@ -100,6 +122,15 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     }
     this.scrollActiveIntoView();
     setTimeout(() => this.updateArrows(), 0);
+    this.catLinks.changes.subscribe(() => {
+      if (this.pendingScrollActive) {
+        // chờ 1 nhịp để class active được apply xong
+        setTimeout(() => {
+          this.scrollActiveIntoView();
+          this.pendingScrollActive = false;
+        }, 0);
+      }
+    });
   }
 
   @HostListener('window:resize')
@@ -165,9 +196,9 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
   // Hàm để xử lý sự kiện khi người dùng click vào logo
   onLogoClick(): void {
-    if (this.router.url === '/home') {
-      // Đang ở /home → reload lại trang
-      window.location.reload();
+    if (this.router.url.startsWith('/home')) {
+      // Đang ở /home hoặc /home?... → reload lại trang
+      this.router.navigate(['/home']).then(() => window.location.reload());
     } else {
       // Nếu đang ở trang khác → chuyển về /home
       this.router.navigate(['/home']);
@@ -186,8 +217,15 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
   // Hàm để xử lý sự kiện khi người dùng chọn một category
   selectCategory(id: any): void {
+    // Clear chế độ search nếu đang bật
+    if (this.searchTermDisplay) {
+      this.searchService.setQuery('');
+      this.searchTermDisplay = '';
+      this.router.navigate(['/home']); // loại ?q khỏi URL
+    }
     this.selectedCategory = id;
     this.searchTermDisplay = null; // Clear search term display khi chọn category mới
+    if (!this.isBrowser) return;
     window.scrollTo({ top: 0, behavior: 'smooth' });
     this.showNavbarNow();
     this.shouldScrollToTop = true;
@@ -229,65 +267,52 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   }
 
   // Hàm để xử lý tìm kiếm bài viết
-  onSearch(): void {
-    const query = this.searchQuery.trim();
-    this.saveToRecentSearches(query); // Lưu từ khóa tìm kiếm vào danh sách gần đây
-    if (!query) {
-      // Nếu không nhập gì: reset danh sách và searchQuery
-      this.searchTermDisplay = null; // Clear search term display
-      this.selectedCategory = 'latest'; // Reset về Latest
-      this.searchQuery = ''; // Clear search input
-      this.loadPosts(); // Tải lại bài viết theo category đã chọn
+  onSearch() {
+    const q = (this.searchQuery || '').trim();
+    if (!q) {
+      // Nếu submit rỗng: clear q khỏi URL và về chế độ bình thường
+      this.searchService.setQuery('');
+      this.searchTermDisplay = '';
+      this.router.navigate(['/home']);   // loại bỏ cả ?category cũ nếu có
+      this.selectedCategory = 'latest';
+      this.shouldScrollToTop = false;
+      this.loadPosts();
       return;
     }
 
-    this.postService.searchPosts(query).subscribe({
+    // Lưu recent + sync service
+    this.searchService.addRecent(q);
+    this.searchService.setQuery(q);
+    this.showRecentSearches = false;
+
+    // Đưa q lên URL (clear category)
+    this.router.navigate(['/home'], { queryParams: { q } });
+
+    // Hiển thị kết quả ngay (không chờ route loop)
+    this.searchTermDisplay = q;
+    this.selectedCategory = 'latest';
+    this.shouldScrollToTop = true;
+    this.searchPosts(q);
+  }
+
+  searchPosts(q: string) {
+    this.postService.searchPosts(q).subscribe({
       next: (res) => {
-        this.posts = res.data.posts;
-        this.selectedCategory = null; // clear highlight
-        this.searchTermDisplay = query; // Hiển thị từ khóa tìm kiếm
+        this.posts = res?.data?.posts || [];
+        // cuộn về đầu danh sách (dùng hàm bạn đã có)
+        setTimeout(() => this.scrollToPostListTop(), 0);
       },
-      error: (err) => console.error('Search error:', err),
+      error: () => {
+        this.posts = [];
+      }
     });
-    this.saveToRecentSearches(query); // Lưu từ khóa tìm kiếm vào danh sách gần đây
   }
 
-  // Hàm để tải danh sách tìm kiếm gần đây từ localStorage
-  loadRecentSearches(): void {
-    if (this.isBrowser) {
-      const stored = localStorage.getItem('recentSearches');
-      if (stored) {
-        this.recentSearches = JSON.parse(stored);
-      }
-    }
-  }
-
-  // Hàm để thêm từ khóa tìm kiếm vào danh sách tìm kiếm gần đây
-  saveToRecentSearches(term: string): void {
-    if (!term.trim()) return;
-
-    if (this.isBrowser) {
-      // Tránh trùng lặp
-      const exists = this.recentSearches.includes(term);
-      if (!exists) {
-        this.recentSearches.unshift(term);
-        // Giới hạn số lượng
-        if (this.recentSearches.length > 5) {
-          this.recentSearches = this.recentSearches.slice(0, 5);
-        }
-        // Lưu localStorage nếu muốn nhớ khi refresh
-        localStorage.setItem(
-          'recentSearches',
-          JSON.stringify(this.recentSearches)
-        );
-      }
-    }
-  }
+  // Hàm để tải danh sách tìm kiếm gần đây
+  get recentSearches(): string[] { return this.searchService.recent; }
 
   onSearchFocus(): void {
-    if (!this.searchQuery.trim()) {
-      this.showRecentSearches = true;
-    }
+    this.showRecentSearches = true;
   }
 
   onSearchBlur(): void {
@@ -304,13 +329,12 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
   // Hàm để xóa từ khóa tìm kiếm gần đây
   removeRecentSearch(term: string): void {
-    this.recentSearches = this.recentSearches.filter((t) => t !== term);
-    if (this.isBrowser) {
-      localStorage.setItem(
-        'recentSearches',
-        JSON.stringify(this.recentSearches)
-      );
-    }
+    const i = this.recentSearches.indexOf(term);
+    if (i >= 0) this.searchService.removeRecent(i);
+  }
+
+  clearAllRecentSearches() {
+    this.searchService.clearRecent();
   }
 
   // Hàm để toggle See more categories

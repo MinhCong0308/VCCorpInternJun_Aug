@@ -30,7 +30,10 @@
                 <!-- Recent Searches Dropdown -->
                 <div *ngIf="showRecentSearches && !searchQuery && recentSearches.length > 0" class="recent-searches-dropdown shadow"
                     (mousedown)="$event.preventDefault()">
-                    <div class="recent-title">RECENT SEARCHES</div>
+                    <div class="recent-title">
+                        RECENT SEARCHES
+                        <span class="clear-all" (click)="clearAllRecentSearches()">Clear all</span>
+                    </div>
                     <div class="recent-item" *ngFor="let term of recentSearches">
                         <i class="ti-search"></i>
                         <span (click)="repeatSearch(term)">{{ term }}</span>

@@ -5,6 +5,8 @@
     --text-secondary: #6c757d;
     --border-color: #e0e0e0;
     --background-color: #ffffff;
+    --navbar-height: 67.33px;
+    --nav-slide: 0;   
 }
 html, body {
     font-family: var(--body-font);
@@ -31,6 +33,16 @@ body {
 .navbar {
     box-shadow: none;
 }
+.navbar.smart-hide {
+  will-change: transform;
+  transform: translateY(calc(-1 * var(--nav-slide) * var(--navbar-height)));
+}
+@media (prefers-reduced-motion: reduce) {
+  .navbar.smart-hide,
+  .nav-category-bar {
+    transition: none;
+  }
+}
 .search-bar-group {
     max-width: 300px;
     background-color: #f3f3f3;
@@ -47,6 +59,35 @@ body {
 }
 .search-bar-group .form-control::placeholder {
     color: #8a8a8a;
+}
+.recent-searches-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 30%;
+  background: white;
+  border-radius: 6px;
+  z-index: 1000;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+}
+.recent-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+.recent-item:hover {
+  background: #f9f9f9;
+}
+.recent-item i {
+  font-size: 14px;
+  margin: 0 6px;
+}
+.recent-item span {
+  flex: 1;
 }
 .btn-write {
     font-weight: 500;
@@ -106,15 +147,64 @@ body {
     margin: 2.5rem 0 2.2rem 0;
     box-shadow: 0 2px 16px rgba(0,0,0,0.03);
 }
-.post-content {
+:host ::ng-deep .post-content {
     font-family: source-serif-pro, Georgia, Cambria, "Times New Roman", Times, serif;
-    max-width: auto;
+    max-width: 100%;
     margin: auto;
     font-size: 20px;
     line-height: 1.75;
     color: #232323;
     letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
+:host ::ng-deep .post-content img,
+:host ::ng-deep .post-content video,
+:host ::ng-deep .post-content svg,
+:host ::ng-deep .post-content canvas {
+  max-width: 100%;
+  height: auto;
+  display: block; /* để margin auto có tác dụng */
+  margin: 1rem auto;
+}
+:host ::ng-deep .post-content iframe,
+:host ::ng-deep .post-content .ql-video {
+  width: 100% !important;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto !important;
+  display: block;
+  margin: 1rem 0;
+  border: 0;
+}
+:host ::ng-deep .post-content table {
+  width: 100%;
+  border-collapse: collapse;
+  display: block;              /* để overflow-x có tác dụng */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+:host ::ng-deep .post-content th,
+:host ::ng-deep .post-content td {
+  border: 1px solid #eee;
+  padding: 0.5rem;
+}
+:host ::ng-deep .post-content figure {
+  margin: 1.25rem 0;
+}
+:host ::ng-deep .post-content figure img {
+  width: 100%;
+  height: auto;
+}
+:host ::ng-deep .post-content figcaption {
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.95rem;
+  margin-top: 0.35rem;
+}
+:host ::ng-deep .post-content .ql-align-center { text-align: center; }
+:host ::ng-deep .post-content .ql-align-right { text-align: right; }
+:host ::ng-deep .post-content .ql-align-justify { text-align: justify; }
 .post-content h2, .post-content h3, .post-content h4 {
     font-family: var(--heading-font);
     font-weight: 700;
@@ -132,12 +222,23 @@ body {
     margin: 2rem 0;
     padding: 0.7rem 1.5rem;
 }
-.post-content pre, .post-content code {
+:host ::ng-deep .post-content pre {
     font-family: "Fira Mono", "Consolas", "Menlo", monospace;
     background: #f6f6f6;
     border-radius: 5px;
     padding: 0.35em 0.6em;
     font-size: 1rem;
+    white-space: pre-wrap;
+    overflow-x: auto;
+}
+:host ::ng-deep .post-content code {
+    font-family: "Fira Mono", "Consolas", "Menlo", monospace;
+    background: #f6f6f6;
+    border-radius: 5px;
+    padding: 0.35em 0.6em;
+    font-size: 1rem;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 .post-tags {
     margin-top: 2.7rem;
@@ -191,19 +292,22 @@ body {
   position: relative;
   display: inline-block;
 }
-.plus-one {
+.plus-one-bubble {
   position: absolute;
-  left: 100%;
-  top: 0;
-  margin-left: 4px;
-  color: #0d6efd;
+  bottom: 50%;
+  transform: translate(-50%, 0) scale(0.9);
+  font-weight: 700;
   font-size: 14px;
-  animation: floatUp 0.6s ease forwards;
+  color: #0d6efd;
+  pointer-events: none; /* không chặn click */
+  animation: plusPop 520ms cubic-bezier(.21,.75,.19,1) forwards;
+  text-shadow: 0 1px 0 rgba(0,0,0,.12);
+  will-change: transform, opacity;
 }
-
-@keyframes floatUp {
-  0% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-10px); }
+@keyframes plusPop {
+  0%   { opacity: 0; transform: translate(-50%, 0) scale(.9); }
+  12%  { opacity: 1; transform: translate(-50%, -8px) scale(1.02); }
+  100% { opacity: 0; transform: translate(-50%, -42px) scale(1.06); }
 }
 .post-author a {
     color: var(--text-primary);

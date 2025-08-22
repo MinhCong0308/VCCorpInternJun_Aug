@@ -1,0 +1,68 @@
+<!-- Content Header -->
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>View Post</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item">
+            <a routerLink="/admin/dashboard">Home</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a routerLink="/admin/posts">Posts</a>
+          </li>
+          <li class="breadcrumb-item active">{{ post?.title || 'Detail' }}</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main content -->
+<section class="content">
+  <div class="container-fluid">
+    <div *ngIf="loading" class="text-center p-5 text-muted">Loading…</div>
+    <div *ngIf="!loading && error" class="alert alert-danger">{{ error }}</div>
+
+    <div *ngIf="!loading && !error && post" class="card">
+      <div class="card-header d-flex justify-content-between align-items-start">
+        <h3 class="card-title m-0" style="flex: 1; margin-right: 1rem;">{{ post.title }}</h3>
+        <div class="text-right">
+          <span class="badge mr-2" [ngClass]="statusBadge().cls">{{ statusBadge().text }}</span>
+          <button class="btn btn-sm btn-secondary" (click)="backToList()">
+            <i class="fas fa-arrow-left mr-1"></i> Back
+          </button>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <!-- Meta -->
+        <ul class="list-inline text-muted small">
+          <li class="list-inline-item"><i class="fas fa-user mr-1"></i> {{ authorName() }}</li>
+          <li class="list-inline-item"><i class="fas fa-language mr-1"></i> {{ langName() }}</li>
+          <li class="list-inline-item"><i class="far fa-clock mr-1"></i> {{ post.createdAt | date:'medium' }}</li>
+          <li class="list-inline-item" *ngIf="post.updatedAt"><i class="fas fa-sync-alt mr-1"></i> {{ post.updatedAt | date:'medium' }}</li>
+          <li class="list-inline-item" *ngIf="post.like_cnt!=null"><i class="far fa-thumbs-up mr-1"></i> {{ post.like_cnt }}</li>
+          <li class="list-inline-item" *ngIf="post.unlike_cnt!=null"><i class="far fa-thumbs-down mr-1"></i> {{ post.unlike_cnt }}</li>
+          <li class="list-inline-item" *ngIf="post.commentCount!=null"><i class="far fa-comments mr-1"></i> {{ post.commentCount }}</li>
+        </ul>
+
+        <!-- Categories -->
+        <div class="mb-3" *ngIf="post.Categories?.length">
+          <span *ngFor="let c of post.Categories" class="badge badge-info mr-1">{{ c.categoryname }}</span>
+        </div>
+
+        <!-- Cover Image -->
+        <div *ngIf="post.coverImage" class="mb-3 text-center">
+          <img [src]="post.coverImage" class="img-fluid rounded" alt="Cover image"
+               style="max-height: 420px; object-fit: cover" />
+        </div>
+
+        <!-- Content (HTML) -->
+        <div class="post-content" [innerHTML]="safeContent"></div>
+      </div>
+    </div>
+  </div>
+</section>

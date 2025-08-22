@@ -1,24 +1,15 @@
-import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, Inject, OnInit, AfterViewInit, PLATFORM_ID, ViewChild, ElementRef, HostListener, OnDestroy } from '@angular/core';
 import { PostService } from '../../core/services/post.service';
 import { CommentService, Comment } from '../../core/services/comment.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
-import { LanguageService } from '../../core/services/language.service';
+import { LanguageService, Language } from '../../core/services/language.service';
 import { ProfileService, UserProfile } from '../../core/services/profile.service';
-
-interface Language {
-  languageid: number;
-  languagename: string;
-  locale_code: string;
-  is_default: boolean;
-  flag_image: string;
-  status: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { SearchService } from '../../core/services/search.service';
 
 type CommentView = Comment & { depth: number };
+type UiComment = Comment & { children: UiComment[]; depth: number };
 
 @Component({
   selector: 'app-post-detail',
@@ -26,7 +17,7 @@ type CommentView = Comment & { depth: number };
   styleUrls: ['./post-detail.component.css'],
   standalone: false,
 })
-export class PostDetailComponent implements OnInit {
+export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   postId: any;
   post: any;
   comments: CommentView[] = [];
@@ -43,13 +34,38 @@ export class PostDetailComponent implements OnInit {
   defaultAvatar: string = 'https://randomuser.me/api/portraits/lego/1.jpg'; // URL của avatar mặc định
   isLiked: boolean = false;
   isAnimating: boolean = false;
-  showPlusOne: boolean = false;
   coverImageUrl: string = '';
   defaultCoverImage: string = 'https://picsum.photos/1000';
   userid: any;
   languages: Language[] = [];
   currentLanguage: Language | null = null;
   userProfile: UserProfile | null = null;
+  rootComments: UiComment[] = [];
+  visibleRootCount = 4;
+  expandedRootIds = new Set<number>();
+  trackByUiId = (_: number, c: UiComment) => c.commentid;
+  recommendedPosts: any[] = [];
+  defaultThumb = 'https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg';
+  @ViewChild('navbar') navbar!: ElementRef<HTMLElement>;
+  isNavHidden = false;
+  lastScrollY = 0;
+  navSlide = 0;
+  query = '';
+  dropdownOpen = false;
+  LONG_PRESS_MS = 250; // thời gian kích hoạt giữ
+  REPEAT_MS = 120; // chu kỳ lặp like (ms)
+  MAX_PER_HOLD = 50; // giới hạn mỗi lần giữ (để tránh lỡ tay)
+  holdTimeout?: any;
+  repeatInterval?: any;
+  holding = false;
+  longPressed = false;
+  holdCount = 0;
+  // Hàng đợi gửi like
+  likeQueue = 0;
+  sendingLike = false;
+  plusBubbles: { id: number; dx: number }[] = []; // dx: lệch ngang ngẫu nhiên
+  bubbleSeq = 0;
+  trackByBubble = (_: number, b: { id: number }) => b.id;
 
   constructor(
     private route: ActivatedRoute,
@@ -59,17 +75,21 @@ export class PostDetailComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private languageService: LanguageService,
+    public search: SearchService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
+    this.search.query$.subscribe(q => this.query = q || '');
   }
   
 
   ngOnInit(): void {
-    // if (this.isBrowser) {
-    //   this.isLoggedIn = !!localStorage.getItem('accessToken'); // Kiểm tra xem người dùng đã đăng nhập hay chưa
-    //   console.log('Access Token:', localStorage.getItem('accessToken'));
-    // }
+    if (this.isBrowser) {
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'auto';
+      }
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }
     this.authService.checkSession().subscribe({
       next: (ok) => {
         this.isLoggedIn = ok;
@@ -94,6 +114,53 @@ export class PostDetailComponent implements OnInit {
     });
   }
 
+  ngAfterViewInit(): void {
+    if (this.isBrowser) {
+      this.isNavHidden = false;
+      this.setNavSlide(0);
+      this.lastScrollY = window.scrollY || 0;
+    }
+  }
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    if (!this.isBrowser) return;
+
+    const y = window.scrollY || 0;
+    const delta = y - this.lastScrollY;
+
+    // Nếu ở sát đầu trang → mở hoàn toàn
+    if (y <= 0) {
+      this.setNavSlide(0);
+      this.lastScrollY = 0;
+      return;
+    }
+
+    // Nếu menu navbar đang mở (mobile), đừng ẩn
+    const collapse = this.navbar?.nativeElement?.querySelector('.navbar-collapse');
+    const expanded = collapse?.classList.contains('show');
+    if (expanded) {
+      this.setNavSlide(0);
+      this.lastScrollY = y;
+      return;
+    }
+
+    // Tính slide theo tổng quãng cuộn
+    const navH = this.getCssVarPx('--navbar-height', 67.33);
+
+    // 1) tích lũy khoảng ẩn-tính theo px (0..navH)
+    let hiddenPx = this.navSlide * navH + delta;
+
+    // 2) clamp vào 0..navH
+    hiddenPx = Math.max(0, Math.min(navH, hiddenPx));
+
+    // 3) đổi sang tỉ lệ 0..1 và set CSS var
+    const ratio = navH > 0 ? hiddenPx / navH : 0;
+    this.setNavSlide(ratio);
+
+    this.lastScrollY = y;
+  }
+
   loadProfile(): void {
     this.profileService.getUserProfile().subscribe({
       next: (profile) => {
@@ -114,6 +181,7 @@ export class PostDetailComponent implements OnInit {
         this.post = res.data;
         // console.log("this.post=", this.post)
         this.coverImageUrl = res?.data?.coverImage || this.defaultCoverImage;
+        this.loadRecommendations(this.post);
       },
       error: (err) => console.error('Failed to load post', err)
     });
@@ -123,12 +191,14 @@ export class PostDetailComponent implements OnInit {
     this.commentService.getCommentsByPostId(id).subscribe({
       next: (list) => {
         this.comments = this.buildDepthFromNestedSet(list);
+        this.rootComments = this.buildTreeFromNestedSet(list);
+        this.visibleRootCount = Math.min(4, this.rootComments.length);
       },
       error: (err) => console.error('Failed to load comments', err)
     });
   }
 
-  private buildDepthFromNestedSet(list: Comment[]): CommentView[] {
+  buildDepthFromNestedSet(list: Comment[]): CommentView[] {
     // Sắp theo lft ASC, dùng stack để tính depth
     const items = [...list].sort((a, b) => a.lft - b.lft);
     const stack: Comment[] = [];
@@ -144,6 +214,40 @@ export class PostDetailComponent implements OnInit {
       stack.push(c);
     }
     return result;
+  }
+
+  buildTreeFromNestedSet(list: Comment[]): UiComment[] {
+    const sorted = [...list].sort((a, b) => a.lft - b.lft);
+    const items: UiComment[] = sorted.map(c => ({ ...c, children: [], depth: 0 }));
+    const stack: UiComment[] = [];
+    const roots: UiComment[] = [];
+
+    for (const c of items) {
+      while (stack.length && stack[stack.length - 1].rgt < c.lft) stack.pop();
+      c.depth = stack.length; // depth tính theo stack
+      if (stack.length) stack[stack.length - 1].children.push(c);
+      else roots.push(c);
+      stack.push(c);
+    }
+    return roots;
+  }
+
+  getDirectChildCount(root: UiComment) {
+    return root.children.length; // đếm con trực tiếp 
+  }
+
+  toggleReplies(root: UiComment) {
+    if (this.expandedRootIds.has(root.commentid)) this.expandedRootIds.delete(root.commentid);
+    else this.expandedRootIds.add(root.commentid);
+  }
+
+  showMoreRoots() {
+    this.visibleRootCount = Math.min(this.visibleRootCount + 4, this.rootComments.length);
+  }
+
+  hideRoots() {
+    this.visibleRootCount = 4;
+    this.expandedRootIds.clear();
   }
 
   showMore() {
@@ -208,10 +312,9 @@ export class PostDetailComponent implements OnInit {
     }
     this.isAnimating = true;
     this.isLiked = true;
-    this.showPlusOne = true;
+    this.spawnPlusOne();
     setTimeout(() => {
       this.isAnimating = false;
-      this.showPlusOne = false;
     }, 600);
     this.postService.likePost(id).subscribe({
       next: (res: any) => {
@@ -240,6 +343,224 @@ export class PostDetailComponent implements OnInit {
       localStorage.setItem('locale_code', lang.locale_code);
     }
     // Goi service doi ngon ngu o day
+  }
+
+  shuffleInPlace<T>(a: T[]): T[] {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  getCategoryIdSet(post: any): Set<number> {
+    // Hỗ trợ cả 2 dạng: post.Categories (array) hoặc post.categoryid (số)
+    if (post?.Categories?.length) {
+      return new Set(post.Categories.map((c: any) => c.categoryid));
+    }
+    if (typeof post?.categoryid === 'number') {
+      return new Set([post.categoryid]);
+    }
+    return new Set<number>();
+  }
+
+  shareAnyCategory(post: any, currentSet: Set<number>): boolean {
+    if (!currentSet.size) return false;
+    const ids = this.getCategoryIdSet(post);
+    for (const id of ids) if (currentSet.has(id)) return true;
+    return false;
+  }
+
+  loadRecommendations(currentPost: any) {
+    const currentId = currentPost?.postid;
+    const currentCats = this.getCategoryIdSet(currentPost);
+
+    this.postService.getPublishedPosts().subscribe({
+      next: (res: any) => {
+        const all: any[] = res?.data?.posts ?? [];
+        // Loại bài hiện tại
+        let pool = all.filter(p => p.postid !== currentId);
+
+        // Nếu bài hiện tại không có category → chọn ngẫu nhiên 4 từ pool
+        if (!currentCats.size) {
+          this.recommendedPosts = this.shuffleInPlace(pool).slice(0, 4);
+          return;
+        }
+
+        // Chia cùng/khác category (share ít nhất 1 category)
+        const sameCat = this.shuffleInPlace(pool.filter(p => this.shareAnyCategory(p, currentCats)));
+        const otherCat = this.shuffleInPlace(pool.filter(p => !this.shareAnyCategory(p, currentCats)));
+
+        const needed = 4;
+        const takeSame = sameCat.slice(0, Math.min(needed, sameCat.length));
+        const takeOther = otherCat.slice(0, Math.max(0, needed - takeSame.length));
+
+        this.recommendedPosts = [...takeSame, ...takeOther];
+      },
+      error: (e) => console.error('Failed to load recommendations', e),
+    });
+  }
+
+  goToPost(id: number) {
+    this.router.navigate(['/post-detail', id]);
+  }
+
+  setCssVar(name: string, value: string) {
+    if (!this.isBrowser) return;
+    document.documentElement.style.setProperty(name, value);
+  }
+
+  getCssVarPx(name: string, fallback = 0): number {
+    if (!this.isBrowser) return fallback;
+    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  setNavSlide(ratio: number) {
+    // clamp 0..1
+    this.navSlide = Math.max(0, Math.min(1, ratio));
+    this.setCssVar('--nav-slide', `${this.navSlide}`);
+  }
+
+  onSearchFocus() { this.dropdownOpen = true; }
+  onSearchBlur()  { setTimeout(() => this.dropdownOpen = false, 120); }
+
+  submit() {
+    const q = (this.query || '').trim();
+    if (!q) return;
+    this.search.addRecent(q);
+    this.search.setQuery(q);
+    this.dropdownOpen = false;
+    // điều hướng về /home?q=...
+    this.router.navigate(['/home'], { queryParams: { q } });
+  }
+
+  clickRecent(item: string) {
+    this.query = item;
+    this.submit();
+  }
+
+  removeRecent(i: number, ev: MouseEvent) {
+    ev.stopPropagation();
+    this.search.removeRecent(i);
+  }
+
+  clearRecent(ev: MouseEvent) {
+    ev.stopPropagation();
+    this.search.clearRecent();
+  }
+
+  // Hàm để tải danh sách tìm kiếm gần đây
+  get recentSearches(): string[] { return this.search.recent; }
+
+  onLikePress(ev: Event) {
+    if (!this.isLoggedIn) { this.router.navigate(['/auth/login']); return; }
+    if (ev.type === 'touchstart') { ev.preventDefault(); } // tránh click ảo trên mobile
+
+    this.holding = true;
+    this.longPressed = false;
+    this.holdCount = 0;
+
+    // nếu giữ > LONG_PRESS_MS -> bật chế độ lặp
+    this.holdTimeout = setTimeout(() => {
+      if (!this.holding) return;
+      this.longPressed = true;
+      this.startRepeat();
+    }, this.LONG_PRESS_MS);
+  }
+
+  onLikeRelease(_ev?: Event) {
+    if (!this.holding) return;
+    this.holding = false;
+
+    clearTimeout(this.holdTimeout);
+    this.holdTimeout = undefined;
+
+    if (this.longPressed) {
+      clearInterval(this.repeatInterval);
+      this.repeatInterval = undefined;
+    } else {
+      this.likeOnce();
+    }
+  }
+
+  startRepeat() {
+    this.repeatInterval = setInterval(() => {
+      if (!this.holding) { this.onLikeRelease(); return; }
+      if (this.holdCount >= this.MAX_PER_HOLD) { this.onLikeRelease(); return; }
+
+      this.likeOnce();
+      this.holdCount++;
+    }, this.REPEAT_MS);
+  }
+
+  likeOnce() {
+    if (!this.post) return;
+    this.isAnimating = true;
+    this.isLiked = true;
+    this.post.like_cnt = (this.post.like_cnt || 0) + 1;
+    this.spawnPlusOne();
+    setTimeout(() => {
+      this.isAnimating = false;
+    }, 300);
+    this.likeQueue++;
+    this.flushLikeQueue();
+  }
+
+  flushLikeQueue() {
+    if (this.sendingLike || this.likeQueue <= 0) return;
+    const postId = this.post?.postid;
+    if (!postId) { this.likeQueue = 0; return; }
+
+    this.sendingLike = true;
+
+    // gửi 1 request/lần, khi xong nếu còn queue thì gửi tiếp
+    this.postService.likePost(postId).subscribe({
+      next: (res: any) => {
+        const cnt = res?.data?.like_cnt;
+        if (typeof cnt === 'number') this.post.like_cnt = cnt;
+      },
+      error: (err) => {
+        console.error('Failed to like post', err);
+        // rollback 1 đơn vị nếu lỗi
+        this.post.like_cnt = Math.max(0, (this.post.like_cnt || 0) - 1);
+      },
+      complete: () => {
+        this.likeQueue = Math.max(0, this.likeQueue - 1);
+        this.sendingLike = false;
+
+        if (this.likeQueue > 0) {
+          // nghỉ 80ms rồi gửi tiếp
+          setTimeout(() => this.flushLikeQueue(), 80);
+        }
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.holdTimeout);
+    clearInterval(this.repeatInterval);
+  }
+
+  spawnPlusOne() {
+    // Giới hạn tối đa bubble đồng thời để bảo vệ DOM
+    const MAX_BUBBLES = 18;
+    if (this.plusBubbles.length >= MAX_BUBBLES) {
+      this.plusBubbles.shift();
+    }
+
+    const id = ++this.bubbleSeq;
+    // Xê dịch ngang ngẫu nhiên cho tự nhiên (-10px..+10px)
+    const dx = (Math.random() * 20) - 10;
+
+    this.plusBubbles.push({ id, dx });
+  }
+
+  onBubbleDone(id: number) {
+    // Xóa bubble khi animation kết thúc
+    const idx = this.plusBubbles.findIndex(b => b.id === id);
+    if (idx >= 0) this.plusBubbles.splice(idx, 1);
   }
 
   // Hàm để đăng xuất

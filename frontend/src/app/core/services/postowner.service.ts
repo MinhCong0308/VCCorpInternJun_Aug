@@ -12,6 +12,12 @@ export interface Post {
   status: string;
   createdAt: string;
 }
+export interface PagedPosts {
+  items: Post[];
+  total: number;
+  page: number;
+  limit: number;
+}
 @Injectable({
   providedIn: 'root' // for all components
 })
@@ -27,6 +33,19 @@ export class PostBlogOwnerService {
         console.error('Error fetching posts:', error);
         return throwError(() => new Error(error.message || 'Fetch posts error'));
       }));
+  }
+  getAllPostsPaging(page = 1, limit = 10): Observable<PagedPosts> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<{ data: PagedPosts }>(
+      `${this.baseUrl}/get-all-posts-paging`,
+      { headers, withCredentials: true, params: { page, limit } as any }
+    ).pipe(
+      map(res => res.data),
+      catchError(error => {
+        console.error('Error fetching posts:', error);
+        return throwError(() => new Error(error.message || 'Fetch posts error'));
+      })
+    );
   }
   deletePost(postid: number): Observable<{ success: boolean; message?: string }> {
     const headers = new HttpHeaders({

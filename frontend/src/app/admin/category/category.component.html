@@ -49,6 +49,11 @@
               type="text"
               formControlName="categoryname"
               class="form-control"
+              [ngClass]="{
+                'is-invalid':
+                  (categoryForm.get('categoryname')?.touched && categoryForm.get('categoryname')?.invalid) ||
+                  categoryForm.get('categoryname')?.errors?.['duplicate']
+              }"
               placeholder="Enter category name"
             />
             <div
@@ -72,6 +77,11 @@
                 *ngIf="categoryForm.get('categoryname')?.errors?.['maxlength']"
               >
                 Maximum 50 characters.
+              </div>
+              <div
+                *ngIf="categoryForm.get('categoryname')?.errors?.['duplicate']"
+              >
+                Category name already exists.
               </div>
             </div>
           </div>
@@ -100,12 +110,6 @@
   <div class="container-fluid">
     <!-- Card Tìm kiếm -->
     <div class="card card-default">
-      <div class="card-header">
-        <h3 class="card-title">
-          <i class="fas fa-search"></i>
-          Search
-        </h3>
-      </div>
       <div class="card-body">
         <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
           <div class="row">
@@ -155,7 +159,7 @@
                   <th style="width: 60px">#</th>
                   <th>Name</th>
                   <th style="width: 200px; text-align: center">Post Count</th>
-                  <th style="width: 150px; text-align: center">Actions</th>
+                  <th style="width: 100px; text-align: center">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -164,20 +168,32 @@
                   <td>{{ category.categoryname }}</td>
                   <td style="text-align: center">{{ category.totalPost }}</td>
                   <td style="text-align: center">
-                    <button
-                      class="btn btn-sm btn-primary"
-                      (click)="onEdit(category)"
-                      title="Edit"
-                    >
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button
-                      class="btn btn-sm btn-danger ml-1"
-                      (click)="onDelete(category.categoryid)"
-                      title="Delete"
-                    >
-                      <i class="fas fa-trash"></i>
-                    </button>
+                    <div class="btn-group">
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        title="Actions"
+                      >
+                        <i class="fas fa-ellipsis-h"></i>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-right p-0">
+                        <button
+                          class="dropdown-item"
+                          (click)="onEdit(category)"
+                        >
+                          <i class="fas fa-edit text-primary mr-2"></i>Edit
+                        </button>
+                        <button
+                          class="dropdown-item"
+                          (click)="openDeleteConfirm(category)"
+                        >
+                          <i class="fas fa-trash text-danger mr-2"></i>Delete
+                        </button>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -212,3 +228,44 @@
     </div>
   </div>
 </section>
+
+<!-- Confirm Delete Modal -->
+<div
+  class="modal fade"
+  id="confirmDeleteModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="confirmDeleteModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white py-2">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Delete</h5>
+        <button
+          type="button"
+          class="close text-white"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-0">
+          Are you sure you want to delete this category?
+          <strong>{{ deleteTarget?.categoryname }}</strong
+          >?
+        </p>
+      </div>
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

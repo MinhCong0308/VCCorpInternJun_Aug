@@ -5,3 +5,12 @@
 .modal .form-group {
   margin-bottom: 12px;
 }
+
+/* Invalid styling */
+.form-control.is-invalid,
+.form-control.ng-invalid.ng-touched {
+  border-color: #dc3545 !important;
+}
+.invalid-feedback {
+  font-size: 0.75rem;
+}

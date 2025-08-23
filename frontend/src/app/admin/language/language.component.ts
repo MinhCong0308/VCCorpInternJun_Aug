@@ -37,6 +37,20 @@ export class LanguageComponent implements OnInit, AfterViewInit {
 
   private selectedFlagFile: File | null = null;
 
+  confirmModal: {
+    action: 'status' | 'delete' | null;
+    lang: Language | null;
+    title: string;
+    message: string;
+    btnClass: string;
+  } = {
+    action: null,
+    lang: null,
+    title: '',
+    message: '',
+    btnClass: 'btn-primary',
+  };
+
   constructor(private fb: FormBuilder, private service: LanguageService) {
     this.searchForm = this.fb.group({ keyword: [''] });
     this.languageForm = this.fb.group({
@@ -188,7 +202,9 @@ export class LanguageComponent implements OnInit, AfterViewInit {
           (window as any).$('#languageModal').modal('hide');
         },
         error: (err) => {
-          this.errorMsg = err?.error?.message || 'Update failed.';
+          const msg = err?.error?.message || 'Update failed.';
+          this.errorMsg = msg;
+          this.applyServerFieldErrors(msg);
         },
       });
     } else {
@@ -205,7 +221,9 @@ export class LanguageComponent implements OnInit, AfterViewInit {
           (window as any).$('#languageModal').modal('hide');
         },
         error: (err) => {
-          this.errorMsg = err?.error?.message || 'Create failed.';
+          const msg = err?.error?.message || 'Create failed.';
+          this.errorMsg = msg;
+          this.applyServerFieldErrors(msg);
         },
       });
     }
@@ -236,7 +254,9 @@ export class LanguageComponent implements OnInit, AfterViewInit {
         this.selectedFlagFile = null;
       },
       error: (err) => {
-        this.errorMsg = err?.error?.message || 'Create failed.';
+        const msg = err?.error?.message || 'Create failed.';
+        this.errorMsg = msg;
+        this.applyServerFieldErrors(msg);
       },
     });
   }
@@ -260,7 +280,9 @@ export class LanguageComponent implements OnInit, AfterViewInit {
         this.selectedFlagFile = null;
       },
       error: (err) => {
-        this.errorMsg = err?.error?.message || 'Update failed.';
+        const msg = err?.error?.message || 'Update failed.';
+        this.errorMsg = msg;
+        this.applyServerFieldErrors(msg);
       },
     });
   }
@@ -280,17 +302,10 @@ export class LanguageComponent implements OnInit, AfterViewInit {
   }
 
   onDelete(id: number): void {
-    if (!confirm('Are you sure you want to delete this language?')) return;
-    this.service.deleteLanguage(id).subscribe({
-      next: () => {
-        if (this.languages.length === 1 && this.currentPage > 1)
-          this.currentPage--;
-        this.loadLanguages(this.currentPage);
-      },
-      error: (err) => {
-        this.errorMsg = err?.error?.message || 'Delete failed.';
-      },
-    });
+    this.openConfirm(
+      this.languages.find((l) => l.languageid === id) || null,
+      'delete'
+    );
   }
 
   flagUrl(path: string): string {
@@ -298,5 +313,72 @@ export class LanguageComponent implements OnInit, AfterViewInit {
     if (/^https?:\/\//i.test(path)) return path;
     const fixed = path.startsWith('/') ? path : `/${path}`;
     return `${this.apiBase}${fixed}`;
+  }
+
+  openConfirm(lang: Language | null, action: 'status' | 'delete'): void {
+    if (!lang) return;
+    this.confirmModal.lang = lang;
+    this.confirmModal.action = action;
+    if (action === 'status') {
+      const willDisable = !!lang.status;
+      this.confirmModal.title = willDisable
+        ? 'Confirm Disable'
+        : 'Confirm Enable';
+      this.confirmModal.message = `${
+        willDisable ? 'Disable' : 'Enable'
+      } language "${lang.languagename}"?`;
+      this.confirmModal.btnClass = willDisable ? 'btn-warning' : 'btn-success';
+    } else {
+      this.confirmModal.title = 'Confirm Delete';
+      this.confirmModal.message = `Delete language "${lang.languagename}"? This action cannot be undone.`;
+      this.confirmModal.btnClass = 'btn-danger';
+    }
+    if (typeof $ === 'function') {
+      $('#languageActionModal').modal('show');
+    }
+  }
+
+  confirmAction(): void {
+    const { action, lang } = this.confirmModal;
+    if (!action || !lang) return;
+    if (action === 'status') {
+      this.onToggleStatus(lang);
+    } else if (action === 'delete') {
+      this.service.deleteLanguage(lang.languageid).subscribe({
+        next: () => {
+          if (this.languages.length === 1 && this.currentPage > 1)
+            this.currentPage--;
+          this.loadLanguages(this.currentPage);
+        },
+        error: (err) => {
+          this.errorMsg = err?.error?.message || 'Delete failed.';
+        },
+      });
+    }
+    if (typeof $ === 'function') {
+      $('#languageActionModal').modal('hide');
+    }
+    setTimeout(() => {
+      this.confirmModal = {
+        action: null,
+        lang: null,
+        title: '',
+        message: '',
+        btnClass: 'btn-primary',
+      };
+    }, 300);
+  }
+
+  private applyServerFieldErrors(msg: string): void {
+    const nameCtrl = this.languageForm.get('languagename');
+    const localeCtrl = this.languageForm.get('locale_code');
+    if (/language name already exists/i.test(msg)) {
+      nameCtrl?.setErrors({ ...(nameCtrl.errors || {}), duplicate: true });
+      nameCtrl?.markAsTouched();
+    }
+    if (/locale code already exists/i.test(msg)) {
+      localeCtrl?.setErrors({ ...(localeCtrl.errors || {}), duplicate: true });
+      localeCtrl?.markAsTouched();
+    }
   }
 }

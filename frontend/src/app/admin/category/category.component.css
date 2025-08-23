@@ -1,0 +1,11 @@
+/* Highlight invalid input with red border */
+.form-control.ng-invalid.ng-touched,
+.form-control.is-invalid {
+  border-color: #dc3545 !important;
+  box-shadow: none;
+}
+
+/* Optional: valid green */
+.form-control.ng-valid.ng-touched {
+  border-color: #28a745;
+}

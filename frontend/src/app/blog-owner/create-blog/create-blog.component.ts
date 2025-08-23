@@ -491,6 +491,8 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       
     } catch (error) {
       console.error('Error loading post for editing:', error);
+      this.isLoading = false; 
+      this.isInitializing = false;
       this.notificationService.error(
         'Post Loading Failed',
         'Failed to load post for editing. Please try again.',
@@ -500,9 +502,12 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
             action: () => this.router.navigate(['/useraccount/profile']),
             style: 'primary'
           }
-        ]
+        ],
+        3000
       );
-      throw error;
+      setTimeout(() => {
+        this.router.navigate(['/useraccount/profile']);
+      }, 3000);
     }
   }
 

@@ -112,7 +112,14 @@
                 <div class="flex-grow-1">
                   <div class="d-flex justify-content-between align-items-center mb-2">
                     <h2 class="mb-0">
-                      <a [routerLink]="['/post-detail', post.postid]" (click)="$event.stopPropagation()" class="blog-title">{{ post.title }}</a>
+                      <a *ngIf="post.status === 'APPROVED'" 
+                        [routerLink]="['/post-detail', post.postid]" 
+                        (click)="$event.stopPropagation()" 
+                        class="blog-title">{{ post.title }}</a>                      
+                      <span *ngIf="post.status !== 'APPROVED'" 
+                            class="blog-title blog-title-disabled"
+                            (click)="showPostStatusNotification(post, $event)"
+                            title="Only approved posts can be viewed">{{ post.title }}</span>
                     </h2>
                     <span class="blog-status" 
                           [ngClass]="{
@@ -124,19 +131,23 @@
                   <p class="blog-subtitle">{{ truncateContent(post.content) }}</p>
                   <div class="blog-meta">
                     <span class="blog-date">{{ formatDate(post.createdAt) }}</span>
-                    <div class="dropdown post-options">
-                      <span class="more-options" role="button" 
-                            data-bs-toggle="dropdown" aria-expanded="false">⋯</span>
-                      <ul class="dropdown-menu">
-                        <li>
-                          <a class="dropdown-item" href="#" 
-                             (click)="editPost(post.postid, $event)">Edit</a>
-                        </li>
-                        <li>
-                          <a class="dropdown-item" href="#" 
-                             (click)="deletePost(post.postid, $event)">Delete</a>
-                        </li>
-                      </ul>
+                    <div class="post-actions d-flex gap-2 ms-3">
+                      <!-- Edit button - only visible for PENDING posts -->
+                      <button *ngIf="post.status === 'PENDING'" 
+                              class="btn btn-sm btn-outline-primary post-action-btn"
+                              (click)="editPost(post.postid, $event)"
+                              title="Edit post">
+                        <i class="ti-pencil"></i>
+                        <span class="d-none d-sm-inline ms-1">Edit</span>
+                      </button>
+                      
+                      <!-- Delete button - always visible -->
+                      <button class="btn btn-sm btn-outline-danger post-action-btn"
+                              (click)="deletePost(post.postid, $event)"
+                              title="Delete post">
+                        <i class="ti-trash"></i>
+                        <span class="d-none d-sm-inline ms-1">Delete</span>
+                      </button>
                     </div>
                   </div>
                 </div>

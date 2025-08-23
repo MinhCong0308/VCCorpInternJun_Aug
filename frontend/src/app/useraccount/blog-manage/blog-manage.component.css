@@ -35,3 +35,99 @@
   display: flex;
   flex-direction: column;
 }
+/* Post action buttons styling */
+.blog-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.post-actions {
+  display: flex;
+  align-items: center;
+}
+
+.post-action-btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.post-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.post-action-btn i {
+  font-size: 0.875rem;
+}
+
+/* Responsive behavior */
+@media (max-width: 576px) {
+  .blog-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .post-actions {
+    margin-top: 0.5rem;
+  }
+  
+  .post-action-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Blog post container */
+.blog-post {
+  transition: all 0.2s ease;
+} 
+
+
+.blog-post .post-actions {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.blog-post:hover .post-actions {
+  opacity: 1;
+}
+
+.post-action-btn.btn-outline-primary {
+  border-color: #0d6efd;
+  color: #0d6efd;
+}
+
+.post-action-btn.btn-outline-danger {
+  border-color: #dc3545;
+  color: #dc3545;
+}
+/* Disabled blog title styling */
+.blog-title-disabled {
+  color: #6c757d;
+  cursor: pointer;
+  text-decoration: none;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.blog-title-disabled:hover {
+  opacity: 1;
+  color: #495057;
+}
+
+/* Optional: Add visual indicators for different statuses */
+.blog-post {
+  position: relative;
+}
+
+.blog-post .blog-title-disabled::after {
+  font-size: 0.8em;
+  opacity: 0.6;
+}
+

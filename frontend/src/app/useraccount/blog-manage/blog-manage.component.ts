@@ -209,6 +209,9 @@ export class BlogManageComponent implements OnInit {
     this.page = 1;
     this.loadPosts();
   }
-
   trackByPostId = (_: number, p: Post) => p.postid;
+  showPostStatusNotification(post: Post, event: Event): void {
+    event.preventDefault();
+    this.notificationService.error('Post Status', `Only approved post can be seen`);
+  }
 }

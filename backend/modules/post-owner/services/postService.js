@@ -74,6 +74,15 @@ const postService = {
             await postService.setTagsForPost(post.postid, originalPost.tags);
             // Update translations
             if (translations && translations.length > 0) {
+                const translationLanguageIds = translations.map(t => t.languageid);
+                const oldTranslations = await db.Post.findAll({ 
+                    where: { 
+                        original_postid: postid, 
+                        languageid: { [Op.notIn]: translationLanguageIds },
+                        postid: { [Op.ne]: postid }
+                    } 
+                });
+                await Promise.all(oldTranslations.map(trans => trans.destroy()));
                 for (const translation of translations) {
                     const trans = await db.Post.findOne({ where: { original_postid: postid, languageid: translation.languageid } });
                     if (trans) {

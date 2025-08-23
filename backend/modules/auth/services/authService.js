@@ -46,8 +46,7 @@ const authService = {
     };
   },
   async signup(userInfo) {
-    const { firstname, lastname, username, email, password, confirm_password } =
-      userInfo;
+    const { firstName, lastName, username, email, password, confirmPassword } = userInfo;
     const existingUser = await db.User.findOne({
       where: {
         [Op.or]: [{ email: email }, { username: username }],
@@ -56,14 +55,14 @@ const authService = {
     if (existingUser) {
       throw new Error("Email or username is already registered.");
     }
-    if (password != confirm_password) {
+    if (password != confirmPassword) {
       throw new Error("Password and confirm password must be identical");
     }
     // initialize a unauthenticated user
     const hashed_password = await bcrypt.hash(password, 10);
     const newUser = await db.User.create({
-      firstname,
-      lastname,
+      firstname: firstName,
+      lastname: lastName,
       username,
       email,
       hashed_password,
@@ -103,6 +102,7 @@ const authService = {
     const otp = await this.genOTP();
     await redis.set(email, otp, { EX: 300 }); // 300s = 5 minitues
     await this.sendOTP(email, otp);
+    console.log("OTP sent successfully");
   },
   async verifyOTP(email, inputOTP) {
     const storedOTP = await redis.get(email);

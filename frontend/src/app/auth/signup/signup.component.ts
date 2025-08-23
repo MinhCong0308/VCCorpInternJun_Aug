@@ -79,6 +79,9 @@ export class SignupComponent implements OnInit {
     this.authService.signup(this.signupForm.value).subscribe({
       next: (response) => {
         this.successMessage = response.message;
+        if(this.isBrowser) {
+          localStorage.setItem('verifyEmail', this.signupForm.value.email);
+        }
         this.router.navigate(['/auth/verify-otp']);
       },
       error: (error) => {

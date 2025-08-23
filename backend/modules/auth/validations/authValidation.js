@@ -6,11 +6,12 @@ const authValidation = {
     new BodyWithLocale("password").notEmpty(),
   ],
   signUp: [
-    new BodyWithLocale("firstname").notEmpty().isString(),
-    new BodyWithLocale("lastname").notEmpty().isString(),
+    new BodyWithLocale("firstName").notEmpty(),
+    new BodyWithLocale("lastName").notEmpty(),
     new BodyWithLocale("email").notEmpty().isEmail(),
+    new BodyWithLocale("username").notEmpty(),
     new BodyWithLocale("password").notEmpty().isLength({ min: 5 }),
-    new BodyWithLocale("confirm_password").notEmpty().confirmed("password"),
+    new BodyWithLocale("confirmPassword").notEmpty().confirmed("password"),
   ],
   verifyOTP: [
     new BodyWithLocale("inputOTP").notEmpty().isLength({ min: 6, max: 6 }),

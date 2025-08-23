@@ -38,12 +38,12 @@ interface AdminLogInWrapper {
   message: string;
 }
 interface SignUpInput {
-  firstname: string;
-  lastname: string;
+  firstName: string;
+  lastName: string;
   username: string;
   email: string;
   password: string;
-  confirm_password: string;
+  confirmPassword: string;
 }
 interface SignUpWrapper {
   success: boolean;
@@ -146,7 +146,6 @@ export class AuthService {
 
     console.log('AUTH SERVICE: Making new session check request');
 
-    // ✅ Remove all delays - make it immediate
     this.sessionCheck$ = this.http
       .get<{ success: boolean }>(`${this.baseUrl}/me`, {
         withCredentials: true,
@@ -229,7 +228,6 @@ export class AuthService {
       );
   }
 
-  // ✅ Add the clearSessionCache method
   clearSessionCache(): void {
     console.log('Manually clearing session cache');
     this.sessionCheck$ = null;
@@ -237,11 +235,12 @@ export class AuthService {
 
   signup(formData: SignUpInput): Observable<SignUpWrapper> {
     const url = `${this.baseUrl}/signup`;
+    // const headers = new HttpHeaders().set('skip-interceptor', 'true');
     return this.http
       .post<SignUpWrapper>(url, formData, { withCredentials: true })
       .pipe(
         tap(() => {
-          this.clearSessionCache(); // ✅ Use the method
+          this.clearSessionCache(); 
           console.log('Signup successful - cleared session cache');
         }),
         catchError((error) => {

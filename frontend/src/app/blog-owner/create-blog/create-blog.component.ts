@@ -846,7 +846,8 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
         const action = this.isEditMode ? 'updated' : 'submitted';
         this.notificationService.success(
           'Success!',
-          `Your blog "${payload.originalPost.title}" and its ${payload.translations.length} translation(s) were ${action} successfully! Redirecting...`
+          `Your blog "${payload.originalPost.title}" and its ${payload.translations.length} translation(s) were ${action} successfully! Redirecting...`,
+          2000
         );
         this.isLoading = false;
         setTimeout(() => {

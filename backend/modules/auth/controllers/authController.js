@@ -65,6 +65,7 @@ const authController = {
         message: "User created. Please verify your email with OTP.",
       });
     } catch (error) {
+      console.log("Sign Up error: ", error.message);
       return responseUtils.unauthorized(res, error.message);
     }
   },

@@ -21,9 +21,17 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
   const http = inject(HttpClient);
   const router = inject(Router);
 
-  if (req.url.includes('/auth/refresh') || req.url.includes('/auth/login')) {
+  if (req.url.includes('/auth/refresh') || req.url.includes('/auth/login') || req.url.includes('/auth/signup')) {
     return next(req);
   }
+  // if (req.headers.has('skip-interceptor')) {
+  //   console.log('TokenInterceptor: Skipping due to skip-interceptor header');
+  //   // Remove the custom header before sending the request
+  //   const cleanedReq = req.clone({
+  //     headers: req.headers.delete('skip-interceptor')
+  //   });
+  //   return next(cleanedReq);
+  // }
 
   function refreshCall(): Observable<any> {
     if (isRefreshing) {

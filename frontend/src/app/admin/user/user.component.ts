@@ -27,6 +27,20 @@ export class UserComponent implements OnInit, AfterViewInit {
   totalItems = 0;
   private apiBase = 'http://localhost:3000';
 
+  confirmModal: {
+    action: 'role' | 'status' | null;
+    user: AdminUser | null;
+    title: string;
+    message: string;
+    btnClass: string;
+  } = {
+    action: null,
+    user: null,
+    title: '',
+    message: '',
+    btnClass: 'btn-primary',
+  };
+
   constructor(private fb: FormBuilder, private service: UserService) {
     this.searchForm = this.fb.group({ keyword: [''] });
   }
@@ -149,5 +163,50 @@ export class UserComponent implements OnInit, AfterViewInit {
           this.errorMsg = err?.error?.message || 'Failed to create user.';
         },
       });
+  }
+
+  openConfirm(user: AdminUser, action: 'role' | 'status'): void {
+    this.confirmModal.user = user;
+    this.confirmModal.action = action;
+    if (action === 'role') {
+      const targetRole = user.roleid === 2 ? 'User' : 'Admin';
+      this.confirmModal.title = 'Confirm Role Change';
+      this.confirmModal.message = `Change role of "${user.username}" to ${targetRole}?`;
+      this.confirmModal.btnClass = 'btn-info';
+    } else {
+      const willDisable = user.status === 1;
+      this.confirmModal.title = willDisable
+        ? 'Confirm Disable'
+        : 'Confirm Enable';
+      this.confirmModal.message = `${
+        willDisable ? 'Disable' : 'Enable'
+      } user "${user.username}"?`;
+      this.confirmModal.btnClass = willDisable ? 'btn-warning' : 'btn-success';
+    }
+    if (typeof $ === 'function') {
+      $('#userActionModal').modal('show');
+    }
+  }
+
+  confirmAction(): void {
+    const { action, user } = this.confirmModal;
+    if (!action || !user) return;
+    if (action === 'role') {
+      this.onChangeRole(user);
+    } else if (action === 'status') {
+      this.onToggleStatus(user);
+    }
+    if (typeof $ === 'function') {
+      $('#userActionModal').modal('hide');
+    }
+    setTimeout(() => {
+      this.confirmModal = {
+        action: null,
+        user: null,
+        title: '',
+        message: '',
+        btnClass: 'btn-primary',
+      };
+    }, 300);
   }
 }

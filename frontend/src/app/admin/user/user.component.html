@@ -20,12 +20,6 @@
 <section class="content">
   <div class="container-fluid">
     <div class="card card-default">
-      <div class="card-header">
-        <h3 class="card-title">
-          <i class="fas fa-search"></i>
-          Search
-        </h3>
-      </div>
       <div class="card-body">
         <form (submit)="onSearch($event, kw.value)">
           <div class="row">
@@ -88,7 +82,7 @@
                   <th style="width: 150px; text-align: center">Status</th>
 
                   <th style="width: 150px; text-align: center">Role</th>
-                  <th style="width: 150px; text-align: center">Actions</th>
+                  <th style="width: 100px; text-align: center">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -120,31 +114,43 @@
                     </span>
                   </td>
                   <td style="text-align: center">
-                    <a
-                      href="#"
-                      class="btn btn-sm mr-1"
-                      [ngClass]="
-                        u.roleid === 2 ? 'btn-secondary' : 'btn-success'
-                      "
-                      title="Change Role"
-                      (click)="$event.preventDefault(); onChangeRole(u)"
-                    >
-                      <i class="fas fa-user"></i>
-                    </a>
-                    <a
-                      href="#"
-                      class="btn btn-sm"
-                      [ngClass]="u.status === 1 ? 'btn-danger' : 'btn-success'"
-                      (click)="$event.preventDefault(); onToggleStatus(u)"
-                      [attr.title]="
-                        u.status === 1 ? 'Disable User' : 'Enable User'
-                      "
-                    >
-                      <i
-                        class="fas"
-                        [ngClass]="u.status === 1 ? 'fa-ban' : 'fa-check'"
-                      ></i>
-                    </a>
+                    <div class="btn-group">
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        title="Actions"
+                      >
+                        <i class="fas fa-ellipsis-h"></i>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-right p-0">
+                        <button
+                          class="dropdown-item"
+                          (click)="openConfirm(u, 'role')"
+                        >
+                          <i class="fas fa-user mr-2 text-primary"></i>Change
+                          Role
+                        </button>
+                        <button
+                          class="dropdown-item"
+                          (click)="openConfirm(u, 'status')"
+                        >
+                          <i
+                            class="fas"
+                            [ngClass]="
+                              u.status === 1
+                                ? 'fa-ban text-danger'
+                                : 'fa-check text-success'
+                            "
+                          ></i>
+                          <span class="ml-2">{{
+                            u.status === 1 ? "Disable User" : "Enable User"
+                          }}</span>
+                        </button>
+                      </div>
+                    </div>
                   </td>
                 </tr>
                 <tr *ngIf="users.length === 0">
@@ -186,6 +192,53 @@
     </div>
   </div>
 </section>
+
+<!-- Confirmation Modal -->
+<div
+  class="modal fade"
+  id="userActionModal"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div
+        class="modal-header py-2"
+        [ngClass]="confirmModal.action === 'status' ? 'bg-warning' : 'bg-info'"
+      >
+        <h5 class="modal-title">{{ confirmModal.title }}</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-0">{{ confirmModal.message }}</p>
+        <small class="text-muted" *ngIf="confirmModal.user"
+          >User: {{ confirmModal.user.username }}</small
+        >
+      </div>
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn"
+          [ngClass]="confirmModal.btnClass"
+          (click)="confirmAction()"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Add User Modal -->
 <div

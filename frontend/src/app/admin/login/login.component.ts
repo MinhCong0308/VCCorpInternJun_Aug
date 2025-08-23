@@ -70,7 +70,7 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
         next: (res) => {
           console.debug('[AdminLogin] Response', res);
           if (res?.success) {
-            this.router.navigate(['/admin/categories']);
+            this.router.navigate(['/admin/dashboard']);
           } else {
             this.errorMessage = res?.message || 'Login failed.';
           }

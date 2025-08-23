@@ -1,21 +1,34 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { PostAdminService } from '../../core/services/post-admin.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+
+declare const $: any; // jQuery for AdminLTE modal & tooltip
 
 @Component({
   selector: 'app-view-post',
   standalone: true,
   imports: [CommonModule, RouterModule, DatePipe],
   templateUrl: './view-post.component.html',
-  styleUrls: ['./view-post.component.css']
+  styleUrls: ['./view-post.component.css'],
 })
-export class ViewPostComponent implements OnInit {
+export class ViewPostComponent implements OnInit, AfterViewInit {
   loading = false;
   error = '';
   post: any = null;
   safeContent: SafeHtml | null = null;
+  confirmModal: {
+    action: 'approve' | 'reject' | null;
+    title: string;
+    message: string;
+    btnClass: string;
+  } = {
+    action: null,
+    title: '',
+    message: '',
+    btnClass: 'btn-primary',
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -34,6 +47,12 @@ export class ViewPostComponent implements OnInit {
     this.fetch(postid);
   }
 
+  ngAfterViewInit(): void {
+    if (typeof $ === 'function') {
+      $('[data-toggle="tooltip"]').tooltip();
+    }
+  }
+
   fetch(postid: number) {
     this.loading = true;
     this.error = '';
@@ -41,7 +60,9 @@ export class ViewPostComponent implements OnInit {
       next: (data) => {
         this.post = data || null;
         // Content từ editor trả về HTML: tin cậy từ backend admin => dùng Sanitizer
-        this.safeContent = this.sanitizer.bypassSecurityTrustHtml(this.post?.content || '');
+        this.safeContent = this.sanitizer.bypassSecurityTrustHtml(
+          this.post?.content || ''
+        );
         this.loading = false;
       },
       error: (err) => {
@@ -71,5 +92,57 @@ export class ViewPostComponent implements OnInit {
 
   backToList() {
     this.router.navigate(['/admin/posts']);
+  }
+
+  openConfirm(action: 'approve' | 'reject') {
+    this.confirmModal.action = action;
+    if (action === 'approve') {
+      this.confirmModal.title = 'Confirm Publish';
+      this.confirmModal.message = 'Are you sure you want to publish this post?';
+      this.confirmModal.btnClass = 'btn-success';
+    } else {
+      this.confirmModal.title = 'Confirm Reject';
+      this.confirmModal.message = 'Are you sure you want to reject this post?';
+      this.confirmModal.btnClass = 'btn-danger';
+    }
+    if (typeof $ === 'function') {
+      $('#confirmActionModal').modal('show');
+    }
+  }
+
+  confirmAction() {
+    if (!this.confirmModal.action || !this.post?.postid) return;
+    const id = this.post.postid;
+    if (this.confirmModal.action === 'approve') {
+      this.service.approvePost(id).subscribe({
+        next: (res) => {
+          this.post.status = res.status;
+          this.closeModal();
+        },
+        error: () => this.closeModal(),
+      });
+    } else {
+      this.service.rejectPost(id).subscribe({
+        next: (res) => {
+          this.post.status = res.status;
+          this.closeModal();
+        },
+        error: () => this.closeModal(),
+      });
+    }
+  }
+
+  private closeModal() {
+    if (typeof $ === 'function') {
+      $('#confirmActionModal').modal('hide');
+    }
+    setTimeout(() => {
+      this.confirmModal = {
+        action: null,
+        title: '',
+        message: '',
+        btnClass: 'btn-primary',
+      };
+    }, 300);
   }
 }

@@ -19,12 +19,6 @@
 <section class="content">
   <div class="container-fluid">
     <div class="card card-default">
-      <div class="card-header">
-        <h3 class="card-title">
-          <i class="fas fa-search"></i>
-          Search
-        </h3>
-      </div>
       <div class="card-body">
         <form (submit)="onSearch($event, kw.value)">
           <div class="row">
@@ -78,7 +72,7 @@
               <th style="width: 150px; text-align: center">Flag</th>
               <th style="width: 150px; text-align: center">Status</th>
               <th style="width: 120px; text-align: center">Default</th>
-              <th style="width: 150px; text-align: center">Actions</th>
+              <th style="width: 110px; text-align: center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -106,26 +100,45 @@
                 >
               </td>
               <td style="text-align: center">
-                <a
-                  href="#"
-                  class="btn btn-sm btn-primary"
-                  title="Edit"
-                  (click)="$event.preventDefault(); onEdit(lang)"
-                >
-                  <i class="fas fa-edit"></i>
-                </a>
-                <a
-                  href="#"
-                  class="btn btn-sm"
-                  [ngClass]="lang.status ? 'btn-danger' : 'btn-success'"
-                  (click)="$event.preventDefault(); onToggleStatus(lang)"
-                  [attr.title]="lang.status ? 'Disable' : 'Enable'"
-                >
-                  <i
-                    class="fas"
-                    [ngClass]="lang.status ? 'fa-ban' : 'fa-check'"
-                  ></i>
-                </a>
+                <div class="btn-group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    title="Actions"
+                  >
+                    <i class="fas fa-ellipsis-h"></i>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right p-0">
+                    <button class="dropdown-item" (click)="openEditModal(lang)">
+                      <i class="fas fa-edit text-primary mr-2"></i>Edit
+                    </button>
+                    <button
+                      class="dropdown-item"
+                      (click)="openConfirm(lang, 'status')"
+                    >
+                      <i
+                        class="fas"
+                        [ngClass]="
+                          lang.status
+                            ? 'fa-ban text-danger'
+                            : 'fa-check text-success'
+                        "
+                      ></i>
+                      <span class="ml-2">{{
+                        lang.status ? "Disable" : "Enable"
+                      }}</span>
+                    </button>
+                    <button
+                      class="dropdown-item"
+                      (click)="openConfirm(lang, 'delete')"
+                    >
+                      <i class="fas fa-trash text-danger mr-2"></i>Delete
+                    </button>
+                  </div>
+                </div>
               </td>
             </tr>
             <tr *ngIf="languages.length === 0">
@@ -157,6 +170,58 @@
   </div>
 </section>
 
+<!-- Confirmation Modal -->
+<div
+  class="modal fade"
+  id="languageActionModal"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div
+        class="modal-header py-2"
+        [ngClass]="{
+          'bg-info': confirmModal.action === 'status',
+          'bg-danger': confirmModal.action === 'delete',
+          'bg-secondary':
+            confirmModal.action === 'status' && !confirmModal.lang?.status
+        }"
+      >
+        <h5 class="modal-title">{{ confirmModal.title }}</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-0">{{ confirmModal.message }}</p>
+        <small class="text-muted" *ngIf="confirmModal.lang"
+          >Language: {{ confirmModal.lang.languagename }}</small
+        >
+      </div>
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn"
+          [ngClass]="confirmModal.btnClass"
+          (click)="confirmAction()"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Add Language Modal -->
 <div
   class="modal fade"
@@ -186,7 +251,33 @@
               type="text"
               class="form-control"
               formControlName="languagename"
+              [ngClass]="{'is-invalid': languageForm.get('languagename')?.touched && languageForm.get('languagename')?.invalid || languageForm.get('languagename')?.errors?.['duplicate']}"
             />
+            <div
+              class="invalid-feedback d-block"
+              *ngIf="languageForm.get('languagename')?.errors && (languageForm.get('languagename')?.touched || languageForm.get('languagename')?.errors?.['duplicate'])"
+            >
+              <div
+                *ngIf="languageForm.get('languagename')?.errors?.['required']"
+              >
+                Name is required.
+              </div>
+              <div
+                *ngIf="languageForm.get('languagename')?.errors?.['minlength']"
+              >
+                Minimum 2 characters.
+              </div>
+              <div
+                *ngIf="languageForm.get('languagename')?.errors?.['maxlength']"
+              >
+                Maximum 50 characters.
+              </div>
+              <div
+                *ngIf="languageForm.get('languagename')?.errors?.['duplicate']"
+              >
+                Language name already exists.
+              </div>
+            </div>
           </div>
           <div class="form-group">
             <label>Locale code</label>
@@ -194,7 +285,28 @@
               type="text"
               class="form-control"
               formControlName="locale_code"
+              [ngClass]="{'is-invalid': languageForm.get('locale_code')?.touched && languageForm.get('locale_code')?.invalid || languageForm.get('locale_code')?.errors?.['duplicate']}"
             />
+            <div
+              class="invalid-feedback d-block"
+              *ngIf="languageForm.get('locale_code')?.errors && (languageForm.get('locale_code')?.touched || languageForm.get('locale_code')?.errors?.['duplicate'])"
+            >
+              <div
+                *ngIf="languageForm.get('locale_code')?.errors?.['required']"
+              >
+                Locale code is required.
+              </div>
+              <div
+                *ngIf="languageForm.get('locale_code')?.errors?.['maxlength']"
+              >
+                Maximum 10 characters.
+              </div>
+              <div
+                *ngIf="languageForm.get('locale_code')?.errors?.['duplicate']"
+              >
+                Locale code already exists.
+              </div>
+            </div>
           </div>
           <div class="form-group">
             <label>Flag image (required)</label>
@@ -269,7 +381,33 @@
               type="text"
               class="form-control"
               formControlName="languagename"
+              [ngClass]="{'is-invalid': languageForm.get('languagename')?.touched && languageForm.get('languagename')?.invalid || languageForm.get('languagename')?.errors?.['duplicate']}"
             />
+            <div
+              class="invalid-feedback d-block"
+              *ngIf="languageForm.get('languagename')?.errors && (languageForm.get('languagename')?.touched || languageForm.get('languagename')?.errors?.['duplicate'])"
+            >
+              <div
+                *ngIf="languageForm.get('languagename')?.errors?.['required']"
+              >
+                Name is required.
+              </div>
+              <div
+                *ngIf="languageForm.get('languagename')?.errors?.['minlength']"
+              >
+                Minimum 2 characters.
+              </div>
+              <div
+                *ngIf="languageForm.get('languagename')?.errors?.['maxlength']"
+              >
+                Maximum 50 characters.
+              </div>
+              <div
+                *ngIf="languageForm.get('languagename')?.errors?.['duplicate']"
+              >
+                Language name already exists.
+              </div>
+            </div>
           </div>
           <div class="form-group">
             <label>Locale code</label>
@@ -277,7 +415,28 @@
               type="text"
               class="form-control"
               formControlName="locale_code"
+              [ngClass]="{'is-invalid': languageForm.get('locale_code')?.touched && languageForm.get('locale_code')?.invalid || languageForm.get('locale_code')?.errors?.['duplicate']}"
             />
+            <div
+              class="invalid-feedback d-block"
+              *ngIf="languageForm.get('locale_code')?.errors && (languageForm.get('locale_code')?.touched || languageForm.get('locale_code')?.errors?.['duplicate'])"
+            >
+              <div
+                *ngIf="languageForm.get('locale_code')?.errors?.['required']"
+              >
+                Locale code is required.
+              </div>
+              <div
+                *ngIf="languageForm.get('locale_code')?.errors?.['maxlength']"
+              >
+                Maximum 10 characters.
+              </div>
+              <div
+                *ngIf="languageForm.get('locale_code')?.errors?.['duplicate']"
+              >
+                Locale code already exists.
+              </div>
+            </div>
           </div>
           <div class="form-group">
             <label>Flag image (optional)</label>

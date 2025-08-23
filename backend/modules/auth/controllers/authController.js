@@ -48,7 +48,7 @@ const authController = {
         sameSite: "lax",
         maxAge: 604800000, // 1 week
       });
-      return responseUtils.ok(res, data);
+      return responseUtils.ok(res, data.user);
     } catch (error) {
       console.error("Admin Login error: ", error);
       return responseUtils.unauthorized(res, error.message);

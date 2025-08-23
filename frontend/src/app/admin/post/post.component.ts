@@ -29,6 +29,21 @@ export class PostComponent implements OnInit, AfterViewInit {
 
   categories: { categoryid: number; categoryname: string }[] = [];
 
+  // Confirmation modal state
+  confirmModal: {
+    action: 'approve' | 'reject' | null;
+    post: AdminPostSummary | null;
+    title: string;
+    message: string;
+    btnClass: string;
+  } = {
+    action: null,
+    post: null,
+    title: '',
+    message: '',
+    btnClass: 'btn-primary',
+  };
+
   constructor(private fb: FormBuilder, private service: PostAdminService) {
     this.filterForm = this.fb.group({
       keyword: [''],
@@ -141,5 +156,45 @@ export class PostComponent implements OnInit, AfterViewInit {
       error: (err) =>
         (this.errorMsg = err?.error?.message || 'Failed to reject post.'),
     });
+  }
+
+  openConfirm(post: AdminPostSummary, action: 'approve' | 'reject'): void {
+    this.confirmModal.post = post;
+    this.confirmModal.action = action;
+    if (action === 'approve') {
+      this.confirmModal.title = 'Confirm Publish';
+      this.confirmModal.message = 'Are you sure you want to publish this post?';
+      this.confirmModal.btnClass = 'btn-success';
+    } else {
+      this.confirmModal.title = 'Confirm Reject';
+      this.confirmModal.message = 'Are you sure you want to reject this post?';
+      this.confirmModal.btnClass = 'btn-danger';
+    }
+    if (typeof $ === 'function') {
+      $('#confirmActionModal').modal('show');
+    }
+  }
+
+  confirmAction(): void {
+    const { action, post } = this.confirmModal;
+    if (!action || !post) return;
+    if (action === 'approve') {
+      this.onApprove(post);
+    } else if (action === 'reject') {
+      this.onReject(post);
+    }
+    if (typeof $ === 'function') {
+      $('#confirmActionModal').modal('hide');
+    }
+    // Reset small delay to avoid flicker
+    setTimeout(() => {
+      this.confirmModal = {
+        action: null,
+        post: null,
+        title: '',
+        message: '',
+        btnClass: 'btn-primary',
+      };
+    }, 300);
   }
 }

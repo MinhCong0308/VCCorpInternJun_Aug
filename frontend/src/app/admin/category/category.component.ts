@@ -1,4 +1,9 @@
-import { AfterViewInit, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  OnInit,
+  ViewEncapsulation,
+} from '@angular/core';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import {
   FormBuilder,
@@ -19,7 +24,7 @@ declare const $: any; // dùng cho tooltip Bootstrap 4
   templateUrl: './category.component.html',
   styleUrls: ['./category.component.css'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgFor, NgIf ],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgFor, NgIf],
 })
 export class CategoryComponent implements OnInit, AfterViewInit {
   categories: Category[] = [];
@@ -31,6 +36,7 @@ export class CategoryComponent implements OnInit, AfterViewInit {
   currentPage = 1;
   totalPages = 0;
   totalItems = 0;
+  deleteTarget: Category | null = null; // category chờ xác nhận xóa
 
   constructor(
     private fb: FormBuilder,
@@ -45,7 +51,7 @@ export class CategoryComponent implements OnInit, AfterViewInit {
         [
           Validators.required,
           Validators.minLength(2),
-          Validators.maxLength(50),
+          Validators.maxLength(250),
         ],
       ],
     });
@@ -142,26 +148,57 @@ export class CategoryComponent implements OnInit, AfterViewInit {
         (window as any).$('#categoryModal').modal('hide');
       },
       error: (err) => {
-        this.errorMsg = err?.error?.message || 'Operation failed.';
+        const msg = err?.error?.message || 'Operation failed.';
+        this.errorMsg = msg;
+        if (msg.toLowerCase().includes('already exists')) {
+          const ctrl = this.categoryForm.get('categoryname');
+          ctrl?.setErrors({ ...(ctrl.errors || {}), duplicate: true });
+          ctrl?.markAsTouched();
+        }
       },
     });
   }
 
   // Xóa category
   onDelete(id: number): void {
-    if (confirm('Are you sure you want to delete this category?')) {
-      this.categoryService.deleteCategory(id).subscribe({
-        next: () => {
-          // Nếu xóa hết ở trang hiện tại thì lùi về trang trước
-          if (this.categories.length === 1 && this.currentPage > 1) {
-            this.currentPage--;
-          }
-          this.loadCategories(this.currentPage);
-        },
-        error: (err) => {
-          this.errorMsg = err?.error?.message || 'Delete failed.';
-        },
-      });
+    // Kept for backward compatibility (could be removed). Use modal instead.
+    this.openDeleteConfirm(
+      this.categories.find((c) => c.categoryid === id) || null
+    );
+  }
+
+  openDeleteConfirm(category: Category | null): void {
+    this.deleteTarget = category;
+    if (typeof $ === 'function') {
+      $('#confirmDeleteModal').modal('show');
+    } else {
+      // Fallback if jQuery not available
+      if (category && confirm(`Delete category "${category.categoryname}"?`)) {
+        this.performDelete(category.categoryid);
+      }
     }
+  }
+
+  confirmDelete(): void {
+    if (!this.deleteTarget) return;
+    this.performDelete(this.deleteTarget.categoryid);
+    if (typeof $ === 'function') {
+      $('#confirmDeleteModal').modal('hide');
+    }
+    setTimeout(() => (this.deleteTarget = null), 300);
+  }
+
+  private performDelete(id: number): void {
+    this.categoryService.deleteCategory(id).subscribe({
+      next: () => {
+        if (this.categories.length === 1 && this.currentPage > 1) {
+          this.currentPage--;
+        }
+        this.loadCategories(this.currentPage);
+      },
+      error: (err) => {
+        this.errorMsg = err?.error?.message || 'Delete failed.';
+      },
+    });
   }
 }

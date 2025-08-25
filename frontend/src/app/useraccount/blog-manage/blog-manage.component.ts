@@ -179,6 +179,25 @@ export class BlogManageComponent implements OnInit {
       }
     });
   }
+  appealPost(postId: number, event: Event): void {
+    event.preventDefault();
+    const confirmed = confirm('Are you sure you want to appeal this post?');
+    if(!confirmed) return;
+    this.postService.requestForAppealPost(postId).subscribe({
+      next: (response) => {
+        console.log('Appeal request successful:', response);
+        this.notificationService.success('Success', 'Appeal request submitted successfully.');
+        this.loadPosts(); // Reload posts after appeal request
+      },
+      error: (error) => {
+        console.error('Error submitting appeal request:', error);
+        this.notificationService.error('Error', 'Failed to submit appeal request. Please try again later.');
+      },
+      complete: () => {
+        this.loadPosts(); // Reload posts after appeal request
+      }
+    });
+  }
   logout(): void {
     this.authService.logout().subscribe({
       next: () => {

@@ -83,4 +83,13 @@ export class PostBlogOwnerService {
       })
     );
   }
+  requestForAppealPost(postid: number): Observable<any> { 
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    return this.http.post<any>(
+      `${this.baseUrl}/appeal/${postid}`,
+      {headers, withCredentials: true }
+    );
+  }
 }

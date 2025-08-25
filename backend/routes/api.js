@@ -124,7 +124,7 @@ router.group(
       validate([postValidation.translatePost]),
       postController.translatePost
     );
-    router.post("/appeals/:postid", postController.appealForRejectedText);
+    router.post("/appeal/:postid", postController.appealForRejectedText);
   }
 );
 

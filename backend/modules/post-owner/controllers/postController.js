@@ -76,7 +76,6 @@ const postsController = {
     },
     translatePost: async (req, res) => {    
         try{
-            const userid = req.user.userid;
             const { text, sourceLanguage, targetLanguage} = req.body;
             const translatedText = await postService.translate(text, sourceLanguage, targetLanguage);
             return responseUtils.ok(res, translatedText);
@@ -96,9 +95,14 @@ const postsController = {
         }
     },
     appealForRejectedText: async (req, res) => {
+        const userid = req.user.userid;
         const { postid } = req.params;
+        if(!userid) {
+            console.log("No token provided, run here");
+            return responseUtils.unauthorized(res);
+        }
         try {
-            const responseData = await postService.appealForRejectedPost(postid);
+            const responseData = await postService.appealForRejectedPost(postid, userid);
             return responseUtils.ok(res, responseData);
         }
         catch (error) {

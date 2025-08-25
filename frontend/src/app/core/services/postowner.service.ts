@@ -89,7 +89,8 @@ export class PostBlogOwnerService {
     });
     return this.http.post<any>(
       `${this.baseUrl}/appeal/${postid}`,
-      {headers, withCredentials: true }
+      {},
+      { headers, withCredentials: true }
     );
   }
 }

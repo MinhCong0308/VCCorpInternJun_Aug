@@ -74,9 +74,6 @@ const postsController = {
             return responseUtils.error(res, error.message);
         }
     },
-    getPostForUpdating: async (req, res) => {
-        
-    },
     translatePost: async (req, res) => {    
         try{
             const userid = req.user.userid;
@@ -97,6 +94,17 @@ const postsController = {
             console.error("Error retrieving translations for post:", error);
             return responseUtils.error(res, error.message);
         }
+    },
+    appealForRejectedText: async (req, res) => {
+        const { postid } = req.params;
+        try {
+            const responseData = await postService.appealForRejectedPost(postid);
+            return responseUtils.ok(res, responseData);
+        }
+        catch (error) {
+            return responseUtils.error(res, error.message);
+        }
     }
+    
 };
 module.exports = postsController;

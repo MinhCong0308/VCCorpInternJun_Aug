@@ -148,6 +148,13 @@
                         <i class="ti-trash"></i>
                         <span class="d-none d-sm-inline ms-1">Delete</span>
                       </button>
+                      <button *ngIf="post.status === 'REJECTED'" 
+                              class="btn btn-sm btn-outline-warning post-action-btn"
+                              (click)="appealPost(post.postid, $event)"
+                              title="Appeal post">
+                        <i class="ti-flag"></i>
+                        <span class="d-none d-sm-inline ms-1">Appeal</span>
+                      </button>
                     </div>
                   </div>
                 </div>

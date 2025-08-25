@@ -3,6 +3,8 @@ const config = require("configs/index");
 const { Op } = require("sequelize");
 const axios = require("axios");
 const language = require("models/language");
+const globalFilter = require("utils/globalFilter"); 
+
 const postService = {
     createPost: async (originalPost, translations, userid) => {
         try {
@@ -37,11 +39,54 @@ const postService = {
                     }
                 }
             }
+            setImmediate(() => {
+                postService.processContentApproval(post.postid)
+                    .catch(error => {
+                        console.error('Error in background content approval:', error);
+                    });
+            });
             return { message: "Post created successfully", post };
         } catch (error) {
             console.log("Error creating post:", error.message);
             throw new Error("Error creating post");
         }
+    },
+    processContentApproval: async (postid, upper = 3) => {
+        const post = await db.Post.findByPk(postid);
+        if(!post) {
+            throw new Error("Post not found");
+        }
+        // Process content approval
+        const titleBadWordsCnt  = globalFilter.countBadWords(post.title);
+        const filteredContent = await postService.getMainContentFromHTML(post.content);
+        const contentBadWordsCnt = globalFilter.countBadWords(filteredContent);
+        if(titleBadWordsCnt + contentBadWordsCnt >= upper) {
+            await db.Post.update({ status: config.config.statuspostenum.REJECTED }, { where: { original_postid: postid } });
+        }
+        else {
+            await db.Post.update({ status: config.config.statuspostenum.APPROVED }, { where: { original_postid: postid } });
+        }
+    },
+    getMainContentFromHTML: async (content) => {
+        if (!content) return '';
+        // Remove HTML tags
+        let textContent = content.replace(/<[^>]*>/g, '');
+        // Decode HTML entities
+        textContent = textContent
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/&apos;/g, "'");
+        
+        // Remove extra whitespace and newlines
+        textContent = textContent
+            .replace(/\s+/g, ' ')
+            .trim();
+        
+        return textContent;
     },
     deletePost: async (postid, userid) => {
         const post = await db.Post.findByPk(postid);
@@ -288,6 +333,16 @@ const postService = {
         } catch(error) {
             console.error("Error translating text:", error);
             throw new Error("Error translating text");
+        }
+    },
+    appealForRejectedPost: async (postid, userid) => {
+        // update status of appealed post be pending
+        await db.Post.update(
+            { status: config.config.statuspostenum.PENDING },
+            { where: { [Op.and]: [{ original_postid: postid }, {userid: userid}] } }
+        );
+        return {
+            message: "Appeal successfully, please wait for admin for processing your request"
         }
     }
 };

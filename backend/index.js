@@ -10,7 +10,17 @@ const cookieParser = require("cookie-parser");
 const { swaggerUIServe,swaggerUISetup } = require("kernels/api-docs");
 const cors = require("cors");
 const app = express();
-const path = require('path')
+const path = require('path');
+const globalFilter = require("utils/globalFilter"); // Import global filter
+
+try {
+  globalFilter.initialize();
+  console.log('Global bad words filter initialized successfully');
+} catch (error) {
+  console.error('Failed to initialize global bad words filter:', error);
+  process.exit(1); // Exit if filter initialization fails
+}
+
 app.disable("x-powered-by");
 const corsOptions = {
   origin: "http://localhost:4200", 

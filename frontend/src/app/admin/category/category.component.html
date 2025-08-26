@@ -57,36 +57,24 @@
               placeholder="Enter category name"
             />
             <div
-              *ngIf="
-                categoryForm.get('categoryname')?.touched &&
-                categoryForm.get('categoryname')?.invalid
-              "
+              *ngIf="categoryForm.get('categoryname') as ctrl"
               class="text-danger mt-1 small"
             >
-              <div
-                *ngIf="categoryForm.get('categoryname')?.errors?.['required']"
+              <ng-container
+                *ngIf="ctrl.invalid && (ctrl.touched || ctrl.dirty)"
               >
-                Name is required.
-              </div>
-              <div
-                *ngIf="categoryForm.get('categoryname')?.errors?.['minlength']"
-              >
-                Minimum 2 characters.
-              </div>
-              <div
-                *ngIf="categoryForm.get('categoryname')?.errors?.['maxlength']"
-              >
-                Maximum 50 characters.
-              </div>
-              <div
-                *ngIf="categoryForm.get('categoryname')?.errors?.['duplicate']"
-              >
-                Category name already exists.
-              </div>
+                <div *ngIf="ctrl.hasError('required')">Name is required.</div>
+                <div *ngIf="ctrl.hasError('minlength')">
+                  Minimum 2 characters.
+                </div>
+                <div *ngIf="ctrl.hasError('maxlength')">
+                  Maximum 50 characters.
+                </div>
+                <div *ngIf="ctrl.hasError('duplicate')">
+                  Category name already exists.
+                </div>
+              </ng-container>
             </div>
-          </div>
-          <div *ngIf="errorMsg" class="alert alert-danger py-1 px-2">
-            {{ errorMsg }}
           </div>
         </div>
         <div class="modal-footer">
@@ -166,7 +154,16 @@
                 <tr *ngFor="let category of categories; let i = index">
                   <td>{{ i + 1 }}.</td>
                   <td>{{ category.categoryname }}</td>
-                  <td style="text-align: center">{{ category.totalPost }}</td>
+                  <td style="text-align: center">
+                    <a
+                      class="font-weight-bold"
+                      [routerLink]="['/admin/posts']"
+                      [queryParams]="{ categoryId: category.categoryid }"
+                      title="View posts in this category"
+                      data-toggle="tooltip"
+                      >{{ category.totalPost }}</a
+                    >
+                  </td>
                   <td style="text-align: center">
                     <div class="btn-group">
                       <button

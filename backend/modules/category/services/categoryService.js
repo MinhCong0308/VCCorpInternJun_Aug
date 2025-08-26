@@ -75,23 +75,24 @@ const categoryService = {
     if (!category) {
       throw new Error("Category not found");
     }
-    try {
-      if (categoryData.categoryname) {
-        const name = categoryData.categoryname.trim();
-        const existed = await db.Category.findOne({
-          where: {
-            categoryname: name,
-          },
-        });
-        if (existed && existed.categoryid !== category.categoryid) {
-          throw new Error("Category name already exists");
-        }
-        categoryData.categoryname = name;
+    if (categoryData.categoryname) {
+      const name = categoryData.categoryname.trim();
+      if (!name) {
+        throw new Error("Category name is required");
       }
-      return await category.update(categoryData);
-    } catch (error) {
-      throw new Error("Failed to update category: " + error.message);
+      // Case-insensitive duplicate check excluding current category
+      const existed = await db.Category.findOne({
+        where: db.sequelize.where(
+          db.sequelize.fn("LOWER", db.sequelize.col("categoryname")),
+          name.toLowerCase()
+        ),
+      });
+      if (existed && existed.categoryid !== category.categoryid) {
+        throw new Error("Category name already exists");
+      }
+      categoryData.categoryname = name;
     }
+    return await category.update(categoryData);
   },
   deleteCategory: async (categoryId) => {
     const category = await db.Category.findByPk(categoryId);

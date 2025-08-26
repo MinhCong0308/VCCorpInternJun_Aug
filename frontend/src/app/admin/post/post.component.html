@@ -22,16 +22,14 @@
   <div class="container-fluid">
     <div class="card card-default">
       <div class="card-body">
-        <form (submit)="onSearch($event, kw.value)">
+        <form [formGroup]="filterForm" (submit)="onSearch($event)">
           <div class="row">
             <!-- Search by Keyword -->
-            <div class="col-md-5">
+            <div class="col-md-7">
               <div class="form-group">
-                <label>Search by Title:</label>
                 <input
                   type="text"
-                  #kw
-                  [value]="keyword || ''"
+                  formControlName="keyword"
                   class="form-control"
                   placeholder="Enter post title..."
                 />
@@ -39,12 +37,11 @@
             </div>
 
             <!-- Filter by Category -->
-            <div class="col-md-5">
+            <div class="col-md-3">
               <div class="form-group">
-                <label>Category:</label>
                 <select
                   class="form-control"
-                  [value]="categoryId || ''"
+                  formControlName="categoryId"
                   (change)="onCategoryChange($event)"
                 >
                   <option value="">-- All Categories --</option>
@@ -56,10 +53,8 @@
             </div>
 
             <!-- Submit Button -->
-            <div class="col-md-2">
+            <div class="col-md-2 ml-auto">
               <div class="form-group">
-                <label> </label>
-                <!-- Giữ khoảng trống để căn chỉnh -->
                 <button type="submit" class="btn btn-primary btn-block">
                   <i class="fas fa-search"></i> Search
                 </button>
@@ -104,7 +99,31 @@
                     >
                   </td>
                   <td>{{ authorName(p) }}</td>
-                  <td>{{ languageName(p) }}</td>
+                  <td>
+                    <ng-container *ngIf="p.Language as lang">
+                      <div
+                        class="d-inline-flex align-items-center"
+                        style="gap: 6px"
+                      >
+                        <img
+                          *ngIf="lang.flag_image"
+                          [src]="flagUrl(lang.flag_image)"
+                          alt="{{ lang.locale_code || lang.languagename }} flag"
+                          style="
+                            width: 24px;
+                            height: 16px;
+                            object-fit: cover;
+                            border: 1px solid #ddd;
+                            border-radius: 2px;
+                          "
+                        />
+                        <span class="font-weight-semibold">
+                          {{ lang.locale_code || lang.languagename || "" }}
+                        </span>
+                      </div>
+                    </ng-container>
+                  </td>
+
                   <td style="text-align: center">
                     <span class="badge" [ngClass]="statusBadge(p).cls">{{
                       statusBadge(p).text

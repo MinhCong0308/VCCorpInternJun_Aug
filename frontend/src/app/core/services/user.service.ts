@@ -36,12 +36,19 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
-  getAllUsers(keyword = '', page = 1): Observable<PaginatedUserResponse> {
+  getAllUsers(
+    keyword = '',
+    page = 1,
+    status: '' | number = ''
+  ): Observable<PaginatedUserResponse> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', this.ITEMS_PER_PAGE.toString());
     if (keyword && keyword.trim())
       params = params.set('search', keyword.trim());
+    if (status !== '' && status !== undefined && status !== null) {
+      params = params.set('status', String(status));
+    }
     return this.http
       .get<ApiResponse<PaginatedUserResponse>>(`${this.baseUrl}/users`, {
         withCredentials: true,
@@ -87,6 +94,7 @@ export class UserService {
     email: string;
     password: string; // mapped to hashed_password server-side
     roleid: number;
+    status?: number; // optional, default ACTIVE (1)
     avatar: File;
   }): Observable<AdminUser> {
     const form = new FormData();
@@ -95,8 +103,8 @@ export class UserService {
     form.append('username', payload.username);
     form.append('email', payload.email);
     form.append('hashed_password', payload.password);
-    // backend expects string for roleid in validation
     form.append('roleid', String(payload.roleid));
+    form.append('status', String(payload.status ?? 1));
     form.append('avatar', payload.avatar);
 
     return this.http

@@ -41,13 +41,17 @@ export class LanguageService {
   // Admin: list languages with pagination and search
   getAllLanguagesAdmin(
     keyword = '',
-    page = 1
+    page = 1,
+    statusFilter: number | '' = ''
   ): Observable<PaginatedLanguageResponse> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', this.ITEMS_PER_PAGE.toString());
     if (keyword && keyword.trim()) {
       params = params.set('search', keyword.trim());
+    }
+    if (statusFilter === 0 || statusFilter === 1) {
+      params = params.set('status', String(statusFilter));
     }
     return this.http
       .get<ApiResponse<PaginatedLanguageResponse>>(
@@ -72,18 +76,6 @@ export class LanguageService {
       .put<ApiResponse<Language>>(`${this.baseUrl}/languages/${id}`, formData, {
         withCredentials: true,
       })
-      .pipe(map((res) => res.data));
-  }
-
-  // Admin: delete language
-  deleteLanguage(id: number): Observable<{ message: string }> {
-    return this.http
-      .delete<ApiResponse<{ message: string }>>(
-        `${this.baseUrl}/languages/${id}`,
-        {
-          withCredentials: true,
-        }
-      )
       .pipe(map((res) => res.data));
   }
 

@@ -89,7 +89,8 @@ export class CategoryService {
           if (response.success && response.data) {
             return response.data;
           }
-          throw new Error('Create category failed');
+          // Throwing preserves message for component error handler
+          throw new Error(response.message || 'Create category failed');
         })
       );
   }
@@ -111,7 +112,7 @@ export class CategoryService {
           if (response.success && response.data) {
             return response.data;
           }
-          throw new Error('Update category failed');
+          throw new Error(response.message || 'Update category failed');
         })
       );
   }

@@ -10,7 +10,11 @@ export interface AdminPostSummary {
   createdAt: string;
   updatedAt: string;
   User?: { firstname: string; lastname: string };
-  Language?: { languagename: string };
+  Language?: {
+    languagename: string;
+    locale_code?: string;
+    flag_image?: string;
+  };
   Categories?: { categoryid: number; categoryname: string }[];
 }
 

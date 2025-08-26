@@ -65,7 +65,10 @@ const postAdminService = {
       where,
       include: [
         { model: db.User, attributes: ["firstname", "lastname"] },
-        { model: db.Language, attributes: ["languagename"] },
+        {
+          model: db.Language,
+          attributes: ["languagename", "locale_code", "flag_image"],
+        },
         categoryInclude,
       ],
       distinct: true,
@@ -82,7 +85,10 @@ const postAdminService = {
     const post = await db.Post.findByPk(postId, {
       include: [
         { model: db.User, attributes: ["firstname", "lastname", "avatar"] },
-        { model: db.Language, attributes: ["languagename"] },
+        {
+          model: db.Language,
+          attributes: ["languagename", "locale_code", "flag_image"],
+        },
         {
           model: db.Category,
           as: "Categories",

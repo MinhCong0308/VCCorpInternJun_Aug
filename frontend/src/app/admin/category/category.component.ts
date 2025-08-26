@@ -37,6 +37,8 @@ export class CategoryComponent implements OnInit, AfterViewInit {
   totalPages = 0;
   totalItems = 0;
   deleteTarget: Category | null = null; // category chờ xác nhận xóa
+  // Lưu giá trị trùng lặp cuối cùng để chỉ clear khi user đổi sang chuỗi khác
+  private lastDuplicateValue: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -54,6 +56,21 @@ export class CategoryComponent implements OnInit, AfterViewInit {
           Validators.maxLength(250),
         ],
       ],
+    });
+
+    // Clear duplicate error when user changes the value after a duplicate was flagged
+    const nameCtrl = this.categoryForm.get('categoryname');
+    nameCtrl?.valueChanges.subscribe((val) => {
+      const ctrl = this.categoryForm.get('categoryname');
+      if (!ctrl) return;
+      if (ctrl.errors?.['duplicate']) {
+        const current = (val || '').trim().toLowerCase();
+        const original = (this.lastDuplicateValue || '').toLowerCase();
+        if (current !== original) {
+          const { duplicate, ...rest } = ctrl.errors as any;
+          ctrl.setErrors(Object.keys(rest).length ? rest : null);
+        }
+      }
     });
   }
 
@@ -110,6 +127,9 @@ export class CategoryComponent implements OnInit, AfterViewInit {
     this.isEditing = false;
     this.selectedCategory = null;
     this.categoryForm.reset();
+    // Clear possible duplicate error state explicitly
+    const ctrl = this.categoryForm.get('categoryname');
+    ctrl?.setErrors(null);
     (window as any).$('#categoryModal').modal('show');
   }
 
@@ -120,6 +140,8 @@ export class CategoryComponent implements OnInit, AfterViewInit {
     this.categoryForm.patchValue({
       categoryname: category.categoryname,
     });
+    const ctrl = this.categoryForm.get('categoryname');
+    ctrl?.setErrors(null);
     (window as any).$('#categoryModal').modal('show');
   }
 
@@ -140,7 +162,6 @@ export class CategoryComponent implements OnInit, AfterViewInit {
     }
     action$.subscribe({
       next: () => {
-        // Nếu thêm mới thì về trang 1, nếu sửa thì giữ nguyên trang
         if (!this.isEditing) {
           this.currentPage = 1;
         }
@@ -148,20 +169,68 @@ export class CategoryComponent implements OnInit, AfterViewInit {
         (window as any).$('#categoryModal').modal('hide');
       },
       error: (err) => {
-        const msg = err?.error?.message || 'Operation failed.';
-        this.errorMsg = msg;
-        if (msg.toLowerCase().includes('already exists')) {
-          const ctrl = this.categoryForm.get('categoryname');
-          ctrl?.setErrors({ ...(ctrl.errors || {}), duplicate: true });
-          ctrl?.markAsTouched();
+        const ctrl = this.categoryForm.get('categoryname');
+        if (!ctrl) return;
+        const msg: string =
+          err?.error?.message ||
+          err?.error?.data?.message ||
+          err?.message ||
+          '';
+
+        let handled = false;
+
+        // Check structured errors array
+        const errorsArr = err?.error?.data?.errors;
+        if (Array.isArray(errorsArr)) {
+          const catErr = errorsArr.find(
+            (e: any) => e?.field === 'categoryname'
+          );
+          if (catErr) {
+            const m = (catErr.message || '').toLowerCase();
+            if (
+              m.includes('unique') ||
+              m.includes('already') ||
+              m.includes('exist')
+            ) {
+              ctrl.setErrors({ duplicate: true });
+              this.lastDuplicateValue = (ctrl.value || '').trim();
+              handled = true;
+            } else if (m.includes('required') || m.includes('empty')) {
+              ctrl.setErrors({ required: true });
+              handled = true;
+            }
+          }
         }
+
+        // Fallback pattern matching on raw message
+        if (!handled) {
+          const lower = msg.toLowerCase();
+          if (
+            lower.includes('already exists') ||
+            lower.includes('must be unique') ||
+            lower.includes('unique constraint') ||
+            lower.includes('categoryname must be unique')
+          ) {
+            ctrl.setErrors({ duplicate: true });
+            this.lastDuplicateValue = (ctrl.value || '').trim();
+            handled = true;
+          } else if (lower.includes('required')) {
+            ctrl.setErrors({ required: true });
+            handled = true;
+          }
+        }
+
+        if (!handled) {
+          ctrl.setErrors({ server: true });
+        }
+
+        ctrl.markAsTouched();
+        ctrl.markAsDirty();
       },
     });
   }
-
   // Xóa category
   onDelete(id: number): void {
-    // Kept for backward compatibility (could be removed). Use modal instead.
     this.openDeleteConfirm(
       this.categories.find((c) => c.categoryid === id) || null
     );

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import {
   PostAdminService,
   AdminPostSummary,
@@ -44,7 +44,11 @@ export class PostComponent implements OnInit, AfterViewInit {
     btnClass: 'btn-primary',
   };
 
-  constructor(private fb: FormBuilder, private service: PostAdminService) {
+  constructor(
+    private fb: FormBuilder,
+    private service: PostAdminService,
+    private route: ActivatedRoute
+  ) {
     this.filterForm = this.fb.group({
       keyword: [''],
       categoryId: [''],
@@ -52,8 +56,18 @@ export class PostComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.loadCategories();
-    this.loadPosts();
+    // Listen to query params for pre-selecting a category (e.g., from Categories module click)
+    this.route.queryParamMap.subscribe((params) => {
+      const cat = params.get('categoryId');
+      if (cat) {
+        const num = Number(cat);
+        this.categoryId = isNaN(num) ? '' : num;
+        // reflect into form control so UI select shows correct option if later bound
+        this.filterForm.get('categoryId')?.setValue(this.categoryId);
+      }
+      this.loadCategories();
+      this.loadPosts();
+    });
   }
 
   ngAfterViewInit(): void {
@@ -87,12 +101,12 @@ export class PostComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onSearch(event?: Event, value?: string): void {
+  onSearch(event?: Event): void {
     if (event) event.preventDefault();
-    if (typeof value === 'string') {
-      this.keyword = value;
-      this.filterForm.get('keyword')?.setValue(value);
-    }
+    this.keyword = (this.filterForm.get('keyword')?.value || '').trim();
+    // categoryId is already synced via form control
+    const formCat = this.filterForm.get('categoryId')?.value;
+    this.categoryId = formCat === '' || formCat == null ? '' : Number(formCat);
     this.currentPage = 1;
     this.loadPosts(1);
   }
@@ -103,6 +117,7 @@ export class PostComponent implements OnInit, AfterViewInit {
         ? val
         : String((val.target as HTMLSelectElement).value || '');
     this.categoryId = v ? Number(v) : '';
+    this.filterForm.get('categoryId')?.setValue(this.categoryId || '');
     this.currentPage = 1;
     this.loadPosts(1);
   }
@@ -127,6 +142,13 @@ export class PostComponent implements OnInit, AfterViewInit {
 
   languageName(p: AdminPostSummary): string {
     return p.Language?.languagename || '';
+  }
+
+  flagUrl(path?: string): string {
+    if (!path) return '/assets/img/logo.png';
+    if (/^https?:\/\//i.test(path)) return path;
+    const fixed = path.startsWith('/') ? path : `/${path}`;
+    return `http://localhost:3000${fixed}`;
   }
 
   statusBadge(p: AdminPostSummary): { text: string; cls: string } {

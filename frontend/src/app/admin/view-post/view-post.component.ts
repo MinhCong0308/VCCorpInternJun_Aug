@@ -82,6 +82,13 @@ export class ViewPostComponent implements OnInit, AfterViewInit {
     return this.post?.Language?.languagename || 'Unknown';
   }
 
+  flagUrl(path?: string): string {
+    if (!path) return '/assets/img/logo.png';
+    if (/^https?:\/\//i.test(path)) return path;
+    const fixed = path.startsWith('/') ? path : `/${path}`;
+    return `http://localhost:3000${fixed}`;
+  }
+
   statusBadge(): { text: string; cls: string } {
     const s = Number(this.post?.status);
     if (s === 2) return { text: 'Published', cls: 'badge badge-success' };

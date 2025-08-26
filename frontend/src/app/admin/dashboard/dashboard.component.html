@@ -21,53 +21,58 @@
     <!-- Admin widgets demo: Tổng số bài, user, bình luận... -->
     <div class="row">
       <div class="col-lg-3 col-6">
-        <div class="small-box bg-info">
-          <div class="inner">
-            <h3>{{ totals.posts }}</h3>
-            <p>Posts</p>
-          </div>
-          <a routerLink="/admin/posts">
+        <a routerLink="/admin/posts">
+          <div class="small-box bg-info">
+            <div class="inner">
+              <h3>{{ totals.posts }}</h3>
+              <p>Posts</p>
+            </div>
+
             <div class="icon">
               <i class="fas fa-file-alt"></i>
             </div>
-          </a>
-        </div>
+          </div>
+        </a>
       </div>
       <div class="col-lg-3 col-6">
-        <div class="small-box bg-success">
-          <div class="inner">
-            <h3>{{ totals.categories }}</h3>
-            <p>Categories</p>
+        <a routerLink="/admin/categories">
+          <div class="small-box bg-success">
+            <div class="inner">
+              <h3>{{ totals.categories }}</h3>
+              <p>Categories</p>
+            </div>
+
+            <div class="icon">
+              <i class="fas fa-tags"></i>
+            </div>
           </div>
-          <a routerLink="/admin/categories"
-            ><div class="icon">
-              <i class="fas fa-tags"></i></div
-          ></a>
-        </div>
+        </a>
       </div>
       <div class="col-lg-3 col-6">
-        <div class="small-box bg-warning">
-          <div class="inner">
-            <h3>{{ totals.users }}</h3>
-            <p>Users</p>
+        <a routerLink="/admin/users">
+          <div class="small-box bg-warning">
+            <div class="inner">
+              <h3>{{ totals.users }}</h3>
+              <p>Users</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-users"></i>
+            </div>
           </div>
-          <a routerLink="/admin/users"
-            ><div class="icon">
-              <i class="fas fa-users"></i></div
-          ></a>
-        </div>
+        </a>
       </div>
       <div class="col-lg-3 col-6">
-        <div class="small-box bg-danger">
-          <div class="inner">
-            <h3>{{ totals.languages }}</h3>
-            <p>Languages</p>
+        <a routerLink="/admin/languages">
+          <div class="small-box bg-danger">
+            <div class="inner">
+              <h3>{{ totals.languages }}</h3>
+              <p>Languages</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-language"></i>
+            </div>
           </div>
-          <a routerLink="/admin/languages"
-            ><div class="icon">
-              <i class="fas fa-language"></i></div
-          ></a>
-        </div>
+        </a>
       </div>
     </div>
 
@@ -84,9 +89,19 @@
           <!-- /.card-header -->
           <div class="card-body p-0" *ngIf="latestPosts?.length; else noPosts">
             <ul class="products-list product-list-in-card pl-2 pr-2">
-              <li class="item clickable" *ngFor="let p of latestPosts" (click)="goToPost(p.postid)" tabindex="0">
+              <li
+                class="item clickable"
+                *ngFor="let p of latestPosts"
+                (click)="goToPost(p.postid)"
+                tabindex="0"
+              >
                 <div class="product-info">
-                  <a class="product-title" [routerLink]="['/admin/posts', p.postid]" (click)="$event.stopPropagation()">{{ p.title }}</a>
+                  <a
+                    class="product-title"
+                    [routerLink]="['/admin/posts', p.postid]"
+                    (click)="$event.stopPropagation()"
+                    >{{ p.title }}</a
+                  >
                   <span class="product-snippet line-clamp-2">{{
                     snippet(p)
                   }}</span>

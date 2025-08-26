@@ -35,36 +35,24 @@
           <span class="badge mr-2" [ngClass]="statusBadge().cls">{{
             statusBadge().text
           }}</span>
-          <div
-            class="btn-group mr-2"
-            *ngIf="post.status === 1 || post.status === 2"
-          >
+          <ng-container *ngIf="post.status === 1 || post.status === 2">
             <button
-              type="button"
-              class="btn btn-sm btn-outline-secondary dropdown-toggle"
-              data-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
+              *ngIf="post.status === 1"
+              class="btn btn-sm btn-success mr-1"
+              (click)="openConfirm('approve')"
+              title="Publish"
             >
-              <i class="fas fa-ellipsis-h"></i>
+              <i class="fas fa-check-circle mr-1"></i> Publish
             </button>
-            <div class="dropdown-menu dropdown-menu-right p-0">
-              <button
-                class="dropdown-item"
-                *ngIf="post.status === 1"
-                (click)="openConfirm('approve')"
-              >
-                <i class="fas fa-check-circle text-success mr-2"></i> Publish
-              </button>
-              <button
-                class="dropdown-item"
-                *ngIf="post.status === 1 || post.status === 2"
-                (click)="openConfirm('reject')"
-              >
-                <i class="fas fa-ban text-danger mr-2"></i> Reject
-              </button>
-            </div>
-          </div>
+            <button
+              *ngIf="post.status === 1 || post.status === 2"
+              class="btn btn-sm btn-danger mr-2"
+              (click)="openConfirm('reject')"
+              title="Reject"
+            >
+              <i class="fas fa-ban mr-1"></i> Reject
+            </button>
+          </ng-container>
           <button class="btn btn-sm btn-secondary" (click)="backToList()">
             <i class="fas fa-arrow-left mr-1"></i> Back
           </button>
@@ -77,8 +65,24 @@
           <li class="list-inline-item">
             <i class="fas fa-user mr-1"></i> {{ authorName() }}
           </li>
-          <li class="list-inline-item">
-            <i class="fas fa-language mr-1"></i> {{ langName() }}
+          <li class="list-inline-item" *ngIf="post.Language as L">
+            <i class="fas fa-language mr-1"></i>
+            <img
+              *ngIf="L.flag_image"
+              [src]="flagUrl(L.flag_image)"
+              alt="{{ L.locale_code || L.languagename }} flag"
+              style="
+                width: 24px;
+                height: 16px;
+                object-fit: cover;
+                border: 1px solid #ddd;
+                border-radius: 2px;
+                margin-right: 4px;
+              "
+            />
+            <span class="font-weight-semibold">
+              {{ L.locale_code || L.languagename || "" }}
+            </span>
           </li>
           <li class="list-inline-item">
             <i class="far fa-clock mr-1"></i>

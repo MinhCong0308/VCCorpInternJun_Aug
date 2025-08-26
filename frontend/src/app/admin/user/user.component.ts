@@ -1,6 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import {
   AdminUser,
@@ -19,8 +24,10 @@ declare const $: any;
 })
 export class UserComponent implements OnInit, AfterViewInit {
   searchForm: FormGroup;
+  userForm: FormGroup;
   users: AdminUser[] = [];
   keyword = '';
+  status: '' | number = '';
   errorMsg = '';
   currentPage = 1;
   totalPages = 0;
@@ -42,7 +49,38 @@ export class UserComponent implements OnInit, AfterViewInit {
   };
 
   constructor(private fb: FormBuilder, private service: UserService) {
-    this.searchForm = this.fb.group({ keyword: [''] });
+    this.searchForm = this.fb.group({ keyword: [''], status: [''] });
+    this.userForm = this.fb.group({
+      firstname: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(50),
+        ],
+      ],
+      lastname: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(50),
+        ],
+      ],
+      username: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(30),
+        ],
+      ],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      roleid: [1, Validators.required],
+      status: [1, Validators.required],
+      avatar: [null, Validators.required],
+    });
   }
 
   ngOnInit(): void {
@@ -52,6 +90,11 @@ export class UserComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     if (typeof $ === 'function') {
       $('[data-toggle="tooltip"]').tooltip();
+      // Reset form when modal is hidden
+      $('#addUserModal').on('hidden.bs.modal', () => {
+        this.userForm.reset({ roleid: 1, status: 1, avatar: null });
+        this.errorMsg = '';
+      });
     }
   }
 
@@ -61,7 +104,10 @@ export class UserComponent implements OnInit, AfterViewInit {
       this.keyword ||
       ''
     ).trim();
-    this.service.getAllUsers(kw, page).subscribe({
+    const stRaw = this.searchForm.get('status')?.value;
+    const st = stRaw === '' || stRaw == null ? '' : Number(stRaw);
+    this.status = st === '' ? '' : st;
+    this.service.getAllUsers(kw, page, this.status).subscribe({
       next: (res: PaginatedUserResponse) => {
         this.users = res.user;
         this.currentPage = res.page;
@@ -75,12 +121,9 @@ export class UserComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onSearch(event?: Event, value?: string): void {
+  onSearch(event?: Event): void {
     if (event) event.preventDefault();
-    if (typeof value === 'string') {
-      this.keyword = value;
-      this.searchForm.get('keyword')?.setValue(value);
-    }
+    this.keyword = (this.searchForm.get('keyword')?.value || '').trim();
     this.currentPage = 1;
     this.loadUsers(1);
   }
@@ -123,46 +166,68 @@ export class UserComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onCreateUser(event: Event): void {
-    event.preventDefault();
-    const form = event.target as HTMLFormElement;
-    const formData = new FormData(form);
-    const firstname = String(formData.get('firstname') || '').trim();
-    const lastname = String(formData.get('lastname') || '').trim();
-    const username = String(formData.get('account_username') || '').trim();
-    const email = String(formData.get('email') || '').trim();
-    const password = String(formData.get('plain_password') || '').trim();
-    const roleid = Number(formData.get('roleid') || 1);
-    const avatar = formData.get('avatar') as File | null;
+  onFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length) {
+      const file = input.files[0];
+      this.userForm.patchValue({ avatar: file });
+      this.userForm.get('avatar')?.updateValueAndValidity();
+    }
+  }
 
-    if (!avatar) {
-      this.errorMsg = 'Avatar image is required.';
+  onCreateUser(): void {
+    if (this.userForm.invalid) {
+      this.userForm.markAllAsTouched();
       return;
     }
 
-    this.service
-      .createUser({
-        firstname,
-        lastname,
-        username,
-        email,
-        password,
-        roleid,
-        avatar,
-      })
-      .subscribe({
-        next: () => {
-          // close modal and refresh list
-          if (typeof $ === 'function') {
-            $('#addUserModal').modal('hide');
-          }
-          form.reset();
-          this.loadUsers(this.currentPage);
-        },
-        error: (err) => {
-          this.errorMsg = err?.error?.message || 'Failed to create user.';
-        },
-      });
+    this.errorMsg = '';
+    const payload = this.userForm.value;
+
+    this.service.createUser(payload).subscribe({
+      next: () => {
+        if (typeof $ === 'function') $('#addUserModal').modal('hide');
+        // Reset is handled by modal hidden event
+        this.loadUsers(this.currentPage);
+      },
+      error: (err) => {
+        const server = err?.error || {};
+        const statusCode = err?.status;
+        // 1. Handle validation middleware errors (422)
+        const validationErrors = server?.data?.errors;
+        if (statusCode === 422 && Array.isArray(validationErrors)) {
+          validationErrors.forEach((ve: any) => {
+            // backend uses field names: firstname, lastname, username, hashed_password, email
+            let field = ve.field;
+            if (field === 'hashed_password') field = 'password';
+            const ctrl = this.userForm.get(field);
+            if (!ctrl) return;
+            const existing = ctrl.errors || {};
+            // map duplicate email message to duplicate flag for consistency
+            if (field === 'email' && /unique|exists/i.test(ve.message)) {
+              ctrl.setErrors({ ...existing, duplicate: true });
+            } else {
+              ctrl.setErrors({ ...existing, server: ve.message });
+            }
+            ctrl.markAsTouched();
+          });
+          return;
+        }
+
+        if (server.field === 'email') {
+          const emailCtrl = this.userForm.get('email');
+          emailCtrl?.setErrors({
+            ...(emailCtrl?.errors || {}),
+            duplicate: true,
+          });
+          emailCtrl?.markAsTouched();
+          this.errorMsg = '';
+          return;
+        }
+
+        this.errorMsg = server.message || 'Failed to create user.';
+      },
+    });
   }
 
   openConfirm(user: AdminUser, action: 'role' | 'status'): void {

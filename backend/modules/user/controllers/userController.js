@@ -1,18 +1,30 @@
-const responseUtils = require("utils/responseUtils");
 const userService = require("modules/user/services/userServices");
+const responseUtils = require("utils/responseUtils");
 
 const userController = {
   getAll: async (req, res) => {
     try {
-      const { limit = 5, page = 1, search = "" } = req.query;
-      const user = await userService.getAllUser(+limit, +page, search);
-      return responseUtils.ok(res, user);
+      const { limit = 5, page = 1, search = "", status } = req.query;
+      let statusNum;
+      if (status !== undefined && status !== "") {
+        const parsed = Number(status);
+        if (!isNaN(parsed) && (parsed === 1 || parsed === 2)) {
+          statusNum = parsed;
+        }
+      }
+      const result = await userService.getAllUser(
+        +limit,
+        +page,
+        search,
+        statusNum
+      );
+      return responseUtils.ok(res, result);
     } catch (error) {
       console.error("Error fetching users:", error);
-      const message = "An error occurred while fetching user";
-      return responseUtils.error(res, message);
+      return responseUtils.error(res, "An error occurred while fetching users");
     }
   },
+
   create: async (req, res) => {
     try {
       const userData = req.body;
@@ -32,24 +44,7 @@ const userController = {
       return responseUtils.error(res, error.message);
     }
   },
-  update: async (req, res) => {
-    try {
-      const { userid } = req.params;
-      const userData = req.body;
 
-      if (req.file) {
-        const fileName = req.file.filename;
-        const avatarImagePath = `/uploads/avatars/${fileName}`;
-
-        userData.avatar = avatarImagePath;
-      }
-
-      const updateUser = await userService.updateUser(userid, userData);
-      return responseUtils.ok(res, updateUser);
-    } catch (error) {
-      return responseUtils.error(res, error.message);
-    }
-  },
   changeRole: async (req, res) => {
     try {
       const { userid } = req.params;
@@ -64,24 +59,22 @@ const userController = {
       return responseUtils.error(res, error.message);
     }
   },
+
   disable: async (req, res) => {
     try {
       const { userid } = req.params;
       await userService.disableUser(userid);
-      return responseUtils.ok(res, {
-        message: "User disable",
-      });
+      return responseUtils.ok(res, { message: "User disabled" });
     } catch (error) {
       return responseUtils.error(res, error.message);
     }
   },
+
   enable: async (req, res) => {
     try {
       const { userid } = req.params;
       await userService.enableUser(userid);
-      return responseUtils.ok(res, {
-        message: "User enable",
-      });
+      return responseUtils.ok(res, { message: "User enabled" });
     } catch (error) {
       return responseUtils.error(res, error.message);
     }

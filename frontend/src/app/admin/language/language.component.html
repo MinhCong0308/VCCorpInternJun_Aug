@@ -20,10 +20,10 @@
   <div class="container-fluid">
     <div class="card card-default">
       <div class="card-body">
-        <form (submit)="onSearch($event, kw.value)">
+        <form (submit)="onSearch($event, kw.value)" [formGroup]="searchForm">
           <div class="row">
             <!-- Search by Keyword -->
-            <div class="col-md-10">
+            <div class="col-md-7">
               <div class="form-group">
                 <input
                   type="text"
@@ -34,8 +34,22 @@
                 />
               </div>
             </div>
+            <!-- Status Filter -->
+            <div class="col-md-3">
+              <div class="form-group">
+                <select
+                  class="form-control"
+                  formControlName="status"
+                  (change)="onSearch($event, kw.value)"
+                >
+                  <option value="">--All Status--</option>
+                  <option value="1">Active</option>
+                  <option value="0">Inactive</option>
+                </select>
+              </div>
+            </div>
             <!-- Submit Button -->
-            <div class="col-md-2">
+            <div class="col-md-2 ml-auto">
               <div class="form-group">
                 <button type="submit" class="btn btn-primary btn-block">
                   <i class="fas fa-search"></i> Search
@@ -118,6 +132,10 @@
                     <button
                       class="dropdown-item"
                       (click)="openConfirm(lang, 'status')"
+                      [disabled]="lang.is_default && lang.status"
+                      [ngClass]="{
+                        'disabled text-muted': lang.is_default && lang.status
+                      }"
                     >
                       <i
                         class="fas"
@@ -130,13 +148,14 @@
                       <span class="ml-2">{{
                         lang.status ? "Disable" : "Enable"
                       }}</span>
+                      <small
+                        *ngIf="lang.is_default && lang.status"
+                        class="text-muted d-block"
+                      >
+                        (Cannot disable default)
+                      </small>
                     </button>
-                    <button
-                      class="dropdown-item"
-                      (click)="openConfirm(lang, 'delete')"
-                    >
-                      <i class="fas fa-trash text-danger mr-2"></i>Delete
-                    </button>
+                    <!-- Delete removed as backend doesn't support -->
                   </div>
                 </div>
               </td>
@@ -332,8 +351,15 @@
               type="checkbox"
               class="form-check-input"
               formControlName="is_default"
+              (change)="
+                languageForm.get('is_default')?.value &&
+                  languageForm.get('status')?.setValue(true)
+              "
             />
             <label for="langDefaultAdd" class="form-check-label">Default</label>
+            <small class="form-text text-muted"
+              >Only one language can be default at a time.</small
+            >
           </div>
         </form>
         <div *ngIf="errorMsg" class="alert alert-danger mt-2">
@@ -453,8 +479,18 @@
               type="checkbox"
               class="form-check-input"
               formControlName="status"
+              [disabled]="!!selected?.is_default"
             />
             <label for="langStatusEdit" class="form-check-label">Active</label>
+            <small class="form-text text-warning" *ngIf="selected?.is_default"
+              >Default language must stay active.</small
+            >
+            <div
+              class="invalid-feedback d-block"
+              *ngIf="languageForm.get('status')?.errors?.['defaultLock']"
+            >
+              Cannot disable default language.
+            </div>
           </div>
           <div class="form-check">
             <input
@@ -462,10 +498,28 @@
               type="checkbox"
               class="form-check-input"
               formControlName="is_default"
+              [disabled]="!!selected?.is_default"
+              (change)="
+                languageForm.get('is_default')?.value &&
+                  languageForm.get('status')?.setValue(true)
+              "
             />
             <label for="langDefaultEdit" class="form-check-label"
               >Default</label
             >
+            <small class="form-text text-muted" *ngIf="!selected?.is_default"
+              >Only one language can be default at a time.</small
+            >
+            <small class="form-text text-warning" *ngIf="selected?.is_default"
+              >Cannot remove default status. There must always be one default
+              language.</small
+            >
+            <div
+              class="invalid-feedback d-block"
+              *ngIf="languageForm.get('is_default')?.errors?.['cannotRemove']"
+            >
+              Cannot remove default language status.
+            </div>
           </div>
         </form>
         <div *ngIf="errorMsg" class="alert alert-danger mt-2">

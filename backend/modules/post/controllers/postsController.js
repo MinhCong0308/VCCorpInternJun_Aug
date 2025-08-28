@@ -1,5 +1,13 @@
 const responseUtils = require("utils/responseUtils");
 const postsService = require("modules/post/services/postsService");
+const MAX_LIKES_PER_REQUEST = 100; // giới hạn mỗi lần được gửi tối đa 100 likes
+
+function parseCount(input) {
+  if (input === undefined || input === null || input === '') return 1;
+  const n = Number.parseInt(input, 10);
+  if (!Number.isFinite(n) || Number.isNaN(n)) return 1;
+  return Math.max(1, Math.min(n, MAX_LIKES_PER_REQUEST)); // clamp [1..100]
+}
 
 const postsController = {
     getPublishedPosts: async (req, res) => {
@@ -37,7 +45,9 @@ const postsController = {
     likePost: async (req, res) => {
         try {
             const { postId } = req.params;
-            const updatedPost = await postsService.likePost(postId);
+            const countRaw = (req.query && req.query.count) ?? (req.body && req.body.count);
+            const count = parseCount(countRaw);
+            const updatedPost = await postsService.likePost(postId, count);
             return responseUtils.ok(res, updatedPost);
         } catch (error) {
             console.error("Error liking post:", error);

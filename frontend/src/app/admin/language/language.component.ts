@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import {
   LanguageService,
   Language,
@@ -52,12 +52,7 @@ export class LanguageComponent implements OnInit, AfterViewInit {
     btnClass: 'btn-primary',
   };
 
-  constructor(
-    private fb: FormBuilder,
-    private service: LanguageService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor(private fb: FormBuilder, private service: LanguageService) {
     this.searchForm = this.fb.group({ keyword: [''], status: [''] });
     this.languageForm = this.fb.group({
       languagename: [
@@ -76,14 +71,7 @@ export class LanguageComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe((params) => {
-      const pageParam = params.get('page');
-      let safePage = Number(pageParam || 1);
-      if (isNaN(safePage) || safePage < 1) safePage = 1;
-      if (!this.languages.length || safePage !== this.currentPage) {
-        this.loadLanguages(safePage);
-      }
-    });
+    this.loadLanguages();
   }
 
   ngAfterViewInit(): void {
@@ -108,9 +96,6 @@ export class LanguageComponent implements OnInit, AfterViewInit {
         this.totalPages = res.totalPages;
         this.totalItems = res.total;
         this.errorMsg = '';
-        if (this.currentPage > this.totalPages && this.totalPages > 0) {
-          this.gotoPage(this.totalPages);
-        }
       },
       error: (err) => {
         this.errorMsg = err?.error?.message || 'Failed to load languages.';
@@ -124,20 +109,12 @@ export class LanguageComponent implements OnInit, AfterViewInit {
       this.keyword = value;
       this.searchForm.get('keyword')?.setValue(value);
     }
-    this.gotoPage(1);
+    this.currentPage = 1;
+    this.loadLanguages(1);
   }
 
   onPageChange(page: number): void {
-    if (page >= 1 && page <= this.totalPages) this.gotoPage(page);
-  }
-
-  private gotoPage(page: number): void {
-    if (page === this.currentPage && this.languages.length) return;
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { page },
-      queryParamsHandling: 'merge',
-    });
+    if (page >= 1 && page <= this.totalPages) this.loadLanguages(page);
   }
 
   getPagesArray(): number[] {
@@ -221,16 +198,20 @@ export class LanguageComponent implements OnInit, AfterViewInit {
         // Prefer field info from server
         if (server.field) {
           if (server.field === 'languagename') {
-            this.languageForm.get('languagename')?.setErrors({
-              ...(this.languageForm.get('languagename')?.errors || {}),
-              duplicate: true,
-            });
+            this.languageForm
+              .get('languagename')
+              ?.setErrors({
+                ...(this.languageForm.get('languagename')?.errors || {}),
+                duplicate: true,
+              });
           }
           if (server.field === 'locale_code') {
-            this.languageForm.get('locale_code')?.setErrors({
-              ...(this.languageForm.get('locale_code')?.errors || {}),
-              duplicate: true,
-            });
+            this.languageForm
+              .get('locale_code')
+              ?.setErrors({
+                ...(this.languageForm.get('locale_code')?.errors || {}),
+                duplicate: true,
+              });
           }
           this.errorMsg = '';
           return;

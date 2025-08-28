@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import {
   AdminUser,
   PaginatedUserResponse,
@@ -48,12 +48,7 @@ export class UserComponent implements OnInit, AfterViewInit {
     btnClass: 'btn-primary',
   };
 
-  constructor(
-    private fb: FormBuilder,
-    private service: UserService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor(private fb: FormBuilder, private service: UserService) {
     this.searchForm = this.fb.group({ keyword: [''], status: [''] });
     this.userForm = this.fb.group({
       firstname: [
@@ -89,14 +84,7 @@ export class UserComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe((params) => {
-      const pageParam = params.get('page');
-      let safePage = Number(pageParam || 1);
-      if (isNaN(safePage) || safePage < 1) safePage = 1;
-      if (!this.users.length || safePage !== this.currentPage) {
-        this.loadUsers(safePage);
-      }
-    });
+    this.loadUsers();
   }
 
   ngAfterViewInit(): void {
@@ -126,9 +114,6 @@ export class UserComponent implements OnInit, AfterViewInit {
         this.totalPages = res.totalPages;
         this.totalItems = res.total;
         this.errorMsg = '';
-        if (this.currentPage > this.totalPages && this.totalPages > 0) {
-          this.gotoPage(this.totalPages);
-        }
       },
       error: (err) => {
         this.errorMsg = err?.error?.message || 'Failed to load users.';
@@ -139,20 +124,12 @@ export class UserComponent implements OnInit, AfterViewInit {
   onSearch(event?: Event): void {
     if (event) event.preventDefault();
     this.keyword = (this.searchForm.get('keyword')?.value || '').trim();
-    this.gotoPage(1);
+    this.currentPage = 1;
+    this.loadUsers(1);
   }
 
   onPageChange(page: number): void {
-    if (page >= 1 && page <= this.totalPages) this.gotoPage(page);
-  }
-
-  private gotoPage(page: number): void {
-    if (page === this.currentPage && this.users.length) return;
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { page },
-      queryParamsHandling: 'merge',
-    });
+    if (page >= 1 && page <= this.totalPages) this.loadUsers(page);
   }
 
   getPagesArray(): number[] {

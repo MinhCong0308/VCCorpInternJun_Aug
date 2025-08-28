@@ -15,7 +15,7 @@ import {
   CategoryService,
   Category,
 } from '../../core/services/category.service';
-import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 declare const $: any; // dùng cho tooltip Bootstrap 4
 
@@ -42,9 +42,7 @@ export class CategoryComponent implements OnInit, AfterViewInit {
 
   constructor(
     private fb: FormBuilder,
-    private categoryService: CategoryService,
-    private route: ActivatedRoute,
-    private router: Router
+    private categoryService: CategoryService
   ) {
     this.searchForm = this.fb.group({
       keyword: [''],
@@ -84,15 +82,7 @@ export class CategoryComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    // Subscribe to query params to keep page after reload/share
-    this.route.queryParamMap.subscribe((params) => {
-      const pageParam = params.get('page');
-      let safePage = Number(pageParam || 1);
-      if (isNaN(safePage) || safePage < 1) safePage = 1;
-      if (!this.categories.length || safePage !== this.currentPage) {
-        this.loadCategories(safePage);
-      }
-    });
+    this.loadCategories();
   }
 
   // Lấy danh sách category có phân trang và tìm kiếm
@@ -105,9 +95,6 @@ export class CategoryComponent implements OnInit, AfterViewInit {
         this.totalPages = data.totalPages;
         this.totalItems = data.total;
         this.errorMsg = '';
-        if (this.currentPage > this.totalPages && this.totalPages > 0) {
-          this.gotoPage(this.totalPages);
-        }
       },
       error: (err) => {
         this.errorMsg = 'Failed to load categories.';
@@ -117,21 +104,15 @@ export class CategoryComponent implements OnInit, AfterViewInit {
 
   // Tìm kiếm category
   onSearch(): void {
-    this.gotoPage(1);
+    this.currentPage = 1;
+    this.loadCategories(1);
   }
 
   // Chuyển trang
   onPageChange(page: number): void {
-    if (page >= 1 && page <= this.totalPages) this.gotoPage(page);
-  }
-
-  private gotoPage(page: number): void {
-    if (page === this.currentPage && this.categories.length) return;
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { page },
-      queryParamsHandling: 'merge',
-    });
+    if (page >= 1 && page <= this.totalPages) {
+      this.loadCategories(page);
+    }
   }
 
   // Tạo mảng số trang cho phân trang

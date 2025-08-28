@@ -170,13 +170,14 @@ const postsService = {
         postJSON.coverImage = extractCoverImage(postJSON.content);
         return postJSON;
     },
-    likePost: async (postId) => {
+    likePost: async (postId, count = 1) => {
+        if (!Number.isFinite(count) || count <= 0) count = 1;
         const post = await db.Post.findByPk(postId);
         if (!post) {
             throw new Error("Post not found");
         }
-        post.like_cnt += 1;
-        await post.save();
+        await post.increment('like_cnt', { by: count });
+        await post.reload();
         return post.toJSON();
     },
     unlikePost: async (postId) => {

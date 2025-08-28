@@ -1,5 +1,5 @@
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { catchError, EMPTY, Observable, throwError } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
@@ -31,13 +31,18 @@ export class PostService {
   getPostDetail(postId: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/posts/${postId}`);
   }
-  likePost(postId: number): Observable<any> {
+  likePost(postId: number, count: number = 1): Observable<any> {
     if (!isPlatformBrowser(this.platformId)) {
       console.error("This feature is only available in the browser.");
       return EMPTY;
     }
-    return this.http.put(`${this.baseUrl}/posts/${postId}/like`, {}, {
+    let params = new HttpParams();
+    if (Number.isFinite(count) && count !== 1) {
+      params = params.set('count', String(count));
+    }
+    return this.http.put(`${this.baseUrl}/posts/${postId}/like`, null, {
       withCredentials: true,
+      params,
     }).pipe(
       catchError(error => {
         if (error.status === 401) {

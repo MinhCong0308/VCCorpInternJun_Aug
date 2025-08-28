@@ -1,3 +1,25 @@
+<!-- Auth toast -->
+<div
+  class="auth-toast"
+  *ngIf="showAuthWarn"
+  role="alert"
+  aria-live="assertive"
+  aria-atomic="true"
+>
+  <i class="ti-alert" aria-hidden="true"></i>
+  <span class="msg">{{ authWarnText }}</span>
+
+  <!-- CTA tùy chọn -->
+  <button type="button" class="btn-toast" (click)="goLogin()">
+    Log in
+  </button>
+
+  <!-- nút đóng (nếu muốn) -->
+  <button type="button" class="btn-toast-close" (click)="dismissAuthToast()" aria-label="Close">
+    ×
+  </button>
+</div>
+
 <!-- Navbar -->
 <nav #navbar
      class="navbar sticky-top smart-hide navbar-expand-lg navbar-light bg-white border-bottom py-2">
@@ -99,11 +121,11 @@
         <div class="col-lg-7 col-md-10 col-12">
             <h1 class="post-title">{{ post?.title }}</h1>
             <div class="post-meta-detail mb-3" *ngIf="post">
-                <a routerLink="/">
+                <a style="cursor: pointer;">
                     <img [src]="post.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'" alt="Author" class="author-avatar" />
                 </a>
                 <div class="post-author">
-                    <a routerLink="/">
+                    <a style="cursor: pointer;">
                         <span class="author-name">{{ post.User?.firstname }} {{ post.User?.lastname }}</span>
                     </a>
                     <span>{{ post.createdAt | date:'MMM d, y'}}</span>
@@ -241,7 +263,7 @@
                 </div>
                 <!-- Template đệ quy để vẽ 1 node con + con của nó -->
                 <ng-template #commentNode let-node>
-                    <div class="response-child" [style.marginLeft.px]="node.depth * 30">
+                    <div class="response-child" [style.marginLeft.px]="node.depth * 10">
                         <div class="d-flex align-items-center mb-1">
                             <a routerLink="/">
                                 <img [src]="node.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'"
@@ -312,78 +334,6 @@
                             </div>
                         </div>
                     </div>
-                
-                    <!-- <div class="rec col-md-6 mb-5">
-                        <a href="#"><img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80"
-                            alt="cover" class="rec-article-cover mb-2"></a>
-                        <div class="rec-author d-flex align-items-center mb-2">
-                            <a href="#"><img src="https://randomuser.me/api/portraits/men/37.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;"></a>
-                            <a href="#"><span style="font-size:13px;">Ryan Holiday</span></a>
-                        </div>
-                        <div class="rec-title fw-bold" style="font-size:1.15rem;line-height:1.3;"><a href="#">How to Be Patient in an Impatient World</a></div>
-                        <div class="text-secondary mb-2" style="font-size:0.97rem;">Patience is a virtue we often ignore.</div>
-                        <div class="d-flex align-items-center mt-2 justify-content-between" style="font-size:0.95rem;">
-                            <span class="text-secondary">Jul 1</span>
-                            <div class="d-flex align-items-center gap-2">
-                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-thumb-up"></i> 13</button>
-                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-comment"></i> 2</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="rec col-md-6 mb-5">
-                        <a href="#"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
-                            alt="cover" class="rec-article-cover mb-2"></a>
-                        <div class="rec-author d-flex align-items-center mb-2">
-                            <a href="#"><img src="https://randomuser.me/api/portraits/women/81.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;"></a>
-                            <a href="#"><span style="font-size:13px;">Marie Kondo</span></a>
-                        </div>
-                        <div class="rec-title fw-bold" style="font-size:1.15rem;line-height:1.3;"><a href="#">Declutter Your Decisions</a></div>
-                        <div class="text-secondary mb-2" style="font-size:0.97rem;">A simple approach to mental clarity.</div>
-                        <div class="d-flex align-items-center mt-2 justify-content-between" style="font-size:0.95rem;">
-                            <span class="text-secondary">Jun 30</span>
-                            <div class="d-flex align-items-center gap-2">
-                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-thumb-up"></i> 8</button>
-                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-comment"></i> 1</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="rec col-md-6 mb-5">
-                        <a href="#"><img src="https://blog.journey.cloud/content/images/2022/12/atomic-habits-an-easy-proven-way-to-build-good-habits-break-bad-ones-by-james-clear.png"
-                            alt="cover" class="rec-article-cover mb-2"></a>
-                        <div class="rec-author d-flex align-items-center mb-2">
-                            <a href="#"><img src="https://randomuser.me/api/portraits/men/75.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;"></a>
-                            <a href="#"><span style="font-size:13px;">James Clear</span></a>
-                        </div>
-                        <div class="rec-title fw-bold" style="font-size:1.15rem;line-height:1.3;"><a href="#">Atomic Habits: The Power of Tiny Changes</a></div>
-                        <div class="text-secondary mb-2" style="font-size:0.97rem;">Tiny decisions create big outcomes.</div>
-                        <div class="d-flex align-items-center mt-2 justify-content-between" style="font-size:0.95rem;">
-                            <span class="text-secondary">Jun 28</span>
-                            <div class="d-flex align-items-center gap-2">
-                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-thumb-up"></i> 17</button>
-                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-comment"></i> 4</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="rec col-md-6 mb-5">
-                        <a href="#"><img src="https://images.unsplash.com/photo-1454023492550-5696f8ff10e1?auto=format&fit=crop&w=400&q=80"
-                            alt="cover" class="rec-article-cover mb-2"></a>
-                        <div class="rec-author d-flex align-items-center mb-2">
-                            <a href="#"><img src="https://randomuser.me/api/portraits/women/55.jpg" class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;"></a>
-                            <a href="#"><span style="font-size:13px;">Jane Doe</span></a>
-                        </div>
-                        <div class="rec-title fw-bold" style="font-size:1.15rem;line-height:1.3;"><a href="#">Making Choices When Nothing Feels Right</a></div>
-                        <div class="text-secondary mb-2" style="font-size:0.97rem;">Practical tips for difficult moments.</div>
-                        <div class="d-flex align-items-center mt-2 justify-content-between" style="font-size:0.95rem;">
-                            <span class="text-secondary">Jun 22</span>
-                            <div class="d-flex align-items-center gap-2">
-                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-thumb-up"></i> 5</button>
-                                <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-comment"></i> 0</button>
-                            </div>
-                        </div>
-                    </div> -->
                 </div>
                 <div *ngIf="recommendedPosts.length === 0" class="text-secondary small">Loading recommendations…</div>
                 <a href="home.html"><button class="btn btn-more-rec ms-auto">See more recommendations</button></a>

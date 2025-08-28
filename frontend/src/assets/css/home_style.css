@@ -149,7 +149,7 @@ body {
   flex: 1;
 }
 .clear-all {
-  padding-left: 80px;
+  padding-left: 100px;
   font-size: 12px;
   color: #888;
   cursor: pointer;

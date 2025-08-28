@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import {
   PostAdminService,
   AdminPostSummary,
@@ -47,7 +47,8 @@ export class PostComponent implements OnInit, AfterViewInit {
   constructor(
     private fb: FormBuilder,
     private service: PostAdminService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     this.filterForm = this.fb.group({
       keyword: [''],
@@ -56,17 +57,28 @@ export class PostComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    // Listen to query params for pre-selecting a category (e.g., from Categories module click)
+    // Listen to query params (page, categoryId, later can extend to keyword)
     this.route.queryParamMap.subscribe((params) => {
+      // categoryId (optional deep link from elsewhere)
       const cat = params.get('categoryId');
-      if (cat) {
+      if (cat !== null) {
         const num = Number(cat);
         this.categoryId = isNaN(num) ? '' : num;
-        // reflect into form control so UI select shows correct option if later bound
         this.filterForm.get('categoryId')?.setValue(this.categoryId);
       }
-      this.loadCategories();
-      this.loadPosts();
+      // page persistence
+      const pageParam = params.get('page');
+      let safePage = Number(pageParam || 1);
+      if (isNaN(safePage) || safePage < 1) safePage = 1;
+
+      // Load supporting data once (simple guard)
+      if (!this.categories.length) {
+        this.loadCategories();
+      }
+
+      if (safePage !== this.currentPage || !this.posts.length) {
+        this.loadPosts(safePage);
+      }
     });
   }
 
@@ -94,6 +106,10 @@ export class PostComponent implements OnInit, AfterViewInit {
         this.totalPages = res.totalPages;
         this.totalItems = res.total;
         this.errorMsg = '';
+        // If current page exceeds new totalPages (data shrink after actions), navigate to last page
+        if (this.currentPage > this.totalPages && this.totalPages > 0) {
+          this.gotoPage(this.totalPages);
+        }
       },
       error: (err) => {
         this.errorMsg = err?.error?.message || 'Failed to load posts.';
@@ -104,11 +120,9 @@ export class PostComponent implements OnInit, AfterViewInit {
   onSearch(event?: Event): void {
     if (event) event.preventDefault();
     this.keyword = (this.filterForm.get('keyword')?.value || '').trim();
-    // categoryId is already synced via form control
     const formCat = this.filterForm.get('categoryId')?.value;
     this.categoryId = formCat === '' || formCat == null ? '' : Number(formCat);
-    this.currentPage = 1;
-    this.loadPosts(1);
+    this.gotoPage(1); // navigate will trigger data load via subscription
   }
 
   onCategoryChange(val: string | Event): void {
@@ -118,14 +132,28 @@ export class PostComponent implements OnInit, AfterViewInit {
         : String((val.target as HTMLSelectElement).value || '');
     this.categoryId = v ? Number(v) : '';
     this.filterForm.get('categoryId')?.setValue(this.categoryId || '');
-    this.currentPage = 1;
-    this.loadPosts(1);
+    this.gotoPage(1); // reset to first page and update URL
   }
 
   // status filter removed per requirements
 
   onPageChange(page: number): void {
-    if (page >= 1 && page <= this.totalPages) this.loadPosts(page);
+    if (page >= 1 && page <= this.totalPages) this.gotoPage(page);
+  }
+
+  gotoPage(page: number): void {
+    if (page === this.currentPage && this.posts.length) return; // avoid redundant navigation
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        page,
+        // Persist categoryId if set; remove from URL if empty
+        categoryId: this.categoryId !== '' ? this.categoryId : null,
+        // Could also persist keyword; uncomment if desired
+        // keyword: this.keyword ? this.keyword : null,
+      },
+      queryParamsHandling: 'merge',
+    });
   }
 
   getPagesArray(): number[] {

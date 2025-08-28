@@ -52,20 +52,23 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   navSlide = 0;
   query = '';
   dropdownOpen = false;
-  LONG_PRESS_MS = 250; // thời gian kích hoạt giữ
-  REPEAT_MS = 120; // chu kỳ lặp like (ms)
-  MAX_PER_HOLD = 50; // giới hạn mỗi lần giữ (để tránh lỡ tay)
+  LONG_PRESS_MS = 250; // giữ lâu hơn 250ms thì vào chế độ lặp
+  REPEAT_MS = 120; // chu kỳ lặp like ms
+  MAX_PER_HOLD = 100; // limit trần an toàn (client) cho mỗi lần giữ
   holdTimeout?: any;
   repeatInterval?: any;
   holding = false;
   longPressed = false;
-  holdCount = 0;
-  // Hàng đợi gửi like
-  likeQueue = 0;
-  sendingLike = false;
+  // Số like (UI) cộng trong 1 lần nhấn/giữ (để gộp gửi khi nhả)
+  sessionLikes = 0;
+  sentOnRelease = false;
   plusBubbles: { id: number; dx: number }[] = []; // dx: lệch ngang ngẫu nhiên
   bubbleSeq = 0;
   trackByBubble = (_: number, b: { id: number }) => b.id;
+  // Toast noti
+  showAuthWarn = false;
+  authWarnText = '';
+  authToastTimer: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -455,12 +458,16 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   get recentSearches(): string[] { return this.search.recent; }
 
   onLikePress(ev: Event) {
-    if (!this.isLoggedIn) { this.router.navigate(['/auth/login']); return; }
+    if (!this.isLoggedIn) {
+      this.showAuthToast('You need to log in to like this post');
+      return; 
+    }
     if (ev.type === 'touchstart') { ev.preventDefault(); } // tránh click ảo trên mobile
 
     this.holding = true;
     this.longPressed = false;
-    this.holdCount = 0;
+    this.sessionLikes = 0;
+    this.sentOnRelease = false;
 
     // nếu giữ > LONG_PRESS_MS -> bật chế độ lặp
     this.holdTimeout = setTimeout(() => {
@@ -468,6 +475,8 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       this.longPressed = true;
       this.startRepeat();
     }, this.LONG_PRESS_MS);
+
+    this.likeOnce(); // khi bấm xuống (đầu) cộng 1 like
   }
 
   onLikeRelease(_ev?: Event) {
@@ -480,67 +489,67 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.longPressed) {
       clearInterval(this.repeatInterval);
       this.repeatInterval = undefined;
-    } else {
-      this.likeOnce();
     }
+
+    // Gửi GỘP đúng tổng số like vừa cộng trong lần nhấn này
+    const totalToSend = Math.max(0, this.sessionLikes);
+    this.sessionLikes = 0;
+
+    // tránh gửi 2 lần nếu release bị lặp (mouse + touch)
+    if (this.sentOnRelease || !totalToSend) return;
+    this.sentOnRelease = true;
+
+    this.sendLikesInChunks(totalToSend);
   }
 
   startRepeat() {
     this.repeatInterval = setInterval(() => {
-      if (!this.holding) { this.onLikeRelease(); return; }
-      if (this.holdCount >= this.MAX_PER_HOLD) { this.onLikeRelease(); return; }
-
+      if (!this.holding || this.sessionLikes >= this.MAX_PER_HOLD) {
+        this.onLikeRelease(); 
+        return; 
+      }
       this.likeOnce();
-      this.holdCount++;
     }, this.REPEAT_MS);
   }
 
   likeOnce() {
     if (!this.post) return;
+    // UI lạc quan
     this.isAnimating = true;
     this.isLiked = true;
     this.post.like_cnt = (this.post.like_cnt || 0) + 1;
     this.spawnPlusOne();
+    this.sessionLikes++; // đếm vào tổng của LẦN NHẤN HIỆN TẠI
     setTimeout(() => {
       this.isAnimating = false;
-    }, 300);
-    this.likeQueue++;
-    this.flushLikeQueue();
+    }, 300); // tắt bounce nhẹ
   }
 
-  flushLikeQueue() {
-    if (this.sendingLike || this.likeQueue <= 0) return;
+  sendLikesInChunks(total: number) {
     const postId = this.post?.postid;
-    if (!postId) { this.likeQueue = 0; return; }
+    if (!postId || total <= 0) return;
 
-    this.sendingLike = true;
+    const CHUNK = 100; // khớp MAX_LIKES_PER_REQUEST ở controller
+    const send = (left: number) => {
+      if (left <= 0) return;
 
-    // gửi 1 request/lần, khi xong nếu còn queue thì gửi tiếp
-    this.postService.likePost(postId).subscribe({
-      next: (res: any) => {
-        const cnt = res?.data?.like_cnt;
-        if (typeof cnt === 'number') this.post.like_cnt = cnt;
-      },
-      error: (err) => {
-        console.error('Failed to like post', err);
-        // rollback 1 đơn vị nếu lỗi
-        this.post.like_cnt = Math.max(0, (this.post.like_cnt || 0) - 1);
-      },
-      complete: () => {
-        this.likeQueue = Math.max(0, this.likeQueue - 1);
-        this.sendingLike = false;
-
-        if (this.likeQueue > 0) {
-          // nghỉ 80ms rồi gửi tiếp
-          setTimeout(() => this.flushLikeQueue(), 80);
+      const n = Math.min(CHUNK, left);
+      this.postService.likePost(postId, n).subscribe({
+        next: (res) => {
+          // đồng bộ theo server để chống lệch
+          const serverCnt = res?.data?.like_cnt;
+          if (typeof serverCnt === 'number') this.post.like_cnt = serverCnt;
+        },
+        error: (err) => {
+          console.error('like (batched) failed', err);
+        },
+        complete: () => {
+          send(left - n);
         }
-      }
-    });
-  }
+      });
+    };
 
-  ngOnDestroy(): void {
-    clearTimeout(this.holdTimeout);
-    clearInterval(this.repeatInterval);
+    send(total);
   }
 
   spawnPlusOne() {
@@ -561,6 +570,33 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     // Xóa bubble khi animation kết thúc
     const idx = this.plusBubbles.findIndex(b => b.id === id);
     if (idx >= 0) this.plusBubbles.splice(idx, 1);
+  }
+
+  showAuthToast(message = 'You need to log in to like the post') {
+    this.authWarnText = message;
+    this.showAuthWarn = true;
+
+    clearTimeout(this.authToastTimer);
+    // Tự ẩn sau 2.8s
+    this.authToastTimer = setTimeout(() => {
+      this.showAuthWarn = false;
+    }, 2800);
+  }
+
+  dismissAuthToast() {
+    clearTimeout(this.authToastTimer);
+    this.showAuthWarn = false;
+  }
+
+  goLogin() {
+    this.dismissAuthToast();
+    this.router.navigate(['/auth/login']);
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.authToastTimer);
+    clearTimeout(this.holdTimeout);
+    clearInterval(this.repeatInterval);
   }
 
   // Hàm để đăng xuất

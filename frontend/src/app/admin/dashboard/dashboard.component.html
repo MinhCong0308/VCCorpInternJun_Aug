@@ -97,9 +97,11 @@
               >
                 <div class="product-info">
                   <a
-                    class="product-title"
+                    class="product-title clamp-2-lines"
                     [routerLink]="['/admin/posts', p.postid]"
                     (click)="$event.stopPropagation()"
+                    data-toggle="tooltip"
+                    [attr.title]="p.title"
                     >{{ p.title }}</a
                   >
                   <span class="product-snippet line-clamp-2">{{

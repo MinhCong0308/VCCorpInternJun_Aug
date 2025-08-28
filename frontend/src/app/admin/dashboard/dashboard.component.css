@@ -31,3 +31,21 @@
   text-decoration: none;
   color: inherit;
 }
+
+/* Two-line clamp for recent post titles */
+.clamp-2-lines {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
+
+/* Limit width of recent post title (~2/3 original visual width) */
+.limit-title-width {
+  max-width: 34ch;
+  display: inline-block;
+  vertical-align: top;
+}

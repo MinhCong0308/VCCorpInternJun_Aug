@@ -25,7 +25,7 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private dashboardService: DashboardService,
-    private router: Router,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -76,7 +76,7 @@ export class DashboardComponent implements OnInit {
   }
 
   goToPost(id: any) {
-    if(!id) return;
+    if (!id) return;
     this.router.navigate(['/admin/posts', id]);
   }
 }

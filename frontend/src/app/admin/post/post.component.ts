@@ -94,6 +94,12 @@ export class PostComponent implements OnInit, AfterViewInit {
         this.totalPages = res.totalPages;
         this.totalItems = res.total;
         this.errorMsg = '';
+        // Reinitialize tooltips for dynamic title elements
+        if (typeof $ === 'function') {
+          setTimeout(() => {
+            $('[data-toggle="tooltip"]').tooltip();
+          }, 0);
+        }
       },
       error: (err) => {
         this.errorMsg = err?.error?.message || 'Failed to load posts.';

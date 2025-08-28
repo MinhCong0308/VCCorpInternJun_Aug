@@ -10,3 +10,64 @@
   text-decoration: underline;
   color: #0056b3;
 }
+
+/* Two-line clamp with ellipsis for long titles (full column width) */
+.clamp-2-lines {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2;
+  line-clamp: 2; /* future */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis; /* ensures trailing ellipsis */
+  width: 100%;
+  max-width: 100%;
+  white-space: normal; /* allow wrapping */
+  position: relative;
+}
+
+/* Optional: prevent underline spanning hidden lines (visual preference) */
+.clamp-2-lines:hover {
+  text-decoration: none;
+}
+
+/* (Removed limit-title-width: title now spans full column) */
+
+/* Stable column layout */
+.posts-table {
+  table-layout: fixed;
+  width: 100%;
+}
+.posts-table th,
+.posts-table td {
+  vertical-align: top;
+}
+.posts-table .col-index {
+  width: 55px;
+}
+.posts-table .col-actions {
+  width: 100px;
+}
+.posts-table .col-status {
+  width: 150px;
+}
+.posts-table .col-author {
+  width: 180px;
+}
+.posts-table .col-language {
+  width: 130px;
+}
+/* Title column takes remaining space without pushing others */
+.posts-table .col-title {
+  width: auto;
+}
+/* Force truncation inside title cell */
+.posts-table .col-title {
+  overflow: hidden;
+}
+
+/* Ensure long unbroken strings wrap, occupy full width */
+.post-title-link {
+  word-break: break-word;
+  display: block;
+  width: 100%;
+}

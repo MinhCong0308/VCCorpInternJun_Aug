@@ -20,8 +20,6 @@ export class BlogManageComponent implements OnInit {
   languages : Language[] = [];
   activeTab = 'home';
   isLoading = false;
-  // errorMessage = '';
-  // successMessage = '';
   defaultLanguage: Language | null = null;
   currentLanguage: Language | null = null;
   page = 1;
@@ -165,46 +163,54 @@ export class BlogManageComponent implements OnInit {
   }
   deletePost(postId: number, event: Event): void {
     event.preventDefault();
-  this.notificationService.confirm(
-    'Delete Post',
-    'Are you sure you want to delete this post? This action cannot be undone.',
-    () => {
-      // Proceed with deletion
-      this.postService.deletePost(postId).subscribe({
-        next: (response) => {
-          console.log('Post deleted successfully:', response);
-          if (response.success) {
-            this.notificationService.success('Success', 'Post deleted successfully.');
-            this.loadPosts(); // Reload posts after deletion
-          } else {
-            this.notificationService.error('Error', response.message || 'Failed to delete post.');
+    this.notificationService.confirm(
+      'Delete Post',
+      'Are you sure you want to delete this post? This action cannot be undone.',
+      () => {
+        // Proceed with deletion
+        this.postService.deletePost(postId).subscribe({
+          next: (response) => {
+            console.log('Post deleted successfully:', response);
+            if (response.success) {
+              this.notificationService.success('Success', 'Post deleted successfully.');
+              this.loadPosts(); // Reload posts after deletion
+            } else {
+              this.notificationService.error('Error', response.message || 'Failed to delete post.');
+            }
           }
-        }
-      });
-    },
-    () => {
-      return;
-    }
-  );
+        });
+      },
+      () => {
+        return;
+      }
+    );
   }
   appealPost(postId: number, event: Event): void {
     event.preventDefault();
-    const confirmed = confirm('Are you sure you want to appeal this post?');
-    if(!confirmed) return;
-    this.postService.requestForAppealPost(postId).subscribe({
-      next: (response) => {
-        console.log('Appeal request successful:', response);
-        this.notificationService.success('Success', 'Appeal request submitted successfully.');
-        this.loadPosts(); // Reload posts after appeal request
+      this.notificationService.confirm(
+      'Appeal Post',
+      'Are you sure you want to appeal this post? This action cannot be undone.',
+      () => {
+        this.postService.requestForAppealPost(postId).subscribe({
+          next: (response) => {
+            console.log('Appeal request successful:', response);
+            this.notificationService.success('Success', 'Appeal request submitted successfully.');
+            this.loadPosts(); // Reload posts after appeal request
+          },
+          error: (error) => {
+            console.error('Error submitting appeal request:', error);
+            this.notificationService.error('Error', 'Failed to submit appeal request. Please try again later.');
+          },
+          complete: () => {
+            this.loadPosts(); // Reload posts after appeal request
+          }
+        });
       },
-      error: (error) => {
-        console.error('Error submitting appeal request:', error);
-        this.notificationService.error('Error', 'Failed to submit appeal request. Please try again later.');
-      },
-      complete: () => {
-        this.loadPosts(); // Reload posts after appeal request
+      () => {
+        return;
       }
-    });
+    );
+
   }
   logout(): void {
     this.authService.logout().subscribe({

@@ -56,6 +56,12 @@
                 </div>
               </div>
             </div>
+            <div *ngIf="errorMessage" class="alert alert-danger mb-3">
+              {{ errorMessage }}
+            </div>
+            <div *ngIf="successMessage" class="alert alert-success mb-3">
+              {{ successMessage }}
+            </div>
             <div class="row">
               <div class="col-8">
                 <div class="icheck-primary">

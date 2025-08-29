@@ -6,6 +6,7 @@ import {
   Renderer2,
   inject,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
@@ -14,11 +15,13 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   standalone: true,
+  imports: [CommonModule]
 })
 export class LoginComponent implements AfterViewInit, OnDestroy {
   private formCleanup: (() => void) | null = null;
   isLoading = false;
   errorMessage = '';
+  successMessage = '';
 
   private router = inject(Router);
   private authService = inject(AuthService);
@@ -46,6 +49,7 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
     this.formCleanup = this.renderer.listen(formEl, 'submit', (evt: Event) => {
       evt.preventDefault();
       this.errorMessage = '';
+      this.successMessage = '';
 
       const email = emailInput.value?.trim();
       const password = passwordInput.value ?? '';
@@ -70,9 +74,12 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
         next: (res) => {
           console.debug('[AdminLogin] Response', res);
           if (res?.success) {
-            this.router.navigate(['/admin/dashboard']);
+            this.successMessage = 'Login successful! Redirecting...';
+            setTimeout(() => {
+              this.router.navigate(['/admin/dashboard']);
+            }, 1000);
           } else {
-            this.errorMessage = res?.message || 'Login failed.';
+            this.errorMessage = 'Username or password is not correct. Please try again';
           }
         },
         error: (err) => {

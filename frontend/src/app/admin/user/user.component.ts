@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import {
   AdminUser,
   PaginatedUserResponse,
@@ -32,6 +32,7 @@ export class UserComponent implements OnInit, AfterViewInit {
   currentPage = 1;
   totalPages = 0;
   totalItems = 0;
+  limit = 5;
   private apiBase = 'http://localhost:3000';
 
   confirmModal: {
@@ -48,7 +49,12 @@ export class UserComponent implements OnInit, AfterViewInit {
     btnClass: 'btn-primary',
   };
 
-  constructor(private fb: FormBuilder, private service: UserService) {
+  constructor(
+    private fb: FormBuilder,
+    private service: UserService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.searchForm = this.fb.group({ keyword: [''], status: [''] });
     this.userForm = this.fb.group({
       firstname: [
@@ -84,7 +90,18 @@ export class UserComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.loadUsers();
+    this.route.queryParamMap.subscribe((q) => {
+      const pageParam = Number(q.get('page'));
+      const limitParam = Number(q.get('limit'));
+      const kw = q.get('keyword');
+
+      if (pageParam > 0) this.currentPage = pageParam;
+      if (limitParam > 0) this.limit = limitParam;
+      if (kw !== null) {
+        this.searchForm.get('keyword')?.setValue(kw);
+      }
+      this.loadUsers(this.currentPage);
+    });
   }
 
   ngAfterViewInit(): void {
@@ -107,13 +124,14 @@ export class UserComponent implements OnInit, AfterViewInit {
     const stRaw = this.searchForm.get('status')?.value;
     const st = stRaw === '' || stRaw == null ? '' : Number(stRaw);
     this.status = st === '' ? '' : st;
-    this.service.getAllUsers(kw, page, this.status).subscribe({
+    this.service.getAllUsers(kw, page, this.status, this.limit).subscribe({
       next: (res: PaginatedUserResponse) => {
         this.users = res.user;
         this.currentPage = res.page;
         this.totalPages = res.totalPages;
         this.totalItems = res.total;
         this.errorMsg = '';
+        this.updateRouteQuery();
       },
       error: (err) => {
         this.errorMsg = err?.error?.message || 'Failed to load users.';
@@ -130,6 +148,20 @@ export class UserComponent implements OnInit, AfterViewInit {
 
   onPageChange(page: number): void {
     if (page >= 1 && page <= this.totalPages) this.loadUsers(page);
+  }
+
+  private updateRouteQuery(): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        page: this.currentPage !== 1 ? this.currentPage : undefined,
+        limit: this.limit !== 5 ? this.limit : undefined,
+        keyword:
+          (this.searchForm.get('keyword')?.value || '').trim() || undefined,
+      },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   getPagesArray(): number[] {

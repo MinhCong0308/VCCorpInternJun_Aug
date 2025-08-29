@@ -53,12 +53,15 @@ export class CategoryService {
    */
   getAllCategories(
     keyword = '',
-    page = 1
+    page = 1,
+    limit: number = this.ITEMS_PER_PAGE
   ): Observable<PaginatedCategoryResponse> {
     let params = new HttpParams()
       .set('page', page.toString())
-      .set('limit', this.ITEMS_PER_PAGE.toString());
-
+      .set(
+        'limit',
+        (limit && limit > 0 ? limit : this.ITEMS_PER_PAGE).toString()
+      );
     if (keyword && keyword.trim()) {
       // Backend expects `search` query for full-text search
       params = params.set('search', keyword.trim());

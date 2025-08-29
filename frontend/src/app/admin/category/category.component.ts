@@ -15,7 +15,7 @@ import {
   CategoryService,
   Category,
 } from '../../core/services/category.service';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 
 declare const $: any; // dùng cho tooltip Bootstrap 4
 
@@ -36,13 +36,16 @@ export class CategoryComponent implements OnInit, AfterViewInit {
   currentPage = 1;
   totalPages = 0;
   totalItems = 0;
+  limit = 5;
   deleteTarget: Category | null = null; // category chờ xác nhận xóa
   // Lưu giá trị trùng lặp cuối cùng để chỉ clear khi user đổi sang chuỗi khác
   private lastDuplicateValue: string | null = null;
 
   constructor(
     private fb: FormBuilder,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     this.searchForm = this.fb.group({
       keyword: [''],
@@ -82,19 +85,31 @@ export class CategoryComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.loadCategories();
+    this.route.queryParamMap.subscribe((q) => {
+      const pageParam = Number(q.get('page'));
+      const limitParam = Number(q.get('limit'));
+      const kw = q.get('keyword');
+
+      if (pageParam > 0) this.currentPage = pageParam;
+      if (limitParam > 0) this.limit = limitParam;
+      if (kw !== null) {
+        this.searchForm.get('keyword')?.setValue(kw);
+      }
+      this.loadCategories(this.currentPage);
+    });
   }
 
   // Lấy danh sách category có phân trang và tìm kiếm
   loadCategories(page: number = 1): void {
     const keyword = this.searchForm.get('keyword')?.value || '';
-    this.categoryService.getAllCategories(keyword, page).subscribe({
+    this.categoryService.getAllCategories(keyword, page, this.limit).subscribe({
       next: (data) => {
         this.categories = data.categories;
         this.currentPage = data.page;
         this.totalPages = data.totalPages;
         this.totalItems = data.total;
         this.errorMsg = '';
+        this.updateRouteQuery();
       },
       error: (err) => {
         this.errorMsg = 'Failed to load categories.';
@@ -113,6 +128,20 @@ export class CategoryComponent implements OnInit, AfterViewInit {
     if (page >= 1 && page <= this.totalPages) {
       this.loadCategories(page);
     }
+  }
+
+  private updateRouteQuery(): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        page: this.currentPage !== 1 ? this.currentPage : undefined,
+        limit: this.limit !== 5 ? this.limit : undefined,
+        keyword:
+          (this.searchForm.get('keyword')?.value || '').trim() || undefined,
+      },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   // Tạo mảng số trang cho phân trang

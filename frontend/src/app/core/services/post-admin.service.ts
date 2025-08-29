@@ -42,6 +42,7 @@ export class PostAdminService {
   getPosts(params: {
     keyword?: string;
     categoryId?: number | '';
+    status?: number | '';
     page?: number;
     limit?: number;
   }): Observable<PaginatedPostResponse> {
@@ -55,7 +56,9 @@ export class PostAdminService {
     if (params.categoryId !== undefined && params.categoryId !== '') {
       qp = qp.set('categoryId', String(params.categoryId));
     }
-
+    if (params.status !== undefined && params.status !== '') {
+      qp = qp.set('status', String(params.status));
+    }
     return this.http
       .get<ApiResponse<PaginatedPostResponse>>(`${this.baseUrl}/post-admin`, {
         withCredentials: true,

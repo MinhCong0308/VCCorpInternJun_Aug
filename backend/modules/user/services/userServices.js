@@ -3,7 +3,7 @@ const { Op } = require("sequelize");
 const bcrypt = require("bcryptjs");
 const config = require("configs/index");
 const userService = {
-  getAllUser: async (limit = 5, page = 1, search = "", status) => {
+  getAllUser: async (limit = 5, page = 1, search = "", status, role) => {
     const offset = (page - 1) * limit;
 
     const options = {
@@ -30,6 +30,9 @@ const userService = {
 
     if (status !== undefined) {
       whereClauses.push({ status });
+    }
+    if (role !== undefined) {
+      whereClauses.push({ roleid: role });
     }
 
     if (whereClauses.length === 1) {

@@ -4,7 +4,7 @@ const responseUtils = require("utils/responseUtils");
 const userController = {
   getAll: async (req, res) => {
     try {
-      const { limit = 5, page = 1, search = "", status } = req.query;
+      const { limit = 5, page = 1, search = "", status, role } = req.query;
       let statusNum;
       if (status !== undefined && status !== "") {
         const parsed = Number(status);
@@ -12,11 +12,18 @@ const userController = {
           statusNum = parsed;
         }
       }
+      let roleNum;
+      if (role !== undefined && role !== "") {
+        const parsedR = Number(role);
+        if (!isNaN(parsedR) && (parsedR === 1 || parsedR === 2))
+          roleNum = parsedR;
+      }
       const result = await userService.getAllUser(
         +limit,
         +page,
         search,
-        statusNum
+        statusNum,
+        roleNum
       );
       return responseUtils.ok(res, result);
     } catch (error) {

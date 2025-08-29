@@ -28,6 +28,7 @@ export class UserComponent implements OnInit, AfterViewInit {
   users: AdminUser[] = [];
   keyword = '';
   status: '' | number = '';
+  role: '' | number = '';
   errorMsg = '';
   currentPage = 1;
   totalPages = 0;
@@ -55,7 +56,11 @@ export class UserComponent implements OnInit, AfterViewInit {
     private route: ActivatedRoute,
     private router: Router
   ) {
-    this.searchForm = this.fb.group({ keyword: [''], status: [''] });
+    this.searchForm = this.fb.group({
+      keyword: [''],
+      status: [''],
+      role: [''],
+    });
     this.userForm = this.fb.group({
       firstname: [
         '',
@@ -91,14 +96,28 @@ export class UserComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe((q) => {
-      const pageParam = Number(q.get('page'));
       const limitParam = Number(q.get('limit'));
+      const pageParam = Number(q.get('page'));
       const kw = q.get('keyword');
+      const stParam = q.get('status');
+      const roleParam = q.get('role');
 
-      if (pageParam > 0) this.currentPage = pageParam;
       if (limitParam > 0) this.limit = limitParam;
+      if (pageParam > 0) this.currentPage = pageParam;
       if (kw !== null) {
         this.searchForm.get('keyword')?.setValue(kw);
+      }
+      if (stParam !== null && stParam !== '') {
+        const stNum = Number(stParam);
+        this.searchForm.get('status')?.setValue(stNum);
+        this.status = stNum;
+      }
+      if (roleParam !== null && roleParam !== '') {
+        const roleNum = Number(roleParam);
+        if (!isNaN(roleNum)) {
+          this.searchForm.get('role')?.setValue(roleNum);
+          this.role = roleNum;
+        }
       }
       this.loadUsers(this.currentPage);
     });
@@ -122,21 +141,27 @@ export class UserComponent implements OnInit, AfterViewInit {
       ''
     ).trim();
     const stRaw = this.searchForm.get('status')?.value;
+    const roleRaw = this.searchForm.get('role')?.value;
     const st = stRaw === '' || stRaw == null ? '' : Number(stRaw);
     this.status = st === '' ? '' : st;
-    this.service.getAllUsers(kw, page, this.status, this.limit).subscribe({
-      next: (res: PaginatedUserResponse) => {
-        this.users = res.user;
-        this.currentPage = res.page;
-        this.totalPages = res.totalPages;
-        this.totalItems = res.total;
-        this.errorMsg = '';
-        this.updateRouteQuery();
-      },
-      error: (err) => {
-        this.errorMsg = err?.error?.message || 'Failed to load users.';
-      },
-    });
+    const rl = roleRaw === '' || roleRaw == null ? '' : Number(roleRaw);
+    this.role = rl === '' ? '' : rl;
+    // BUG FIX: previously passed (kw, page, status, limit) so limit was misinterpreted as role.
+    this.service
+      .getAllUsers(kw, page, this.status, this.role, this.limit)
+      .subscribe({
+        next: (res: PaginatedUserResponse) => {
+          this.users = res.user;
+          this.currentPage = res.page;
+          this.totalPages = res.totalPages;
+          this.totalItems = res.total;
+          this.errorMsg = '';
+          this.updateRouteQuery();
+        },
+        error: (err) => {
+          this.errorMsg = err?.error?.message || 'Failed to load users.';
+        },
+      });
   }
 
   onSearch(event?: Event): void {
@@ -149,15 +174,24 @@ export class UserComponent implements OnInit, AfterViewInit {
   onPageChange(page: number): void {
     if (page >= 1 && page <= this.totalPages) this.loadUsers(page);
   }
+  onPageSizeChange(raw: string): void {
+    const newSize = Number(raw);
+    if (!newSize || newSize <= 0 || newSize === this.limit) return;
+    this.limit = newSize;
+    this.currentPage = 1;
+    this.loadUsers(1);
+  }
 
   private updateRouteQuery(): void {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
-        page: this.currentPage !== 1 ? this.currentPage : undefined,
-        limit: this.limit !== 5 ? this.limit : undefined,
+        limit: this.limit,
+        page: this.currentPage,
         keyword:
           (this.searchForm.get('keyword')?.value || '').trim() || undefined,
+        status: this.status !== '' ? this.status : undefined,
+        role: this.role !== '' ? this.role : undefined,
       },
       queryParamsHandling: 'merge',
       replaceUrl: true,

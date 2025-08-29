@@ -134,8 +134,8 @@ export class CategoryComponent implements OnInit, AfterViewInit {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
-        page: this.currentPage !== 1 ? this.currentPage : undefined,
-        limit: this.limit !== 5 ? this.limit : undefined,
+        limit: this.limit,
+        page: this.currentPage,
         keyword:
           (this.searchForm.get('keyword')?.value || '').trim() || undefined,
       },
@@ -149,6 +149,14 @@ export class CategoryComponent implements OnInit, AfterViewInit {
     return Array(this.totalPages)
       .fill(0)
       .map((_, i) => i + 1);
+  }
+
+  onPageSizeChange(raw: string): void {
+    const newSize = Number(raw);
+    if (!newSize || newSize <= 0 || newSize === this.limit) return;
+    this.limit = newSize;
+    this.currentPage = 1;
+    this.loadCategories(1);
   }
 
   // Hiện modal thêm mới

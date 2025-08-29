@@ -78,8 +78,8 @@ export class LanguageComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe((q) => {
-      const pageParam = Number(q.get('page'));
       const limitParam = Number(q.get('limit'));
+      const pageParam = Number(q.get('page'));
       const kw = q.get('keyword');
 
       if (pageParam > 0) this.currentPage = pageParam;
@@ -136,13 +136,20 @@ export class LanguageComponent implements OnInit, AfterViewInit {
   onPageChange(page: number): void {
     if (page >= 1 && page <= this.totalPages) this.loadLanguages(page);
   }
+  onPageSizeChange(raw: string): void {
+    const newSize = Number(raw);
+    if (!newSize || newSize <= 0 || newSize === this.limit) return;
+    this.limit = newSize;
+    this.currentPage = 1;
+    this.loadLanguages(1);
+  }
 
   private updateRouteQuery(): void {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
-        page: this.currentPage !== 1 ? this.currentPage : undefined,
-        limit: this.limit !== 5 ? this.limit : undefined,
+        limit: this.limit,
+        page: this.currentPage,
         keyword:
           (this.searchForm.get('keyword')?.value || '').trim() || undefined,
       },

@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import {
   LanguageService,
   Language,
@@ -34,6 +34,7 @@ export class LanguageComponent implements OnInit, AfterViewInit {
   currentPage = 1;
   totalPages = 0;
   totalItems = 0;
+  limit = 5;
   private apiBase = 'http://localhost:3000';
 
   private selectedFlagFile: File | null = null;
@@ -52,7 +53,12 @@ export class LanguageComponent implements OnInit, AfterViewInit {
     btnClass: 'btn-primary',
   };
 
-  constructor(private fb: FormBuilder, private service: LanguageService) {
+  constructor(
+    private fb: FormBuilder,
+    private service: LanguageService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.searchForm = this.fb.group({ keyword: [''], status: [''] });
     this.languageForm = this.fb.group({
       languagename: [
@@ -71,7 +77,18 @@ export class LanguageComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.loadLanguages();
+    this.route.queryParamMap.subscribe((q) => {
+      const pageParam = Number(q.get('page'));
+      const limitParam = Number(q.get('limit'));
+      const kw = q.get('keyword');
+
+      if (pageParam > 0) this.currentPage = pageParam;
+      if (limitParam > 0) this.limit = limitParam;
+      if (kw !== null) {
+        this.searchForm.get('keyword')?.setValue(kw);
+      }
+      this.loadLanguages(this.currentPage);
+    });
   }
 
   ngAfterViewInit(): void {
@@ -89,18 +106,21 @@ export class LanguageComponent implements OnInit, AfterViewInit {
     const statRaw = this.searchForm.get('status')?.value;
     const statusFilter = statRaw === '' ? '' : (Number(statRaw) as 0 | 1);
     this.statusFilter = statusFilter;
-    this.service.getAllLanguagesAdmin(kw, page, statusFilter).subscribe({
-      next: (res: PaginatedLanguageResponse) => {
-        this.languages = res.languages;
-        this.currentPage = res.page;
-        this.totalPages = res.totalPages;
-        this.totalItems = res.total;
-        this.errorMsg = '';
-      },
-      error: (err) => {
-        this.errorMsg = err?.error?.message || 'Failed to load languages.';
-      },
-    });
+    this.service
+      .getAllLanguagesAdmin(kw, page, statusFilter, this.limit)
+      .subscribe({
+        next: (res: PaginatedLanguageResponse) => {
+          this.languages = res.languages;
+          this.currentPage = res.page;
+          this.totalPages = res.totalPages;
+          this.totalItems = res.total;
+          this.errorMsg = '';
+          this.updateRouteQuery();
+        },
+        error: (err) => {
+          this.errorMsg = err?.error?.message || 'Failed to load languages.';
+        },
+      });
   }
 
   onSearch(event?: Event, value?: string): void {
@@ -115,6 +135,20 @@ export class LanguageComponent implements OnInit, AfterViewInit {
 
   onPageChange(page: number): void {
     if (page >= 1 && page <= this.totalPages) this.loadLanguages(page);
+  }
+
+  private updateRouteQuery(): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        page: this.currentPage !== 1 ? this.currentPage : undefined,
+        limit: this.limit !== 5 ? this.limit : undefined,
+        keyword:
+          (this.searchForm.get('keyword')?.value || '').trim() || undefined,
+      },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   getPagesArray(): number[] {
@@ -198,20 +232,16 @@ export class LanguageComponent implements OnInit, AfterViewInit {
         // Prefer field info from server
         if (server.field) {
           if (server.field === 'languagename') {
-            this.languageForm
-              .get('languagename')
-              ?.setErrors({
-                ...(this.languageForm.get('languagename')?.errors || {}),
-                duplicate: true,
-              });
+            this.languageForm.get('languagename')?.setErrors({
+              ...(this.languageForm.get('languagename')?.errors || {}),
+              duplicate: true,
+            });
           }
           if (server.field === 'locale_code') {
-            this.languageForm
-              .get('locale_code')
-              ?.setErrors({
-                ...(this.languageForm.get('locale_code')?.errors || {}),
-                duplicate: true,
-              });
+            this.languageForm.get('locale_code')?.setErrors({
+              ...(this.languageForm.get('locale_code')?.errors || {}),
+              duplicate: true,
+            });
           }
           this.errorMsg = '';
           return;

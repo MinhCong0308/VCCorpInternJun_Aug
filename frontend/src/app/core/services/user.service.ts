@@ -39,11 +39,15 @@ export class UserService {
   getAllUsers(
     keyword = '',
     page = 1,
-    status: '' | number = ''
+    status: '' | number = '',
+    limit = this.ITEMS_PER_PAGE
   ): Observable<PaginatedUserResponse> {
     let params = new HttpParams()
       .set('page', page.toString())
-      .set('limit', this.ITEMS_PER_PAGE.toString());
+      .set(
+        'limit',
+        (limit && limit > 0 ? limit : this.ITEMS_PER_PAGE).toString()
+      );
     if (keyword && keyword.trim())
       params = params.set('search', keyword.trim());
     if (status !== '' && status !== undefined && status !== null) {

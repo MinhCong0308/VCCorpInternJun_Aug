@@ -43,6 +43,7 @@ export class PostAdminService {
     keyword?: string;
     categoryId?: number | '';
     page?: number;
+    limit?: number;
   }): Observable<PaginatedPostResponse> {
     let qp = new HttpParams()
       .set('limit', this.ITEMS_PER_PAGE.toString())

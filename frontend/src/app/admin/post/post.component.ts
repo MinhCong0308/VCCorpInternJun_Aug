@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import {
   PostAdminService,
   AdminPostSummary,
   PaginatedPostResponse,
 } from '../../core/services/post-admin.service';
+import { privateDecrypt } from 'node:crypto';
 
 declare const $: any;
 
@@ -26,6 +27,7 @@ export class PostComponent implements OnInit, AfterViewInit {
   currentPage = 1;
   totalPages = 0;
   totalItems = 0;
+  limit = 5;
 
   categories: { categoryid: number; categoryname: string }[] = [];
 
@@ -47,7 +49,8 @@ export class PostComponent implements OnInit, AfterViewInit {
   constructor(
     private fb: FormBuilder,
     private service: PostAdminService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     this.filterForm = this.fb.group({
       keyword: [''],
@@ -65,8 +68,12 @@ export class PostComponent implements OnInit, AfterViewInit {
         // reflect into form control so UI select shows correct option if later bound
         this.filterForm.get('categoryId')?.setValue(this.categoryId);
       }
+      const pageParam = Number(params.get('page'));
+      const limitParam = Number(params.get('limit'));
+      if (pageParam && pageParam > 0) this.currentPage = pageParam;
+      if (limitParam && limitParam > 0) this.limit = limitParam;
       this.loadCategories();
-      this.loadPosts();
+      this.loadPosts(this.currentPage);
     });
   }
 
@@ -94,6 +101,7 @@ export class PostComponent implements OnInit, AfterViewInit {
         this.totalPages = res.totalPages;
         this.totalItems = res.total;
         this.errorMsg = '';
+        this.updateRouteQuery();
         // Reinitialize tooltips for dynamic title elements
         if (typeof $ === 'function') {
           setTimeout(() => {
@@ -132,6 +140,21 @@ export class PostComponent implements OnInit, AfterViewInit {
 
   onPageChange(page: number): void {
     if (page >= 1 && page <= this.totalPages) this.loadPosts(page);
+  }
+
+  private updateRouteQuery(): void {
+    // merge without triggering extra load if values unchanged
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        categoryId: this.categoryId || undefined,
+        page: this.currentPage !== 1 ? this.currentPage : undefined,
+        limit: this.limit !== 5 ? this.limit : undefined,
+        // (optional) could add search: this.keyword || undefined
+      },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   getPagesArray(): number[] {

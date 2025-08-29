@@ -42,11 +42,15 @@ export class LanguageService {
   getAllLanguagesAdmin(
     keyword = '',
     page = 1,
-    statusFilter: number | '' = ''
+    statusFilter: number | '' = '',
+    limit = this.ITEMS_PER_PAGE
   ): Observable<PaginatedLanguageResponse> {
     let params = new HttpParams()
       .set('page', page.toString())
-      .set('limit', this.ITEMS_PER_PAGE.toString());
+      .set(
+        'limit',
+        (limit && limit > 0 ? limit : this.ITEMS_PER_PAGE).toString()
+      );
     if (keyword && keyword.trim()) {
       params = params.set('search', keyword.trim());
     }

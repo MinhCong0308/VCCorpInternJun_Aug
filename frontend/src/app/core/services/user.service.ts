@@ -40,6 +40,7 @@ export class UserService {
     keyword = '',
     page = 1,
     status: '' | number = '',
+    role: '' | number = '',
     limit = this.ITEMS_PER_PAGE
   ): Observable<PaginatedUserResponse> {
     let params = new HttpParams()
@@ -52,6 +53,9 @@ export class UserService {
       params = params.set('search', keyword.trim());
     if (status !== '' && status !== undefined && status !== null) {
       params = params.set('status', String(status));
+    }
+    if (role !== '' && role !== undefined && role !== null) {
+      params = params.set('role', String(role));
     }
     return this.http
       .get<ApiResponse<PaginatedUserResponse>>(`${this.baseUrl}/users`, {

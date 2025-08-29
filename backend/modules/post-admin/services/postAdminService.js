@@ -21,14 +21,12 @@ const postAdminService = {
       order: [["createdAt", "DESC"]],
     };
 
-    // Build where incrementally
     let where = {};
 
     if (search && search.trim() !== "") {
       const q = search.trim().toLowerCase();
       const escapeLike = (s) => s.replace(/[\\%_]/g, "\\$&");
       const likePattern = `%${escapeLike(q)}%`;
-      // Match title only
       where = {
         ...where,
         [Op.and]: [
@@ -38,16 +36,15 @@ const postAdminService = {
         ],
       };
     }
-    // Do not filter by status here per requirements
     if (userId) {
-      // correct column name is userid
       where = { ...where, userid: userId };
     }
     if (languageId) {
-      // correct column name is languageid
       where = { ...where, languageid: languageId };
     }
-
+    if (status) {
+      where = { ...where, status };
+    }
     let categoryInclude = {
       model: db.Category,
       as: "Categories",

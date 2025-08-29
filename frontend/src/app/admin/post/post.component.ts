@@ -23,6 +23,7 @@ export class PostComponent implements OnInit, AfterViewInit {
   posts: AdminPostSummary[] = [];
   keyword = '';
   categoryId: number | '' = '';
+  status: '' | number = '';
   errorMsg = '';
   currentPage = 1;
   totalPages = 0;
@@ -55,6 +56,7 @@ export class PostComponent implements OnInit, AfterViewInit {
     this.filterForm = this.fb.group({
       keyword: [''],
       categoryId: [''],
+      status: [''],
     });
   }
 
@@ -70,8 +72,16 @@ export class PostComponent implements OnInit, AfterViewInit {
       }
       const pageParam = Number(params.get('page'));
       const limitParam = Number(params.get('limit'));
+      const statusParam = Number(params.get('status'));
       if (pageParam && pageParam > 0) this.currentPage = pageParam;
       if (limitParam && limitParam > 0) this.limit = limitParam;
+      if (statusParam !== null && statusParam.toString() !== '') {
+        const sNum = Number(statusParam);
+        if ([1, 2, 3].includes(sNum)) {
+          this.status = sNum;
+          this.filterForm.get('status')?.setValue(this.status);
+        }
+      }
       this.loadCategories();
       this.loadPosts(this.currentPage);
     });
@@ -94,25 +104,29 @@ export class PostComponent implements OnInit, AfterViewInit {
     // Use component state as source of truth to avoid empty-string overriding
     const kw = (this.keyword || '').trim();
     const cat = this.categoryId;
-    this.service.getPosts({ keyword: kw, categoryId: cat, page }).subscribe({
-      next: (res: PaginatedPostResponse) => {
-        this.posts = res.posts;
-        this.currentPage = res.page;
-        this.totalPages = res.totalPages;
-        this.totalItems = res.total;
-        this.errorMsg = '';
-        this.updateRouteQuery();
-        // Reinitialize tooltips for dynamic title elements
-        if (typeof $ === 'function') {
-          setTimeout(() => {
-            $('[data-toggle="tooltip"]').tooltip();
-          }, 0);
-        }
-      },
-      error: (err) => {
-        this.errorMsg = err?.error?.message || 'Failed to load posts.';
-      },
-    });
+    const stRaw = this.filterForm.get('status')?.value;
+    this.status = stRaw === '' || stRaw == null ? '' : Number(stRaw);
+    this.service
+      .getPosts({
+        keyword: kw,
+        categoryId: cat,
+        status: this.status,
+        limit: this.limit,
+        page,
+      })
+      .subscribe({
+        next: (res: PaginatedPostResponse) => {
+          this.posts = res.posts;
+          this.currentPage = res.page;
+          this.totalPages = res.totalPages;
+          this.totalItems = res.total;
+          this.errorMsg = '';
+          this.updateRouteQuery();
+        },
+        error: (err) => {
+          this.errorMsg = err?.error?.message || 'Failed to load posts.';
+        },
+      });
   }
 
   onSearch(event?: Event): void {
@@ -121,6 +135,9 @@ export class PostComponent implements OnInit, AfterViewInit {
     // categoryId is already synced via form control
     const formCat = this.filterForm.get('categoryId')?.value;
     this.categoryId = formCat === '' || formCat == null ? '' : Number(formCat);
+
+    const st = this.filterForm.get('status')?.value;
+    this.status = st === '' || st == null ? '' : Number(st);
     this.currentPage = 1;
     this.loadPosts(1);
   }
@@ -135,8 +152,19 @@ export class PostComponent implements OnInit, AfterViewInit {
     this.currentPage = 1;
     this.loadPosts(1);
   }
-
-  // status filter removed per requirements
+  onStatusChange(val: string | Event): void {
+    const v =
+      typeof val === 'string'
+        ? val
+        : String((val.target as HTMLSelectElement).value || '');
+    this.status = v ? Number(v) : '';
+    // đảm bảo form control sync về string hoặc ''
+    this.filterForm
+      .get('status')
+      ?.setValue(this.status === '' ? '' : String(this.status));
+    this.currentPage = 1;
+    this.loadPosts(1);
+  }
 
   onPageChange(page: number): void {
     if (page >= 1 && page <= this.totalPages) this.loadPosts(page);
@@ -147,10 +175,10 @@ export class PostComponent implements OnInit, AfterViewInit {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
+        limit: this.limit,
+        page: this.currentPage,
         categoryId: this.categoryId || undefined,
-        page: this.currentPage !== 1 ? this.currentPage : undefined,
-        limit: this.limit !== 5 ? this.limit : undefined,
-        // (optional) could add search: this.keyword || undefined
+        status: this.status !== '' ? this.status : undefined,
       },
       queryParamsHandling: 'merge',
       replaceUrl: true,
@@ -161,6 +189,14 @@ export class PostComponent implements OnInit, AfterViewInit {
     return Array(this.totalPages)
       .fill(0)
       .map((_, i) => i + 1);
+  }
+
+  onPageSizeChange(raw: string): void {
+    const newSize = Number(raw);
+    if (!newSize || newSize <= 0 || newSize === this.limit) return;
+    this.limit = newSize;
+    this.currentPage = 1;
+    this.loadPosts(1);
   }
 
   authorName(p: AdminPostSummary): string {

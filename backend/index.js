@@ -12,6 +12,7 @@ const cors = require("cors");
 const app = express();
 const path = require('path');
 const globalFilter = require("utils/globalFilter"); // Import global filter
+const cronUtils = require('utils/cronUtils');
 
 try {
   globalFilter.initialize();
@@ -20,7 +21,12 @@ try {
   console.error('Failed to initialize global bad words filter:', error);
   process.exit(1); // Exit if filter initialization fails
 }
-
+try {
+  cronUtils.start();
+} catch (error) {
+  console.error('Failed to start cron jobs:', error);
+  process.exit(1); // Exit if cron job initialization fails
+}
 app.disable("x-powered-by");
 const corsOptions = {
   origin: "http://localhost:4200", 

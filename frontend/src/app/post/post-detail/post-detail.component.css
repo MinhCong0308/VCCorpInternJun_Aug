@@ -442,11 +442,10 @@ body {
 }
 /* ===== Auth toast (fixed, top-center) ===== */
 :host ::ng-deep .auth-toast {
-  position: fixed;
-  top: 14px;
+  position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 2000;              /* đảm bảo trên mọi thứ khác */
+  top: 7px;
   background: #ff474c;
   color: #fff;
   padding: 10px 14px;
@@ -481,6 +480,17 @@ body {
   line-height: 1;
   padding: 0 2px;
   cursor: pointer;
+}
+
+:host ::ng-deep .toast-sticky-container {
+  position: sticky;
+  top: 7px;
+  z-index: 2000;
+  height: 0;
+  overflow: visible;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
 }
 
 @keyframes toastIn {

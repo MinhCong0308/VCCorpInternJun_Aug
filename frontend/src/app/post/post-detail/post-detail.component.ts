@@ -577,10 +577,10 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showAuthWarn = true;
 
     clearTimeout(this.authToastTimer);
-    // Tự ẩn sau 2.8s
+    // Tự ẩn sau 3s
     this.authToastTimer = setTimeout(() => {
       this.showAuthWarn = false;
-    }, 2800);
+    }, 3000);
   }
 
   dismissAuthToast() {

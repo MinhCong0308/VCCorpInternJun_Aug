@@ -1,23 +1,25 @@
 <!-- Auth toast -->
-<div
-  class="auth-toast"
-  *ngIf="showAuthWarn"
-  role="alert"
-  aria-live="assertive"
-  aria-atomic="true"
->
-  <i class="ti-alert" aria-hidden="true"></i>
-  <span class="msg">{{ authWarnText }}</span>
+<div class="toast-sticky-container">
+    <div
+    class="auth-toast"
+    *ngIf="showAuthWarn"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+    >
+        <i class="ti-alert" aria-hidden="true"></i>
+        <span class="msg">{{ authWarnText }}</span>
 
-  <!-- CTA tùy chọn -->
-  <button type="button" class="btn-toast" (click)="goLogin()">
-    Log in
-  </button>
+        <!-- CTA tùy chọn -->
+        <button type="button" class="btn-toast" (click)="goLogin()">
+            Log in
+        </button>
 
-  <!-- nút đóng (nếu muốn) -->
-  <button type="button" class="btn-toast-close" (click)="dismissAuthToast()" aria-label="Close">
-    ×
-  </button>
+        <!-- nút đóng (nếu muốn) -->
+        <button type="button" class="btn-toast-close" (click)="dismissAuthToast()" aria-label="Close">
+            ×
+        </button>
+    </div>
 </div>
 
 <!-- Navbar -->
@@ -207,7 +209,12 @@
             <section id="responses" class="post-responses mt-5 mb-4">
                 <h4 class="fw-bold mb-4" style="font-size: 1.35rem;">Responses ({{ comments.length }})</h4>
                 <!-- Nếu chưa login -->
-                
+                <div *ngIf="!isLoggedIn" class="mb-4" (click)="goLogin()" style="cursor: pointer;"> 
+                    <div class="reply-form d-flex align-items-start">
+                        <a><img src="https://randomuser.me/api/portraits/lego/1.jpg" class="rounded-circle" style="width:32px;height:32px;margin-right:12px;"></a>
+                        <textarea class="form-control" rows="3" placeholder="Login/Create an account to write a response." style="resize:none; cursor: pointer;"></textarea>
+                    </div>
+                </div>
                 <!-- Nếu đã login -->
                 <!-- Form bình luận mới (ở đầu) -->
                 <div *ngIf="isLoggedIn" class="mb-4">

@@ -4,7 +4,7 @@
     <div class="container-fluid px-4">
         <a class="navbar-brand logo" (click)="onLogoClick()" style="cursor: pointer;">
             <img src="./assets/img/logo.png" class="logo-img" alt="logo-image">
-            BlogBlogBlog
+            MSTBlog
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -43,6 +43,28 @@
             </div>
             <!-- Nếu chưa login -->
             <div *ngIf="!isLoggedIn" class="d-flex align-items-center gap-3 ms-auto">
+                <!-- Language Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
+                        type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <ng-container *ngIf="currentLanguage as lang; else noLang">
+                            <img [src]="lang.flag_image" class="flag-icon me-1" alt="{{ lang.locale_code }}" />
+                        </ng-container>
+                        <ng-template #noLang>
+                            <span class="d-none d-lg-inline">Language</span>
+                        </ng-template>
+                        <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="langDropdown">
+                        <li *ngFor="let lang of languages">
+                            <a class="dropdown-item d-flex align-items-center gap-2" (click)="selectLanguage(lang)" style="cursor: pointer;">
+                                <img [src]="lang.flag_image" class="flag-icon" alt="{{ lang.locale_code }}" />
+                                <span class="flex-grow-1">{{ lang.languagename }}</span>
+                                <i *ngIf="currentLanguage?.languageid === lang.languageid" class="ti-check text-success" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
                 <a routerLink="/auth/login"><button class="btn btn-login">Log in</button></a>
                 <a routerLink="/auth/signup"><button class="btn btn-signup">Sign up</button></a>
             </div>

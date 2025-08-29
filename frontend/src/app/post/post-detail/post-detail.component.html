@@ -28,7 +28,7 @@
     <div class="container-fluid px-4">
         <a class="navbar-brand logo" routerLink="/home">
             <img src="./assets/img/logo.png" class="logo-img" alt="logo-image">
-            BlogBlogBlog
+            MSTBlog
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -315,7 +315,7 @@
 
             <!-- Recommendation -->
             <section class="recommended-posts py-4 mt-5 border-top">
-                <h4 class="fw-bold mb-4" style="font-size: 1.35rem;">Recommended from BlogBlogBlog</h4>
+                <h4 class="fw-bold mb-4" style="font-size: 1.35rem;">Recommended from MSTBlog</h4>
                 <div class="row">
                     <div *ngFor="let post of recommendedPosts" class="rec col-md-6 mb-5" (click)="goToPost(post.postid)" style="cursor:pointer">
                         <a [routerLink]="['/post-detail', post.postid]" (click)="$event.stopPropagation()">

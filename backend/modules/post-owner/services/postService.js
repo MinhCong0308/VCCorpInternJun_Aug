@@ -39,12 +39,12 @@ const postService = {
                     }
                 }
             }
-            setImmediate(() => {
-                postService.processContentApproval(post.postid)
-                    .catch(error => {
-                        console.error('Error in background content approval:', error);
-                    });
-            });
+            // setImmediate(() => {
+            //     postService.processContentApproval(post.postid)
+            //         .catch(error => {
+            //             console.error('Error in background content approval:', error);
+            //         });
+            // });
             return { message: "Post created successfully", post };
         } catch (error) {
             console.log("Error creating post:", error.message);

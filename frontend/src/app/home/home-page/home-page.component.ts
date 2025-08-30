@@ -40,11 +40,18 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   @ViewChild('postListTop') postListTop!: ElementRef<HTMLElement>;
   shouldScrollToTop = false;
   @ViewChild('navbar') navbar!: ElementRef<HTMLElement>;
+  @ViewChild('sidebarOuter', { static: true }) sidebarOuter!: ElementRef<HTMLElement>;
+  @ViewChild('sidebarInner', { static: true }) sidebarInner!: ElementRef<HTMLElement>;
   isNavHidden = false;
   lastScrollY = 0;
   suppressAutoHideUntil = 0;
   navSlide = 0;
   pendingScrollActive = false;
+  rafId: number | null = null;
+  scrollParent: Window | HTMLElement | null = null; // KHÔNG khởi tạo = window
+  boundOnScroll = () => this.scheduleUpdate();
+  lastScrollTop = 0;
+  scrollDir: 'down' | 'up' = 'down';
 
   constructor(
     private categoryService: CategoryService,
@@ -116,12 +123,11 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    if (this.isBrowser) {
-      this.isNavHidden = false;
-      this.setNavSlide(0);
-      this.lastScrollY = window.scrollY || 0;
-      this.updateSidebarTop();
-    }
+    if (!this.isBrowser) return;
+    this.isNavHidden = false;
+    this.setNavSlide(0);
+    this.lastScrollY = window.scrollY || 0;
+    this.updateSidebarTop();
     this.scrollActiveIntoView();
     setTimeout(() => this.updateArrows(), 0);
     this.catLinks.changes.subscribe(() => {
@@ -132,6 +138,33 @@ export class HomePageComponent implements OnInit, AfterViewInit {
           this.pendingScrollActive = false;
         }, 0);
       }
+    });
+    this.updateSidebarTopOffset();
+    // tìm scroll parent dựa trên sidebar-outer
+    const outer = this.sidebarOuter.nativeElement;
+    this.scrollParent = this.getScrollParent(outer);
+
+    // lắng nghe scroll
+    if (this.scrollParent === window) {
+      window.addEventListener('scroll', this.boundOnScroll, { passive: true });
+    } else {
+      (this.scrollParent as HTMLElement).addEventListener('scroll', this.boundOnScroll, { passive: true });
+    }
+    // lắng nghe resize của window (viewport thay đổi)
+    window.addEventListener('resize', this.boundOnScroll, { passive: true });
+
+    // set trạng thái ban đầu
+    this.updateSidebarMode();
+  }
+
+  @HostListener('window:scroll')
+  @HostListener('window:resize')
+  onScrollOrResize() {
+    if (this.rafId != null) return;
+    this.rafId = requestAnimationFrame(() => {
+      this.updateSidebarTopOffset();
+      this.updateSidebarMode();
+      this.rafId = null;
     });
   }
 
@@ -551,6 +584,105 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
     const top = Math.round(navVisible + 24); // đệm nhỏ cho đẹp
     this.setCssVar('--sidebar-top', `${top}px`);
+  }
+
+  updateSidebarTopOffset() {
+    if (!this.isBrowser) return;
+    // Lấy chiều cao navbar thực tế (kể cả khi smart-hide)
+    const nav = this.navbar?.nativeElement;
+    const navRect = nav?.getBoundingClientRect();
+    const baseNavH = navRect ? navRect.height : 64;
+
+    // Thêm đệm 24px như CSS
+    const topOffset = Math.max(0, baseNavH) + 24;
+
+    document.documentElement.style.setProperty('--sidebar-top', `${topOffset}px`);
+  }
+
+  updateSidebarMode() {
+    if (!this.isBrowser) return;
+    const outer = this.sidebarOuter.nativeElement;
+    const inner = this.sidebarInner.nativeElement;
+
+    // reset
+    inner.classList.remove('is-sticky-top', 'is-sticky-bottom');
+
+    const topOffset = this.getTopOffset(); // ~80–140px
+    const isWindow = this.scrollParent === window || this.scrollParent == null;
+    const viewportH = isWindow
+      ? window.innerHeight
+      : (this.scrollParent as HTMLElement).clientHeight;
+
+    const outerRect = outer.getBoundingClientRect();
+    const containerTop = isWindow ? 0 : (this.scrollParent as HTMLElement).getBoundingClientRect().top;
+
+    const relTop = outerRect.top - containerTop;
+    const relBottom = outerRect.bottom - containerTop;
+
+    // “đệm” chống rung
+    const EPS = 2;
+
+    if (this.scrollDir === 'down') {
+      // chỉ dính đáy khi đáy khung đã lọt vào đáy viewport
+      if (relBottom <= viewportH + EPS) {
+        inner.classList.add('is-sticky-bottom');
+      } // else: free
+    } else {
+      // chỉ dính đỉnh khi đỉnh khung đã chạm ngưỡng topOff 
+      if (!(relTop <= topOffset - EPS && relBottom > viewportH + EPS)) {
+        inner.classList.add('is-sticky-top');
+      } // else: free
+    }
+
+    // (tuỳ chọn) lúc ở sát đầu trang, cho phép “dính đỉnh” để giữ cảm giác mốc:
+    const atVeryTop = this.getScrollTop() <= 1;
+    if (atVeryTop && relTop <= topOffset + EPS) {
+      inner.classList.add('is-sticky-top');
+    }
+
+    // DEBUG nếu cần
+    console.log('[SB] mode', this.scrollDir, { relTop, relBottom, topOffset, viewportH, class: inner.className });
+  }
+
+  getScrollParent(el: HTMLElement): Window | HTMLElement {
+    let p: HTMLElement | null = el.parentElement;
+    while (p) {
+      const st = getComputedStyle(p);
+      const oy = st.overflowY;
+      if (oy === 'auto' || oy === 'scroll') return p;
+      p = p.parentElement;
+    }
+    return window; // fallback
+  }
+
+  scheduleUpdate() {
+    if (!this.isBrowser) return;
+    if (this.rafId != null) return;
+    this.rafId = requestAnimationFrame(() => {
+      const curr = this.getScrollTop();
+      this.scrollDir = curr > this.lastScrollTop ? 'down' : 'up';
+      this.lastScrollTop = curr;
+
+      this.updateSidebarTopOffset();  // nếu bạn cần đọc lại chiều cao navbar
+      this.updateSidebarMode();
+      this.rafId = null;
+    });
+  }
+
+  getTopOffset(): number {
+    // thử tìm header/nav phổ biến của bạn
+    const nav =
+      document.querySelector('header.navbar, nav.navbar, header[role="banner"], .app-navbar') as HTMLElement | null;
+    const navH = nav ? nav.offsetHeight : 64; // fallback 64
+    return navH + 24; // + khoảng đệm như CSS
+  }
+
+  getScrollTop(): number {
+    if (!this.isBrowser) return 0;
+    if (this.scrollParent === window || this.scrollParent == null) {
+      return window.pageYOffset || document.documentElement.scrollTop || 0;
+    }
+    return (this.scrollParent as HTMLElement).scrollTop;
   }
 
   getCurrentLanguageId(): number {

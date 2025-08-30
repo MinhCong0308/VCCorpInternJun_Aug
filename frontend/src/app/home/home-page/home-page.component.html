@@ -197,7 +197,7 @@
                     </a>
                 </div>
 
-                <!-- <div class="post-item">
+                <div class="post-item">
                     <div class="post-info">
                         <div class="d-flex align-items-center mb-1">
                             <img src="https://randomuser.me/api/portraits/men/11.jpg" class="author-avatar" alt="Author">
@@ -276,76 +276,86 @@
                         </div>
                     </div>
                     <a href="#"><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*7RLhPlkS-a6-l8iFCWA3Rw@2x.jpeg" class="post-img-thumb" alt="Preview"></a>
-                </div> -->
+                </div>
             </div>
         </main>
         <!-- Sidebar -->
-        <aside class="col-lg-3 col-md-3 d-none d-md-block border-start bg-white pt-4">
-            <div class="sidebar-inner ps-4">
-                <div class="sidebar-section">
-                    <h6>Top Picks</h6>
+        <aside class="col-lg-3 col-md-3 d-none d-md-block border-start bg-white pt-4 pb-4" #sidebarContainer>
+            <!-- KHUNG TĨNH của sidebar: dùng để đo top/bottom -->
+            <div class="sidebar-outer ps-4" #sidebarOuter>
+                <!-- Sentinel trên: đánh dấu “đầu” container -->
+                <div class="sb-sentinel sb-sentinel-top" aria-hidden="true"></div>
+            
+                <!-- PHẦN NỘI DUNG CÓ THỂ STICKY -->
+                <div class="sidebar-inner" #sidebarInner>
+                    <div class="sidebar-section">
+                        <h6>Top Picks</h6>
 
-                    <div *ngFor="let post of trendingPreviewPosts" class="mb-3" (click)="goToPost(post.postid)" style="cursor: pointer;">
-                        <div class="d-flex align-items-center mb-1">
-                            <img
-                                [src]="post.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'"
-                                class="author-avatar"
-                                alt="Author"
-                            />
-                            <span class="author-name">
-                                <a routerLink="" (click)="$event.stopPropagation()">{{ post.User?.firstname }} {{ post.User?.lastname }}</a>
+                        <div *ngFor="let post of trendingPreviewPosts" class="mb-3" (click)="goToPost(post.postid)" style="cursor: pointer;">
+                            <div class="d-flex align-items-center mb-1">
+                                <img
+                                    [src]="post.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'"
+                                    class="author-avatar"
+                                    alt="Author"
+                                />
+                                <span class="author-name">
+                                    <a routerLink="" (click)="$event.stopPropagation()">{{ post.User?.firstname }} {{ post.User?.lastname }}</a>
+                                </span>
+                            </div>
+
+                            <div class="sidebar-post-title">
+                                <a [routerLink]="['/post-detail', post.postid]" (click)="$event.stopPropagation()">{{ post.title }}</a>
+                            </div>
+
+                            <span class="text-secondary" style="font-size: 11px;">
+                            {{ post.createdAt | date: 'MMM d' }}
                             </span>
                         </div>
 
-                        <div class="sidebar-post-title">
-                            <a [routerLink]="['/post-detail', post.postid]" (click)="$event.stopPropagation()">{{ post.title }}</a>
+                        <div class="mb-3 full-list">
+                            <a (click)="selectCategory('trending')">See the full list</a>
                         </div>
+                    </div>
+                    <div class="sidebar-section bg-light p-3 rounded">
+                        <h6>Writing on Blog</h6>
+                        <ul class="list-unstyled mb-2 ps-1">
+                            <li>New writer FAQ</li>
+                            <li>Expert writing advice</li>
+                            <li>Grow your readership</li>
+                        </ul>
+                        <a routerLink="/blog-owner/create"><button class="btn btn-dark btn-sm rounded-pill">Start writing</button></a>
+                    </div>
+                    <div class="sidebar-section">
+                        <h6>Recommended categories</h6>
+                        <a *ngFor="let cat of showAllRecommended ? allCategories : recommendedCategories" (click)="selectCategory(cat.categoryid)" style="cursor: pointer;">
+                            <span class="category-tag">{{ cat.categoryname }}</span>
+                        </a>
+                        <div class="mb-3 full-list">
+                            <a (click)="toggleRecommended()">{{ showAllRecommended ? 'See less' : 'See more categories' }}</a>
+                        </div>
+                    </div>
+                    <div class="sidebar-section">
+                        <h6>Reading list</h6>
+                        <p style="font-size:15px;">Click the <i class="ti-bookmark"></i> on any story to easily add it to your reading list or a custom list that you can share.</p>
+                    </div>
+                    <div class="sidebar-footer">
+                        <div class="sidebar-footer-links">
+                            <a routerLink="#">Help</a>
+                            <a routerLink="#">Status</a>
+                            <a routerLink="#">About</a>
+                            <a routerLink="#">Careers</a>
+                            <a routerLink="#">Press</a>
+                            <a routerLink="#">Blog</a>
+                            <a routerLink="#">Privacy</a>
+                            <a routerLink="#">Rules</a>
+                            <a routerLink="#">Terms</a>
+                            <a routerLink="#">Text to speech</a>
+                        </div>
+                    </div>
+                </div>
 
-                        <span class="text-secondary" style="font-size: 11px;">
-                        {{ post.createdAt | date: 'MMM d' }}
-                        </span>
-                    </div>
-
-                    <div class="mb-3 full-list">
-                        <a (click)="selectCategory('trending')">See the full list</a>
-                    </div>
-                </div>
-                <div class="sidebar-section bg-light p-3 rounded">
-                    <h6>Writing on Blog</h6>
-                    <ul class="list-unstyled mb-2 ps-1">
-                        <li>New writer FAQ</li>
-                        <li>Expert writing advice</li>
-                        <li>Grow your readership</li>
-                    </ul>
-                    <a routerLink="/blog-owner/create"><button class="btn btn-dark btn-sm rounded-pill">Start writing</button></a>
-                </div>
-                <div class="sidebar-section">
-                    <h6>Recommended categories</h6>
-                    <a *ngFor="let cat of showAllRecommended ? allCategories : recommendedCategories" (click)="selectCategory(cat.categoryid)" style="cursor: pointer;">
-                        <span class="category-tag">{{ cat.categoryname }}</span>
-                    </a>
-                    <div class="mb-3 full-list">
-                        <a (click)="toggleRecommended()">{{ showAllRecommended ? 'See less' : 'See more categories' }}</a>
-                    </div>
-                </div>
-                <div class="sidebar-section">
-                    <h6>Reading list</h6>
-                    <p style="font-size:15px;">Click the <i class="ti-bookmark"></i> on any story to easily add it to your reading list or a custom list that you can share.</p>
-                </div>
-                <div class="sidebar-footer">
-                    <div class="sidebar-footer-links">
-                        <a routerLink="#">Help</a>
-                        <a routerLink="#">Status</a>
-                        <a routerLink="#">About</a>
-                        <a routerLink="#">Careers</a>
-                        <a routerLink="#">Press</a>
-                        <a routerLink="#">Blog</a>
-                        <a routerLink="#">Privacy</a>
-                        <a routerLink="#">Rules</a>
-                        <a routerLink="#">Terms</a>
-                        <a routerLink="#">Text to speech</a>
-                    </div>
-                </div>
+                <!-- Sentinel dưới: đánh dấu “cuối” container -->
+                <div class="sb-sentinel sb-sentinel-bottom" aria-hidden="true"></div>
             </div>
         </aside>
     </div>

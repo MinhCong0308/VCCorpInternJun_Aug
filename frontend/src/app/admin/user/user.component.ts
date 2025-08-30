@@ -237,9 +237,26 @@ export class UserComponent implements OnInit, AfterViewInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
       const file = input.files[0];
+      // Validate type
+      if (!file.type.startsWith('image/')) {
+        this.errorMsg = 'Avatar file must be an image.';
+        input.value = '';
+        this.userForm.patchValue({ avatar: null });
+        this.avatarPreview = null;
+        return;
+      }
+      // Validate size < 2MB
+      const maxBytes = 2 * 1024 * 1024;
+      if (file.size > maxBytes) {
+        this.errorMsg = 'Avatar must be smaller than 2MB.';
+        input.value = '';
+        this.userForm.patchValue({ avatar: null });
+        this.avatarPreview = null;
+        return;
+      }
+      this.errorMsg = '';
       this.userForm.patchValue({ avatar: file });
       this.userForm.get('avatar')?.updateValueAndValidity();
-      // preview image
       const reader = new FileReader();
       reader.onload = () => (this.avatarPreview = reader.result as string);
       reader.readAsDataURL(file);

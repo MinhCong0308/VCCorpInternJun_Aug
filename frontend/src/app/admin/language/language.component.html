@@ -153,7 +153,6 @@
                         *ngIf="lang.is_default && lang.status"
                         class="text-muted d-block"
                       >
-                        (Cannot disable default)
                       </small>
                     </button>
                     <!-- Delete removed as backend doesn't support -->
@@ -336,6 +335,28 @@
               (change)="onFileChange($event)"
               accept="image/*"
             />
+            <div *ngIf="flagPreviewUrl" class="mt-2 d-flex align-items-center">
+              <img
+                [src]="flagPreviewUrl"
+                alt="Flag preview"
+                style="
+                  max-height: 50px;
+                  max-width: 90px;
+                  object-fit: cover;
+                  border: 1px solid #ddd;
+                  padding: 2px;
+                  border-radius: 4px;
+                "
+              />
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger ml-2"
+                (click)="clearSelectedFlag()"
+                title="Remove selected image"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
           </div>
           <div class="form-check">
             <input
@@ -473,6 +494,47 @@
               (change)="onFileChange($event)"
               accept="image/*"
             />
+            <div
+              *ngIf="flagPreviewUrl; else existingFlag"
+              class="mt-2 d-flex align-items-center"
+            >
+              <img
+                [src]="flagPreviewUrl"
+                alt="Flag preview"
+                style="
+                  max-height: 50px;
+                  max-width: 90px;
+                  object-fit: cover;
+                  border: 1px solid #ddd;
+                  padding: 2px;
+                  border-radius: 4px;
+                "
+              />
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger ml-2"
+                (click)="clearSelectedFlag()"
+                title="Remove selected image"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <ng-template #existingFlag>
+              <div *ngIf="selected?.flag_image && !flagPreviewUrl" class="mt-2">
+                <img
+                  [src]="flagUrl(selected?.flag_image || '')"
+                  alt="Current flag"
+                  style="
+                    max-height: 50px;
+                    max-width: 90px;
+                    object-fit: cover;
+                    border: 1px solid #ddd;
+                    padding: 2px;
+                    border-radius: 4px;
+                  "
+                />
+              </div>
+            </ng-template>
           </div>
           <div class="form-check">
             <input
@@ -480,18 +542,8 @@
               type="checkbox"
               class="form-check-input"
               formControlName="status"
-              [disabled]="!!selected?.is_default"
             />
             <label for="langStatusEdit" class="form-check-label">Active</label>
-            <small class="form-text text-warning" *ngIf="selected?.is_default"
-              >Default language must stay active.</small
-            >
-            <div
-              class="invalid-feedback d-block"
-              *ngIf="languageForm.get('status')?.errors?.['defaultLock']"
-            >
-              Cannot disable default language.
-            </div>
           </div>
           <div class="form-check">
             <input
@@ -499,7 +551,6 @@
               type="checkbox"
               class="form-check-input"
               formControlName="is_default"
-              [disabled]="!!selected?.is_default"
               (change)="
                 languageForm.get('is_default')?.value &&
                   languageForm.get('status')?.setValue(true)
@@ -511,16 +562,6 @@
             <small class="form-text text-muted" *ngIf="!selected?.is_default"
               >Only one language can be default at a time.</small
             >
-            <small class="form-text text-warning" *ngIf="selected?.is_default"
-              >Cannot remove default status. There must always be one default
-              language.</small
-            >
-            <div
-              class="invalid-feedback d-block"
-              *ngIf="languageForm.get('is_default')?.errors?.['cannotRemove']"
-            >
-              Cannot remove default language status.
-            </div>
           </div>
         </form>
         <div *ngIf="errorMsg" class="alert alert-danger mt-2">

@@ -377,8 +377,9 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   loadRecommendations(currentPost: any) {
     const currentId = currentPost?.postid;
     const currentCats = this.getCategoryIdSet(currentPost);
+    const langId = currentPost?.languageid;
 
-    this.postService.getPublishedPosts().subscribe({
+    this.postService.getPublishedPosts(langId).subscribe({
       next: (res: any) => {
         const all: any[] = res?.data?.posts ?? [];
         // Loại bài hiện tại

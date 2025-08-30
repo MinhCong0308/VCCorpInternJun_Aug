@@ -31,6 +31,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   trendingPreviewPosts: any[] = [];
   languages: Language[] = [];
   currentLanguage: Language | null = null;
+  LS_LANG_ID = 'languageId';
   @ViewChild('navCategoryScroll') navScroll!: ElementRef<HTMLDivElement>;
   @ViewChild('categoryBar') categoryBar!: ElementRef<HTMLDivElement>;
   @ViewChildren('catLink') catLinks!: QueryList<ElementRef<HTMLAnchorElement>>;
@@ -68,7 +69,8 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         }
       },
     });
-    this.getTrendingPreviewPosts(); // Tải danh sách post trending
+    const langId = this.getCurrentLanguageId();
+    this.getTrendingPreviewPosts(langId); // Tải danh sách post trending
     this.categoryService.getCategories().subscribe({
       next: (res: any) => {
         const staticTabs = [
@@ -87,7 +89,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     });
     this.loadLanguages();
     this.shouldScrollToTop = false;
-    this.loadPosts();
+    this.loadPosts(langId);
     this.searchService.query$.subscribe(q => this.searchQuery = q || '');
     this.route.queryParamMap.subscribe(pm => {
       const q = (pm.get('q') || '').trim();
@@ -98,7 +100,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         this.searchTermDisplay = q;
         this.selectedCategory = 'latest';
         this.shouldScrollToTop = true;
-        this.searchPosts(q);
+        this.searchPosts(q, langId);
         return;
       }
       this.searchTermDisplay = '';
@@ -108,7 +110,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         // this.cdr.detectChanges();
       } else {
         this.selectedCategory = 'latest';
-        this.loadPosts();
+        this.loadPosts(langId);
       }
     });
   }
@@ -229,16 +231,17 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     this.showNavbarNow();
     this.shouldScrollToTop = true;
-    this.loadPosts();
+    const langId = this.getCurrentLanguageId();
+    this.loadPosts(langId);
     this.scrollActiveIntoView();
     setTimeout(() => this.updateArrows(), 350);
     this.scrollToCategoryBar();
   }
 
   // Hàm để tải bài viết dựa trên category đã chọn
-  loadPosts(): void {
+  loadPosts(langId: number): void {
     if (this.selectedCategory === 'latest') {
-      this.postService.getPublishedPosts().subscribe((res) => {
+      this.postService.getPublishedPosts(langId).subscribe((res) => {
         this.posts = res?.data?.posts || [];
         if (this.shouldScrollToTop) {
           setTimeout(() => this.scrollToPostListTop(), 0);
@@ -246,7 +249,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         }
       });
     } else if (this.selectedCategory === 'trending') {
-      this.postService.getPublishedPostsTrending().subscribe((res) => {
+      this.postService.getPublishedPostsTrending(langId).subscribe((res) => {
         this.posts = res?.data?.posts || [];
         if (this.shouldScrollToTop) {
           setTimeout(() => this.scrollToPostListTop(), 0);
@@ -255,7 +258,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       });
     } else {
       this.postService
-        .getPostsByCategory(this.selectedCategory)
+        .getPostsByCategory(this.selectedCategory, langId)
         .subscribe((res) => {
           this.posts = res?.data?.posts || [];
           if (this.shouldScrollToTop) {
@@ -276,7 +279,8 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       this.router.navigate(['/home']);   // loại bỏ cả ?category cũ nếu có
       this.selectedCategory = 'latest';
       this.shouldScrollToTop = false;
-      this.loadPosts();
+      const langId = this.getCurrentLanguageId();
+      this.loadPosts(langId);
       return;
     }
 
@@ -292,11 +296,12 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     this.searchTermDisplay = q;
     this.selectedCategory = 'latest';
     this.shouldScrollToTop = true;
-    this.searchPosts(q);
+    const langId = this.getCurrentLanguageId();
+    this.searchPosts(q, langId);
   }
 
-  searchPosts(q: string) {
-    this.postService.searchPosts(q).subscribe({
+  searchPosts(q: string, langId: number) {
+    this.postService.searchPosts(q, langId).subscribe({
       next: (res) => {
         this.posts = res?.data?.posts || [];
         // cuộn về đầu danh sách (dùng hàm bạn đã có)
@@ -343,8 +348,8 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   }
 
   // Hàm lấy 3 top picks
-  getTrendingPreviewPosts(): void {
-    this.postService.getPublishedPostsTrending().subscribe({
+  getTrendingPreviewPosts(langId: number) {
+    this.postService.getPublishedPostsTrending(langId).subscribe({
       next: (res: any) => {
         this.trendingPreviewPosts = res?.data?.posts.slice(0, 3) || [];
       },
@@ -359,23 +364,61 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   }
 
   loadLanguages(): void {
-    this.languageService.getLanguages().subscribe({
-      next: (res: any) => {
-        const list: Language[] = res?.data?.languages || [];
-        this.languages = list;
-        const byDefault = this.languages.find(l => l.is_default);
-        this.currentLanguage = byDefault || null;
-      },
-      error: (err) => console.error('Failed to load languages', err),
+    this.languageService.getLanguages().subscribe(res => {
+      this.languages = res?.data?.languages || [];
+      let init = null;
+      const savedId = this.isBrowser ? Number(localStorage.getItem(this.LS_LANG_ID)) : NaN;
+      if (Number.isFinite(savedId)) {
+        init = this.languages.find(l => l.languageid === savedId) || null;
+      }
+      if (!init) {
+        init = this.languages.find(l => l.is_default) || this.languages[0] || null;
+      }
+
+      if (init) {
+        this.currentLanguage = init;
+        this.setLanguage(init.languageid);
+      }
     });
   }
 
   selectLanguage(lang: Language) {
     this.currentLanguage = lang;
-    if(this.isBrowser) {
-      localStorage.setItem('locale_code', lang.locale_code);
+    this.setLanguage(lang.languageid);
+    const langId = this.getCurrentLanguageId();
+    const q = (this.searchQuery || '').trim();
+
+    if (q) {
+      // đang ở chế độ search → search lại theo ngôn ngữ mới
+      this.searchTermDisplay = q;
+      this.postService.searchPosts(q, langId).subscribe(res => {
+        this.posts = res?.data?.posts || [];
+        setTimeout(() => this.scrollToPostListTop(), 0);
+      });
+      this.getTrendingPreviewPosts(langId);
+      return;
     }
-    // Goi service doi ngon ngu o day
+
+    // không search → làm mới đúng tab hiện tại
+    if (this.selectedCategory === 'trending') {
+      this.postService.getPublishedPostsTrending(langId).subscribe(res => {
+        this.posts = res?.data?.posts || [];
+        setTimeout(() => this.scrollToPostListTop(), 0);
+      });
+    } else if (typeof this.selectedCategory === 'number') {
+      this.postService.getPostsByCategory(this.selectedCategory, langId).subscribe(res => {
+        this.posts = res?.data?.posts || [];
+        setTimeout(() => this.scrollToPostListTop(), 0);
+      });
+    } else {
+      // latest
+      this.postService.getPublishedPosts(langId).subscribe(res => {
+        this.posts = res?.data?.posts || [];
+        setTimeout(() => this.scrollToPostListTop(), 0);
+      });
+    }
+
+    this.getTrendingPreviewPosts(langId);
   }
 
   scrollToCategoryBar() {
@@ -508,6 +551,17 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
     const top = Math.round(navVisible + 24); // đệm nhỏ cho đẹp
     this.setCssVar('--sidebar-top', `${top}px`);
+  }
+
+  getCurrentLanguageId(): number {
+    const id = this.currentLanguage?.languageid
+      ?? (this.isBrowser ? Number(localStorage.getItem(this.LS_LANG_ID)) : NaN);
+    return Number.isFinite(id) ? id : NaN;
+  }
+
+  setLanguage(langId: number) {
+    if (!this.isBrowser) return;
+    localStorage.setItem(this.LS_LANG_ID, String(langId));
   }
 
   // Hàm để đăng xuất

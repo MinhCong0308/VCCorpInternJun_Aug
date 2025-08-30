@@ -16,17 +16,17 @@ export class PostService {
     @Inject(PLATFORM_ID) private platformId: Object
   ) { }
 
-  getPublishedPosts(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/posts`);
+  getPublishedPosts(languageId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/posts?languageId=${languageId}`);
   }
-  getPublishedPostsTrending(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/posts/trending`);
+  getPublishedPostsTrending(languageId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/posts/trending?languageId=${languageId}`);
   }
-  getPostsByCategory(categoryId: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/posts?categoryId=${categoryId}`);
+  getPostsByCategory(categoryId: number, languageId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/posts?categoryId=${categoryId}&languageId=${languageId}`);
   }
-  searchPosts(query: string) {
-    return this.http.get<any>(`${this.baseUrl}/posts?search=${encodeURIComponent(query)}`);
+  searchPosts(query: string, languageId: number) {
+    return this.http.get<any>(`${this.baseUrl}/posts?search=${encodeURIComponent(query)}&languageId=${languageId}`);
   }
   getPostDetail(postId: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/posts/${postId}`);

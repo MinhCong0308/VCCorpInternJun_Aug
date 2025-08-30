@@ -1,0 +1,73 @@
+/* Avatar circular picker */
+.avatar-picker-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.avatar-circle {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #f0f2f5;
+  border: 2px dashed #c7ccd1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: border-color 0.2s, background 0.2s;
+}
+.avatar-circle.has-image {
+  border-style: solid;
+  border-color: #4a90e2;
+  background: #fff;
+}
+.avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.avatar-initials {
+  font-size: 48px;
+  color: #9aa0a6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar-upload-btn {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+  z-index: 2; /* ensure on top of img */
+}
+.avatar-upload-btn:hover {
+  background: rgba(0, 0, 0, 0.75);
+}
+.avatar-circle.has-image .avatar-upload-btn {
+  opacity: 0.9;
+}
+.avatar-circle.has-image:hover .avatar-upload-btn {
+  opacity: 1;
+}
+.avatar-upload-btn i {
+  pointer-events: none;
+}
+
+/* Make dashed border highlight on hover */
+.avatar-circle:not(.has-image):hover {
+  border-color: #6aa7e8;
+  background: #e9f3ff;
+}

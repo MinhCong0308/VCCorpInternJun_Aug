@@ -81,14 +81,15 @@
           <thead>
             <tr>
               <th style="width: 60px">#</th>
-              <th>Name</th>
-              <th style="width: 80">Locale Code</th>
-              <th style="width: 150px; text-align: center">Flag</th>
+              <th style="width: 220px">Name</th>
+              <th style="width: 100px">Locale Code</th>
+              <th style="width: 180px; text-align: center">Flag</th>
               <th style="width: 150px; text-align: center">Status</th>
-              <th style="width: 120px; text-align: center">Default</th>
-              <th style="width: 110px; text-align: center">Actions</th>
+              <th style="width: 130px; text-align: center">Default</th>
+              <th style="width: 130px; text-align: center">Actions</th>
             </tr>
           </thead>
+
           <tbody>
             <tr *ngFor="let lang of languages; let i = index">
               <td>{{ (currentPage - 1) * 5 + i + 1 }}.</td>

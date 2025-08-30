@@ -100,19 +100,18 @@
               <thead>
                 <tr>
                   <th style="width: 60px">#</th>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th style="width: 150px; text-align: center">Avatar</th>
-
+                  <th style="width: 200px">Username</th>
+                  <th style="width: 240px">Email</th>
+                  <th style="width: 180px; text-align: center">Avatar</th>
                   <th style="width: 150px; text-align: center">Status</th>
-
                   <th style="width: 150px; text-align: center">Role</th>
-                  <th style="width: 100px; text-align: center">Actions</th>
+                  <th style="width: 130px; text-align: center">Actions</th>
                 </tr>
               </thead>
+
               <tbody>
                 <tr *ngFor="let u of users; let i = index">
-                  <td>{{ (currentPage - 1) * 5 + i + 1 }}.</td>
+                  <td>{{ (currentPage - 1) * limit + i + 1 }}.</td>
                   <td>{{ u.username }}</td>
                   <td>{{ u.email }}</td>
                   <td style="text-align: center">
@@ -294,6 +293,43 @@
             {{ errorMsg }}
           </div>
 
+          <!-- Avatar Circular Picker -->
+          <div class="avatar-picker-wrapper mb-3">
+            <div class="avatar-circle" [class.has-image]="avatarPreview">
+              <img
+                *ngIf="avatarPreview; else defaultAvatarTpl"
+                [src]="avatarPreview"
+                alt="Avatar preview"
+              />
+              <ng-template #defaultAvatarTpl>
+                <div class="avatar-initials">
+                  <i class="fas fa-user"></i>
+                </div>
+              </ng-template>
+              <button
+                type="button"
+                class="avatar-upload-btn"
+                (click)="hiddenFileInput.click()"
+                title="Upload avatar"
+              >
+                <i class="fas fa-camera"></i>
+              </button>
+            </div>
+            <input
+              type="file"
+              #hiddenFileInput
+              class="d-none"
+              accept="image/*"
+              (change)="onFileChange($event)"
+            />
+            <div
+              class="text-danger small mt-1"
+              *ngIf="userForm.get('avatar')?.errors?.['required'] && userForm.get('avatar')?.touched"
+            >
+              Avatar is required.
+            </div>
+          </div>
+
           <div class="form-group">
             <label>First name</label>
             <input
@@ -449,26 +485,6 @@
               <option value="1">Active</option>
               <option value="2">Disabled</option>
             </select>
-          </div>
-          <div class="form-group">
-            <label>Avatar</label>
-            <input
-              type="file"
-              class="form-control-file"
-              (change)="onFileChange($event)"
-              accept="image/*"
-              [ngClass]="{
-                'is-invalid':
-                  userForm.get('avatar')?.touched &&
-                  userForm.get('avatar')?.invalid
-              }"
-            />
-            <div
-              class="invalid-feedback"
-              *ngIf="userForm.get('avatar')?.errors?.['required'] && userForm.get('avatar')?.touched"
-            >
-              Avatar is required.
-            </div>
           </div>
         </div>
         <div class="modal-footer">

@@ -35,6 +35,7 @@ export class UserComponent implements OnInit, AfterViewInit {
   totalItems = 0;
   limit = 5;
   private apiBase = 'http://localhost:3000';
+  avatarPreview: string | null = null; // data URL preview for new user form
 
   confirmModal: {
     action: 'role' | 'status' | null;
@@ -238,6 +239,10 @@ export class UserComponent implements OnInit, AfterViewInit {
       const file = input.files[0];
       this.userForm.patchValue({ avatar: file });
       this.userForm.get('avatar')?.updateValueAndValidity();
+      // preview image
+      const reader = new FileReader();
+      reader.onload = () => (this.avatarPreview = reader.result as string);
+      reader.readAsDataURL(file);
     }
   }
 
@@ -255,6 +260,7 @@ export class UserComponent implements OnInit, AfterViewInit {
         if (typeof $ === 'function') $('#addUserModal').modal('hide');
         // Reset is handled by modal hidden event
         this.loadUsers(this.currentPage);
+        this.avatarPreview = null;
       },
       error: (err) => {
         const server = err?.error || {};

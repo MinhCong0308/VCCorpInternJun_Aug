@@ -31,6 +31,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   trendingPreviewPosts: any[] = [];
   languages: Language[] = [];
   currentLanguage: Language | null = null;
+  LS_LANG_ID = 'languageId';
   @ViewChild('navCategoryScroll') navScroll!: ElementRef<HTMLDivElement>;
   @ViewChild('categoryBar') categoryBar!: ElementRef<HTMLDivElement>;
   @ViewChildren('catLink') catLinks!: QueryList<ElementRef<HTMLAnchorElement>>;
@@ -39,11 +40,18 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   @ViewChild('postListTop') postListTop!: ElementRef<HTMLElement>;
   shouldScrollToTop = false;
   @ViewChild('navbar') navbar!: ElementRef<HTMLElement>;
+  @ViewChild('sidebarOuter', { static: true }) sidebarOuter!: ElementRef<HTMLElement>;
+  @ViewChild('sidebarInner', { static: true }) sidebarInner!: ElementRef<HTMLElement>;
   isNavHidden = false;
   lastScrollY = 0;
   suppressAutoHideUntil = 0;
   navSlide = 0;
   pendingScrollActive = false;
+  rafId: number | null = null;
+  scrollParent: Window | HTMLElement | null = null; // KHÔNG khởi tạo = window
+  boundOnScroll = () => this.scheduleUpdate();
+  lastScrollTop = 0;
+  scrollDir: 'down' | 'up' = 'down';
 
   constructor(
     private categoryService: CategoryService,
@@ -68,7 +76,8 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         }
       },
     });
-    this.getTrendingPreviewPosts(); // Tải danh sách post trending
+    const langId = this.getCurrentLanguageId();
+    this.getTrendingPreviewPosts(langId); // Tải danh sách post trending
     this.categoryService.getCategories().subscribe({
       next: (res: any) => {
         const staticTabs = [
@@ -87,7 +96,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     });
     this.loadLanguages();
     this.shouldScrollToTop = false;
-    this.loadPosts();
+    this.loadPosts(langId);
     this.searchService.query$.subscribe(q => this.searchQuery = q || '');
     this.route.queryParamMap.subscribe(pm => {
       const q = (pm.get('q') || '').trim();
@@ -98,7 +107,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         this.searchTermDisplay = q;
         this.selectedCategory = 'latest';
         this.shouldScrollToTop = true;
-        this.searchPosts(q);
+        this.searchPosts(q, langId);
         return;
       }
       this.searchTermDisplay = '';
@@ -108,18 +117,17 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         // this.cdr.detectChanges();
       } else {
         this.selectedCategory = 'latest';
-        this.loadPosts();
+        this.loadPosts(langId);
       }
     });
   }
 
   ngAfterViewInit() {
-    if (this.isBrowser) {
-      this.isNavHidden = false;
-      this.setNavSlide(0);
-      this.lastScrollY = window.scrollY || 0;
-      this.updateSidebarTop();
-    }
+    if (!this.isBrowser) return;
+    this.isNavHidden = false;
+    this.setNavSlide(0);
+    this.lastScrollY = window.scrollY || 0;
+    this.updateSidebarTop();
     this.scrollActiveIntoView();
     setTimeout(() => this.updateArrows(), 0);
     this.catLinks.changes.subscribe(() => {
@@ -130,6 +138,33 @@ export class HomePageComponent implements OnInit, AfterViewInit {
           this.pendingScrollActive = false;
         }, 0);
       }
+    });
+    this.updateSidebarTopOffset();
+    // tìm scroll parent dựa trên sidebar-outer
+    const outer = this.sidebarOuter.nativeElement;
+    this.scrollParent = this.getScrollParent(outer);
+
+    // lắng nghe scroll
+    if (this.scrollParent === window) {
+      window.addEventListener('scroll', this.boundOnScroll, { passive: true });
+    } else {
+      (this.scrollParent as HTMLElement).addEventListener('scroll', this.boundOnScroll, { passive: true });
+    }
+    // lắng nghe resize của window (viewport thay đổi)
+    window.addEventListener('resize', this.boundOnScroll, { passive: true });
+
+    // set trạng thái ban đầu
+    this.updateSidebarMode();
+  }
+
+  @HostListener('window:scroll')
+  @HostListener('window:resize')
+  onScrollOrResize() {
+    if (this.rafId != null) return;
+    this.rafId = requestAnimationFrame(() => {
+      this.updateSidebarTopOffset();
+      this.updateSidebarMode();
+      this.rafId = null;
     });
   }
 
@@ -229,16 +264,17 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     this.showNavbarNow();
     this.shouldScrollToTop = true;
-    this.loadPosts();
+    const langId = this.getCurrentLanguageId();
+    this.loadPosts(langId);
     this.scrollActiveIntoView();
     setTimeout(() => this.updateArrows(), 350);
     this.scrollToCategoryBar();
   }
 
   // Hàm để tải bài viết dựa trên category đã chọn
-  loadPosts(): void {
+  loadPosts(langId: number): void {
     if (this.selectedCategory === 'latest') {
-      this.postService.getPublishedPosts().subscribe((res) => {
+      this.postService.getPublishedPosts(langId).subscribe((res) => {
         this.posts = res?.data?.posts || [];
         if (this.shouldScrollToTop) {
           setTimeout(() => this.scrollToPostListTop(), 0);
@@ -246,7 +282,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         }
       });
     } else if (this.selectedCategory === 'trending') {
-      this.postService.getPublishedPostsTrending().subscribe((res) => {
+      this.postService.getPublishedPostsTrending(langId).subscribe((res) => {
         this.posts = res?.data?.posts || [];
         if (this.shouldScrollToTop) {
           setTimeout(() => this.scrollToPostListTop(), 0);
@@ -255,7 +291,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       });
     } else {
       this.postService
-        .getPostsByCategory(this.selectedCategory)
+        .getPostsByCategory(this.selectedCategory, langId)
         .subscribe((res) => {
           this.posts = res?.data?.posts || [];
           if (this.shouldScrollToTop) {
@@ -276,7 +312,8 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       this.router.navigate(['/home']);   // loại bỏ cả ?category cũ nếu có
       this.selectedCategory = 'latest';
       this.shouldScrollToTop = false;
-      this.loadPosts();
+      const langId = this.getCurrentLanguageId();
+      this.loadPosts(langId);
       return;
     }
 
@@ -292,11 +329,12 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     this.searchTermDisplay = q;
     this.selectedCategory = 'latest';
     this.shouldScrollToTop = true;
-    this.searchPosts(q);
+    const langId = this.getCurrentLanguageId();
+    this.searchPosts(q, langId);
   }
 
-  searchPosts(q: string) {
-    this.postService.searchPosts(q).subscribe({
+  searchPosts(q: string, langId: number) {
+    this.postService.searchPosts(q, langId).subscribe({
       next: (res) => {
         this.posts = res?.data?.posts || [];
         // cuộn về đầu danh sách (dùng hàm bạn đã có)
@@ -343,8 +381,8 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   }
 
   // Hàm lấy 3 top picks
-  getTrendingPreviewPosts(): void {
-    this.postService.getPublishedPostsTrending().subscribe({
+  getTrendingPreviewPosts(langId: number) {
+    this.postService.getPublishedPostsTrending(langId).subscribe({
       next: (res: any) => {
         this.trendingPreviewPosts = res?.data?.posts.slice(0, 3) || [];
       },
@@ -359,23 +397,61 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   }
 
   loadLanguages(): void {
-    this.languageService.getLanguages().subscribe({
-      next: (res: any) => {
-        const list: Language[] = res?.data?.languages || [];
-        this.languages = list;
-        const byDefault = this.languages.find(l => l.is_default);
-        this.currentLanguage = byDefault || null;
-      },
-      error: (err) => console.error('Failed to load languages', err),
+    this.languageService.getLanguages().subscribe(res => {
+      this.languages = res?.data?.languages || [];
+      let init = null;
+      const savedId = this.isBrowser ? Number(localStorage.getItem(this.LS_LANG_ID)) : NaN;
+      if (Number.isFinite(savedId)) {
+        init = this.languages.find(l => l.languageid === savedId) || null;
+      }
+      if (!init) {
+        init = this.languages.find(l => l.is_default) || this.languages[0] || null;
+      }
+
+      if (init) {
+        this.currentLanguage = init;
+        this.setLanguage(init.languageid);
+      }
     });
   }
 
   selectLanguage(lang: Language) {
     this.currentLanguage = lang;
-    if(this.isBrowser) {
-      localStorage.setItem('locale_code', lang.locale_code);
+    this.setLanguage(lang.languageid);
+    const langId = this.getCurrentLanguageId();
+    const q = (this.searchQuery || '').trim();
+
+    if (q) {
+      // đang ở chế độ search → search lại theo ngôn ngữ mới
+      this.searchTermDisplay = q;
+      this.postService.searchPosts(q, langId).subscribe(res => {
+        this.posts = res?.data?.posts || [];
+        setTimeout(() => this.scrollToPostListTop(), 0);
+      });
+      this.getTrendingPreviewPosts(langId);
+      return;
     }
-    // Goi service doi ngon ngu o day
+
+    // không search → làm mới đúng tab hiện tại
+    if (this.selectedCategory === 'trending') {
+      this.postService.getPublishedPostsTrending(langId).subscribe(res => {
+        this.posts = res?.data?.posts || [];
+        setTimeout(() => this.scrollToPostListTop(), 0);
+      });
+    } else if (typeof this.selectedCategory === 'number') {
+      this.postService.getPostsByCategory(this.selectedCategory, langId).subscribe(res => {
+        this.posts = res?.data?.posts || [];
+        setTimeout(() => this.scrollToPostListTop(), 0);
+      });
+    } else {
+      // latest
+      this.postService.getPublishedPosts(langId).subscribe(res => {
+        this.posts = res?.data?.posts || [];
+        setTimeout(() => this.scrollToPostListTop(), 0);
+      });
+    }
+
+    this.getTrendingPreviewPosts(langId);
   }
 
   scrollToCategoryBar() {
@@ -508,6 +584,116 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
     const top = Math.round(navVisible + 24); // đệm nhỏ cho đẹp
     this.setCssVar('--sidebar-top', `${top}px`);
+  }
+
+  updateSidebarTopOffset() {
+    if (!this.isBrowser) return;
+    // Lấy chiều cao navbar thực tế (kể cả khi smart-hide)
+    const nav = this.navbar?.nativeElement;
+    const navRect = nav?.getBoundingClientRect();
+    const baseNavH = navRect ? navRect.height : 64;
+
+    // Thêm đệm 24px như CSS
+    const topOffset = Math.max(0, baseNavH) + 24;
+
+    document.documentElement.style.setProperty('--sidebar-top', `${topOffset}px`);
+  }
+
+  updateSidebarMode() {
+    if (!this.isBrowser) return;
+    const outer = this.sidebarOuter.nativeElement;
+    const inner = this.sidebarInner.nativeElement;
+
+    // reset
+    inner.classList.remove('is-sticky-top', 'is-sticky-bottom');
+
+    const topOffset = this.getTopOffset(); // ~80–140px
+    const isWindow = this.scrollParent === window || this.scrollParent == null;
+    const viewportH = isWindow
+      ? window.innerHeight
+      : (this.scrollParent as HTMLElement).clientHeight;
+
+    const outerRect = outer.getBoundingClientRect();
+    const containerTop = isWindow ? 0 : (this.scrollParent as HTMLElement).getBoundingClientRect().top;
+
+    const relTop = outerRect.top - containerTop;
+    const relBottom = outerRect.bottom - containerTop;
+
+    // “đệm” chống rung
+    const EPS = 2;
+
+    if (this.scrollDir === 'down') {
+      // chỉ dính đáy khi đáy khung đã lọt vào đáy viewport
+      if (relBottom <= viewportH + EPS) {
+        inner.classList.add('is-sticky-bottom');
+      } // else: free
+    } else {
+      // chỉ dính đỉnh khi đỉnh khung đã chạm ngưỡng topOff 
+      if (!(relTop <= topOffset - EPS && relBottom > viewportH + EPS)) {
+        inner.classList.add('is-sticky-top');
+      } // else: free
+    }
+
+    // (tuỳ chọn) lúc ở sát đầu trang, cho phép “dính đỉnh” để giữ cảm giác mốc:
+    const atVeryTop = this.getScrollTop() <= 1;
+    if (atVeryTop && relTop <= topOffset + EPS) {
+      inner.classList.add('is-sticky-top');
+    }
+
+    // DEBUG nếu cần
+    console.log('[SB] mode', this.scrollDir, { relTop, relBottom, topOffset, viewportH, class: inner.className });
+  }
+
+  getScrollParent(el: HTMLElement): Window | HTMLElement {
+    let p: HTMLElement | null = el.parentElement;
+    while (p) {
+      const st = getComputedStyle(p);
+      const oy = st.overflowY;
+      if (oy === 'auto' || oy === 'scroll') return p;
+      p = p.parentElement;
+    }
+    return window; // fallback
+  }
+
+  scheduleUpdate() {
+    if (!this.isBrowser) return;
+    if (this.rafId != null) return;
+    this.rafId = requestAnimationFrame(() => {
+      const curr = this.getScrollTop();
+      this.scrollDir = curr > this.lastScrollTop ? 'down' : 'up';
+      this.lastScrollTop = curr;
+
+      this.updateSidebarTopOffset();  // nếu bạn cần đọc lại chiều cao navbar
+      this.updateSidebarMode();
+      this.rafId = null;
+    });
+  }
+
+  getTopOffset(): number {
+    // thử tìm header/nav phổ biến của bạn
+    const nav =
+      document.querySelector('header.navbar, nav.navbar, header[role="banner"], .app-navbar') as HTMLElement | null;
+    const navH = nav ? nav.offsetHeight : 64; // fallback 64
+    return navH + 24; // + khoảng đệm như CSS
+  }
+
+  getScrollTop(): number {
+    if (!this.isBrowser) return 0;
+    if (this.scrollParent === window || this.scrollParent == null) {
+      return window.pageYOffset || document.documentElement.scrollTop || 0;
+    }
+    return (this.scrollParent as HTMLElement).scrollTop;
+  }
+
+  getCurrentLanguageId(): number {
+    const id = this.currentLanguage?.languageid
+      ?? (this.isBrowser ? Number(localStorage.getItem(this.LS_LANG_ID)) : NaN);
+    return Number.isFinite(id) ? id : NaN;
+  }
+
+  setLanguage(langId: number) {
+    if (!this.isBrowser) return;
+    localStorage.setItem(this.LS_LANG_ID, String(langId));
   }
 
   // Hàm để đăng xuất

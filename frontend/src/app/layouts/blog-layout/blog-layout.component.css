@@ -43,6 +43,7 @@
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
+  transform: none !important;
 }
 
 .blog-layout-wrapper.loaded {
@@ -66,16 +67,14 @@
 
 /* Smooth entrance animation */
 .blog-layout-wrapper.loaded {
-  animation: fadeInUp 0.5s ease forwards;
+  animation: fadeIn 0.5s ease forwards;
 }
 
-@keyframes fadeInUp {
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }

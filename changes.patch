@@ -20783,7 +20783,7 @@ index 0000000..112c053
 +  <!-- Top Navbar -->
 +  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
 +    <div class="container">
-+      <a class="navbar-brand fw-bold fs-3" href="home.html">BlogBlogBlog</a>
++      <a class="navbar-brand fw-bold fs-3" href="home.html">MSTBlog</a>
 +      
 +      <!-- Search Bar -->
 +      <div class="flex-grow-1 mx-4">
@@ -32333,7 +32333,7 @@ index 0000000..ece05f5
 +        <!-- Sidebar -->
 +        <aside class="sidebar d-flex flex-column flex-shrink-0 p-3" style="height: 100vh">
 +            <a href="index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-+                <span class="logo">BlogBlogBlog</span>
++                <span class="logo">MSTBlog</span>
 +            </a>
 +            <hr>
 +            <ul class="nav nav-pills flex-column mb-auto">
@@ -32474,7 +32474,7 @@ index 0000000..0c7fb7a
 +        <!-- Sidebar -->
 +        <aside class="sidebar d-flex flex-column flex-shrink-0 p-3" style="height: 100vh">
 +            <a href="../index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-+                <span class="logo">BlogBlogBlog</span>
++                <span class="logo">MSTBlog</span>
 +            </a>
 +            <hr>
 +            <ul class="nav nav-pills flex-column mb-auto">
@@ -32603,7 +32603,7 @@ index 0000000..0ddb3b6
 +        <!-- Sidebar -->
 +        <aside class="sidebar d-flex flex-column flex-shrink-0 p-3" style="height: 100vh">
 +            <a href="../index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-+                <span class="logo">BlogBlogBlog</span>
++                <span class="logo">MSTBlog</span>
 +            </a>
 +            <hr>
 +            <ul class="nav nav-pills flex-column mb-auto">
@@ -32727,7 +32727,7 @@ index 0000000..6e8bdf5
 +        <!-- Sidebar -->
 +        <aside class="sidebar d-flex flex-column flex-shrink-0 p-3" style="height: 100vh">
 +            <a href="../index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-+                <span class="logo">BlogBlogBlog</span>
++                <span class="logo">MSTBlog</span>
 +            </a>
 +            <hr>
 +            <ul class="nav nav-pills flex-column mb-auto">
@@ -32830,7 +32830,7 @@ index 0000000..0af6a42
 +    <div class="d-flex admin-wrapper">
 +        <aside class="sidebar d-flex flex-column flex-shrink-0 p-3" style="height: 100vh">
 +            <a href="../index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-+                <span class="logo">BlogBlogBlog</span>
++                <span class="logo">MSTBlog</span>
 +            </a>
 +            <hr>
 +            <ul class="nav nav-pills flex-column mb-auto">
@@ -52433,7 +52433,7 @@ index ece05f5..16da976 100644
  <body>
 +  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
 +    <div class="container-fluid px-4">
-+      <a class="navbar-brand logo" href="index.html">BlogBlogBlog</a>
++      <a class="navbar-brand logo" href="index.html">MSTBlog</a>
 +      <div class="flex-grow-1 mx-4 d-none d-md-block">
 +        <div class="search-bar-group input-group" style="margin-left: -16px;">
 +          <span class="input-group-text bg-transparent border-0">
@@ -52465,7 +52465,7 @@ index ece05f5..16da976 100644
 -        <!-- Sidebar -->
 -        <aside class="sidebar d-flex flex-column flex-shrink-0 p-3" style="height: 100vh">
 -            <a href="index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
--                <span class="logo">BlogBlogBlog</span>
+-                <span class="logo">MSTBlog</span>
 -            </a>
 -            <hr>
 -            <ul class="nav nav-pills flex-column mb-auto">
@@ -52670,7 +52670,7 @@ index 0c7fb7a..1b65ef4 100644
 -        <!-- Sidebar -->
 -        <aside class="sidebar d-flex flex-column flex-shrink-0 p-3" style="height: 100vh">
 -            <a href="../index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
--                <span class="logo">BlogBlogBlog</span>
+-                <span class="logo">MSTBlog</span>
 -            </a>
 -            <hr>
 -            <ul class="nav nav-pills flex-column mb-auto">
@@ -52749,7 +52749,7 @@ index 0c7fb7a..1b65ef4 100644
 -        </main>
 +    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
 +    <div class="container-fluid px-4">
-+      <a class="navbar-brand logo" href="../index.html">BlogBlogBlog</a>
++      <a class="navbar-brand logo" href="../index.html">MSTBlog</a>
 +      <div class="flex-grow-1 mx-4 d-none d-md-block">
 +        <div class="search-bar-group input-group" style="margin-left: -16px;">
 +          <span class="input-group-text bg-transparent border-0">
@@ -52903,7 +52903,7 @@ index 0ddb3b6..4a750bd 100644
 -        <!-- Sidebar -->
 -        <aside class="sidebar d-flex flex-column flex-shrink-0 p-3" style="height: 100vh">
 -            <a href="../index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
--                <span class="logo">BlogBlogBlog</span>
+-                <span class="logo">MSTBlog</span>
 -            </a>
 -            <hr>
 -            <ul class="nav nav-pills flex-column mb-auto">
@@ -52973,7 +52973,7 @@ index 0ddb3b6..4a750bd 100644
 -        </main>
 +    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
 +    <div class="container-fluid px-4">
-+      <a class="navbar-brand logo" href="../index.html">BlogBlogBlog</a>
++      <a class="navbar-brand logo" href="../index.html">MSTBlog</a>
 +      <div class="flex-grow-1 mx-4 d-none d-md-block">
 +        <div class="search-bar-group input-group" style="margin-left: -16px;">
 +          <span class="input-group-text bg-transparent border-0">
@@ -53113,7 +53113,7 @@ index 6e8bdf5..0000000
 -        <!-- Sidebar -->
 -        <aside class="sidebar d-flex flex-column flex-shrink-0 p-3" style="height: 100vh">
 -            <a href="../index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
--                <span class="logo">BlogBlogBlog</span>
+-                <span class="logo">MSTBlog</span>
 -            </a>
 -            <hr>
 -            <ul class="nav nav-pills flex-column mb-auto">
@@ -53220,7 +53220,7 @@ index 0af6a42..2038783 100644
  <body>
 +    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
 +    <div class="container-fluid px-4">
-+      <a class="navbar-brand logo" href="../index.html">BlogBlogBlog</a>
++      <a class="navbar-brand logo" href="../index.html">MSTBlog</a>
 +      <div class="flex-grow-1 mx-4 d-none d-md-block">
 +        <div class="search-bar-group input-group" style="margin-left: -16px;">
 +          <span class="input-group-text bg-transparent border-0">
@@ -53251,7 +53251,7 @@ index 0af6a42..2038783 100644
 -    <div class="d-flex admin-wrapper">
 -        <aside class="sidebar d-flex flex-column flex-shrink-0 p-3" style="height: 100vh">
 -            <a href="../index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
--                <span class="logo">BlogBlogBlog</span>
+-                <span class="logo">MSTBlog</span>
 -            </a>
 -            <hr>
 -            <ul class="nav nav-pills flex-column mb-auto">
@@ -54229,7 +54229,7 @@ index 0000000..880356b
 +<head>
 +    <meta charset="UTF-8" />
 +    <meta name="viewport" content="width=device-width, initial-scale=1" />
-+    <title>BlogBlogBlog - Home</title>
++    <title>MSTBlog - Home</title>
 +    <!-- Bootstrap 5 CSS -->
 +    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
 +    <!-- Themify Icons -->
@@ -54244,7 +54244,7 @@ index 0000000..880356b
 +    <!-- Navbar -->
 +    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
 +        <div class="container-fluid px-4">
-+            <a class="navbar-brand logo" href="#">BlogBlogBlog</a>
++            <a class="navbar-brand logo" href="#">MSTBlog</a>
 +            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
 +                <span class="navbar-toggler-icon"></span>
 +            </button>
@@ -54921,7 +54921,7 @@ index 0000000..8efde55
 +<head>
 +    <meta charset="UTF-8" />
 +    <meta name="viewport" content="width=device-width, initial-scale=1" />
-+    <title>BlogBlogBlog - Template</title>
++    <title>MSTBlog - Template</title>
 +    <!-- Bootstrap 5 CSS -->
 +    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
 +    <!-- Themify Icons -->
@@ -54936,7 +54936,7 @@ index 0000000..8efde55
 +    <!-- Navbar -->
 +    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
 +        <div class="container-fluid px-4">
-+            <a class="navbar-brand logo" href="#">BlogBlogBlog</a>
++            <a class="navbar-brand logo" href="#">MSTBlog</a>
 +            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
 +                <span class="navbar-toggler-icon"></span>
 +            </button>

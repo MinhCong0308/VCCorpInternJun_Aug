@@ -56,7 +56,7 @@ export class CategoryComponent implements OnInit, AfterViewInit {
         [
           Validators.required,
           Validators.minLength(2),
-          Validators.maxLength(250),
+          Validators.maxLength(150),
         ],
       ],
     });

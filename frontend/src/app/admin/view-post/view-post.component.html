@@ -103,11 +103,13 @@
           </li>
         </ul>
 
-        <!-- Categories -->
+        <!-- Categories (truncate long names with tooltip) -->
         <div class="mb-3" *ngIf="post.Categories?.length">
           <span
             *ngFor="let c of post.Categories"
-            class="badge badge-info mr-1"
+            class="badge badge-info mr-1 cat-badge"
+            data-toggle="tooltip"
+            [attr.title]="c.categoryname"
             >{{ c.categoryname }}</span
           >
         </div>

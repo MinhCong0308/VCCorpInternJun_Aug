@@ -74,3 +74,11 @@
   display: block;
   width: 100%;
 }
+
+/* Truncate long category names in filter select visually */
+select.form-control option {
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -68,7 +68,7 @@
                   Minimum 2 characters.
                 </div>
                 <div *ngIf="ctrl.hasError('maxlength')">
-                  Maximum 100 characters.
+                  Maximum 150 characters.
                 </div>
                 <div *ngIf="ctrl.hasError('duplicate')">
                   Category name already exists.
@@ -153,7 +153,14 @@
               <tbody>
                 <tr *ngFor="let category of categories; let i = index">
                   <td>{{ i + 1 }}.</td>
-                  <td>{{ category.categoryname }}</td>
+                  <td>
+                    <span
+                      class="cat-name"
+                      data-toggle="tooltip"
+                      [attr.title]="category.categoryname"
+                      >{{ category.categoryname }}</span
+                    >
+                  </td>
                   <td style="text-align: center">
                     <a
                       class="font-weight-bold"
@@ -251,7 +258,14 @@
       <div class="modal-body">
         <p class="mb-0">
           Are you sure you want to delete this category?
-          <strong>{{ deleteTarget?.categoryname }}</strong
+          <strong>
+            <span
+              class="cat-name-inline"
+              data-toggle="tooltip"
+              [attr.title]="deleteTarget?.categoryname"
+            >
+              {{ deleteTarget?.categoryname }}
+            </span> </strong
           >?
         </p>
       </div>

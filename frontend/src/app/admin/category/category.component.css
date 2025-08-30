@@ -9,3 +9,40 @@
 .form-control.ng-valid.ng-touched {
   border-color: #28a745;
 }
+
+/* Truncate long category names in table */
+.cat-name {
+  display: inline-block;
+  max-width: 400px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
+
+/* Truncate inside modal inline text */
+.cat-name-inline {
+  display: inline-block;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+
+@media (max-width: 992px) {
+  .cat-name {
+    max-width: 200px;
+  }
+  .cat-name-inline {
+    max-width: 180px;
+  }
+}
+@media (max-width: 576px) {
+  .cat-name {
+    max-width: 140px;
+  }
+  .cat-name-inline {
+    max-width: 120px;
+  }
+}

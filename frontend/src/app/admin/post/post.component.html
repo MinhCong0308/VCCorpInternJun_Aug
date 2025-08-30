@@ -45,8 +45,16 @@
                   (change)="onCategoryChange($event)"
                 >
                   <option value="">-- All Categories --</option>
-                  <option *ngFor="let c of categories" [value]="c.categoryid">
-                    {{ c.categoryname }}
+                  <option
+                    *ngFor="let c of categories"
+                    [value]="c.categoryid"
+                    [attr.title]="c.categoryname"
+                  >
+                    {{
+                      c.categoryname.length > 20
+                        ? (c.categoryname | slice : 0 : 20) + "…"
+                        : c.categoryname
+                    }}
                   </option>
                 </select>
               </div>

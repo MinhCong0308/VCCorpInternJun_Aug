@@ -29,6 +29,7 @@ export class PostComponent implements OnInit, AfterViewInit {
   totalPages = 0;
   totalItems = 0;
   limit = 5;
+  // Removed translationType filter per latest request
 
   categories: { categoryid: number; categoryname: string }[] = [];
 
@@ -82,6 +83,7 @@ export class PostComponent implements OnInit, AfterViewInit {
           this.filterForm.get('status')?.setValue(this.status);
         }
       }
+      // translationType filter removed
       this.loadCategories();
       this.loadPosts(this.currentPage);
     });
@@ -113,6 +115,7 @@ export class PostComponent implements OnInit, AfterViewInit {
         status: this.status,
         limit: this.limit,
         page,
+        // translationType removed
       })
       .subscribe({
         next: (res: PaginatedPostResponse) => {
@@ -138,6 +141,7 @@ export class PostComponent implements OnInit, AfterViewInit {
 
     const st = this.filterForm.get('status')?.value;
     this.status = st === '' || st == null ? '' : Number(st);
+    // translationType removed
     this.currentPage = 1;
     this.loadPosts(1);
   }
@@ -166,6 +170,8 @@ export class PostComponent implements OnInit, AfterViewInit {
     this.loadPosts(1);
   }
 
+  // onTranslationTypeChange removed
+
   onPageChange(page: number): void {
     if (page >= 1 && page <= this.totalPages) this.loadPosts(page);
   }
@@ -179,6 +185,7 @@ export class PostComponent implements OnInit, AfterViewInit {
         page: this.currentPage,
         categoryId: this.categoryId || undefined,
         status: this.status !== '' ? this.status : undefined,
+        // translationType removed
       },
       queryParamsHandling: 'merge',
       replaceUrl: true,

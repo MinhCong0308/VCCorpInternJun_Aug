@@ -66,6 +66,12 @@ const postAdminService = {
           model: db.Language,
           attributes: ["languagename", "locale_code", "flag_image"],
         },
+        // Include original post (if this post is a translation) to expose its id & title for admin UI
+        {
+          model: db.Post,
+          as: "originalPost",
+          attributes: ["postid", "title", "languageid"],
+        },
         categoryInclude,
       ],
       distinct: true,
@@ -91,6 +97,11 @@ const postAdminService = {
           as: "Categories",
           attributes: ["categoryid", "categoryname"],
           through: { attributes: [] },
+        },
+        {
+          model: db.Post,
+          as: "originalPost",
+          attributes: ["postid", "title", "languageid"],
         },
       ],
     });

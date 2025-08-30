@@ -122,6 +122,48 @@
                         [attr.title]="p.title"
                         >{{ p.title }}</a
                       >
+                      <div
+                        class="mt-1 small"
+                        *ngIf="
+                          p.originalPost && p.original_postid !== p.postid;
+                          else rootBadge
+                        "
+                      >
+                        <ng-container *ngIf="p.originalPost as op">
+                          <i class="fas fa-link text-muted"></i>
+                          <a
+                            class="text-truncate align-middle ml-1 d-inline-block"
+                            style="max-width: 180px"
+                            [routerLink]="['/admin/posts', op.postid]"
+                            data-toggle="tooltip"
+                            [attr.title]="'Original: ' + (op.title || '')"
+                            >{{ "#" + op.postid }}</a
+                          >
+                          <a
+                            class="ml-1 text-muted"
+                            [routerLink]="['/admin/posts', op.postid]"
+                            target="_blank"
+                            data-toggle="tooltip"
+                            title="Open original in new tab"
+                          >
+                            <i class="fas fa-external-link-alt"></i>
+                          </a>
+                        </ng-container>
+                      </div>
+                      <ng-template #rootBadge>
+                        <div
+                          class="mt-1 small d-flex align-items-center"
+                          style="gap: 6px"
+                        >
+                          <span class="text-muted">#{{ p.postid }}</span>
+                          <span
+                            class="badge badge-secondary"
+                            data-toggle="tooltip"
+                            title="Root post"
+                            >Root</span
+                          >
+                        </div>
+                      </ng-template>
                     </div>
                   </td>
                   <td class="col-author">{{ authorName(p) }}</td>

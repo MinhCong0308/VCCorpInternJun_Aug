@@ -56,6 +56,9 @@
 .posts-table .col-language {
   width: 130px;
 }
+.posts-table .col-original {
+  width: 140px;
+}
 /* Title column takes remaining space without pushing others */
 .posts-table .col-title {
   width: auto;

@@ -38,6 +38,7 @@ export class LanguageComponent implements OnInit, AfterViewInit {
   private apiBase = 'http://localhost:3000';
 
   private selectedFlagFile: File | null = null;
+  flagPreviewUrl: string | null = null; // object URL for selected flag image preview
 
   confirmModal: {
     action: 'status' | 'delete' | null;
@@ -168,6 +169,10 @@ export class LanguageComponent implements OnInit, AfterViewInit {
     this.isEditing = false;
     this.selected = null;
     this.selectedFlagFile = null;
+    if (this.flagPreviewUrl) {
+      URL.revokeObjectURL(this.flagPreviewUrl);
+      this.flagPreviewUrl = null;
+    }
     this.errorMsg = ''; // Clear any previous errors
     this.languageForm.reset({
       languagename: '',
@@ -176,6 +181,9 @@ export class LanguageComponent implements OnInit, AfterViewInit {
       is_default: false,
       flag_image: null,
     });
+    // Ensure controls enabled for fresh add
+    this.languageForm.get('status')?.enable({ emitEvent: false });
+    this.languageForm.get('is_default')?.enable({ emitEvent: false });
     (window as any).$('#addLanguageModal').modal('show');
   }
 
@@ -183,6 +191,10 @@ export class LanguageComponent implements OnInit, AfterViewInit {
     this.isEditing = true;
     this.selected = lang;
     this.selectedFlagFile = null;
+    if (this.flagPreviewUrl) {
+      URL.revokeObjectURL(this.flagPreviewUrl);
+      this.flagPreviewUrl = null; // show current stored flag until user picks new
+    }
     this.errorMsg = ''; // Clear any previous errors
     this.languageForm.patchValue({
       languagename: lang.languagename,
@@ -191,12 +203,57 @@ export class LanguageComponent implements OnInit, AfterViewInit {
       is_default: !!lang.is_default,
       flag_image: null,
     });
+    // Programmatically lock controls if default language
+    if (lang.is_default) {
+      this.languageForm.get('status')?.disable({ emitEvent: false });
+      this.languageForm.get('is_default')?.disable({ emitEvent: false });
+    } else {
+      this.languageForm.get('status')?.enable({ emitEvent: false });
+      this.languageForm.get('is_default')?.enable({ emitEvent: false });
+    }
     (window as any).$('#editLanguageModal').modal('show');
   }
 
   onFileChange(event: any): void {
     const file: File | null = event?.target?.files?.[0] || null;
     this.selectedFlagFile = file;
+    // cleanup previous preview
+    if (this.flagPreviewUrl) {
+      URL.revokeObjectURL(this.flagPreviewUrl);
+      this.flagPreviewUrl = null;
+    }
+    if (file) {
+      // basic type guard (image/*)
+      if (!file.type.startsWith('image/')) {
+        this.errorMsg = 'Selected file is not an image.';
+        this.selectedFlagFile = null;
+        return;
+      }
+      // size validation < 2MB
+      const maxBytes = 2 * 1024 * 1024; // 2MB
+      if (file.size > maxBytes) {
+        this.errorMsg = 'Image must be smaller than 2MB.';
+        this.selectedFlagFile = null;
+        // Clear file input
+        const input: HTMLInputElement | null = event?.target || null;
+        if (input) input.value = '';
+        return;
+      }
+      this.flagPreviewUrl = URL.createObjectURL(file);
+    }
+  }
+
+  clearSelectedFlag(): void {
+    if (this.flagPreviewUrl) {
+      URL.revokeObjectURL(this.flagPreviewUrl);
+      this.flagPreviewUrl = null;
+    }
+    this.selectedFlagFile = null;
+    // Reset file input visual (optional)
+    const inputs: NodeListOf<HTMLInputElement> = document.querySelectorAll(
+      '#addLanguageModal input[type=file], #editLanguageModal input[type=file]'
+    );
+    inputs.forEach((i) => (i.value = ''));
   }
 
   onSubmitAdd(): void {
@@ -204,8 +261,7 @@ export class LanguageComponent implements OnInit, AfterViewInit {
 
     this.errorMsg = ''; // Clear previous errors
     this.clearFormErrors();
-
-    const values = this.languageForm.value;
+    const values = this.languageForm.getRawValue();
     const formData = new FormData();
     formData.append('languagename', values.languagename);
     formData.append('locale_code', values.locale_code);
@@ -261,7 +317,7 @@ export class LanguageComponent implements OnInit, AfterViewInit {
 
   onSubmitEdit(): void {
     if (this.languageForm.invalid || !this.selected) return;
-    const values = this.languageForm.value;
+    const values = this.languageForm.getRawValue();
     const formData = new FormData();
     formData.append('languagename', values.languagename);
     formData.append('locale_code', values.locale_code);
@@ -276,18 +332,7 @@ export class LanguageComponent implements OnInit, AfterViewInit {
     this.clearFormErrors();
 
     // Prevent disabling default directly
-    if (this.selected.is_default && !values.status) {
-      this.errorMsg =
-        'Cannot disable default language. Default language must remain active.';
-      return;
-    }
-
-    // Prevent removing default status
-    if (this.selected.is_default && !values.is_default) {
-      this.errorMsg =
-        'Cannot remove default language status. There must always be one default language in the system.';
-      return;
-    }
+    // (Disabled UI already prevents changing default language status/active state)
 
     this.service.updateLanguage(this.selected.languageid, formData).subscribe({
       next: () => {
@@ -311,11 +356,7 @@ export class LanguageComponent implements OnInit, AfterViewInit {
   }
 
   onToggleStatus(lang: Language): void {
-    if (lang.is_default && lang.status) {
-      this.errorMsg =
-        'Cannot disable default language. Default language must remain active.';
-      return;
-    }
+    if (lang.is_default && lang.status) return; // ignore attempt silently
 
     this.errorMsg = ''; // Clear previous errors
     const req$ = lang.status
@@ -329,8 +370,7 @@ export class LanguageComponent implements OnInit, AfterViewInit {
       error: (err) => {
         const message = err?.error?.message || 'Failed to update status.';
         if (/cannot disable default language/i.test(message)) {
-          this.errorMsg =
-            'Cannot disable default language. Default language must remain active.';
+          this.errorMsg = '';
         } else {
           this.errorMsg = `Failed to ${
             lang.status ? 'disable' : 'enable'
@@ -432,20 +472,10 @@ export class LanguageComponent implements OnInit, AfterViewInit {
       handled = true;
     }
     if (/cannot disable default language/i.test(msg)) {
-      const statusCtrl = this.languageForm.get('status');
-      statusCtrl?.setErrors({
-        ...(statusCtrl?.errors || {}),
-        defaultLock: true,
-      });
-      handled = true;
+      handled = true; // server message ignored due to UI protections
     }
     if (/cannot remove default language/i.test(msg)) {
-      const defaultCtrl = this.languageForm.get('is_default');
-      defaultCtrl?.setErrors({
-        ...(defaultCtrl?.errors || {}),
-        cannotRemove: true,
-      });
-      handled = true;
+      handled = true; // already protected in UI
     }
     // Keep the original server message in this.errorMsg for display
     return handled;

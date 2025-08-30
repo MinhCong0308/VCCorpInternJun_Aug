@@ -4,11 +4,13 @@ import { Observable, map } from 'rxjs';
 
 export interface AdminPostSummary {
   postid: number;
+  original_postid?: number | null;
   title: string;
   content: string;
   status: number;
   createdAt: string;
   updatedAt: string;
+  originalPost?: { postid: number; title: string } | null;
   User?: { firstname: string; lastname: string };
   Language?: {
     languagename: string;

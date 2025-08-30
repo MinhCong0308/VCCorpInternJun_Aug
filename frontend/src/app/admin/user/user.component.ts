@@ -35,6 +35,7 @@ export class UserComponent implements OnInit, AfterViewInit {
   totalItems = 0;
   limit = 5;
   private apiBase = 'http://localhost:3000';
+  avatarPreview: string | null = null; // data URL preview for new user form
 
   confirmModal: {
     action: 'role' | 'status' | null;
@@ -236,8 +237,29 @@ export class UserComponent implements OnInit, AfterViewInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
       const file = input.files[0];
+      // Validate type
+      if (!file.type.startsWith('image/')) {
+        this.errorMsg = 'Avatar file must be an image.';
+        input.value = '';
+        this.userForm.patchValue({ avatar: null });
+        this.avatarPreview = null;
+        return;
+      }
+      // Validate size < 2MB
+      const maxBytes = 2 * 1024 * 1024;
+      if (file.size > maxBytes) {
+        this.errorMsg = 'Avatar must be smaller than 2MB.';
+        input.value = '';
+        this.userForm.patchValue({ avatar: null });
+        this.avatarPreview = null;
+        return;
+      }
+      this.errorMsg = '';
       this.userForm.patchValue({ avatar: file });
       this.userForm.get('avatar')?.updateValueAndValidity();
+      const reader = new FileReader();
+      reader.onload = () => (this.avatarPreview = reader.result as string);
+      reader.readAsDataURL(file);
     }
   }
 
@@ -255,6 +277,7 @@ export class UserComponent implements OnInit, AfterViewInit {
         if (typeof $ === 'function') $('#addUserModal').modal('hide');
         // Reset is handled by modal hidden event
         this.loadUsers(this.currentPage);
+        this.avatarPreview = null;
       },
       error: (err) => {
         const server = err?.error || {};

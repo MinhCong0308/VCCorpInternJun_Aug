@@ -8,12 +8,48 @@
   display: block; /* để margin auto có tác dụng */
   margin: 1rem auto;
 }
-:host ::ng-deep .post-content .ql-align-center { text-align: center; }
-:host ::ng-deep .post-content .ql-align-justify { text-align: justify; }
-:host ::ng-deep .post-content .ql-align-right { text-align: right; }
+:host ::ng-deep .post-content .ql-align-center {
+  text-align: center;
+}
+:host ::ng-deep .post-content .ql-align-justify {
+  text-align: justify;
+}
+:host ::ng-deep .post-content .ql-align-right {
+  text-align: right;
+}
 
 /* Chữ đọc dễ hơn */
-:host ::ng-deep .post-content h1, .post-content h2, .post-content h3 { margin-top: 1rem; }
-:host ::ng-deep .post-content p { margin: 0.5rem 0; line-height: 1.7; }
+:host ::ng-deep .post-content h1,
+.post-content h2,
+.post-content h3 {
+  margin-top: 1rem;
+}
+:host ::ng-deep .post-content p {
+  margin: 0.5rem 0;
+  line-height: 1.7;
+}
 
-:host ::ng-deep .card-title { font-weight: 600; font-size: 35px;}
+:host ::ng-deep .card-title {
+  font-weight: 600;
+  font-size: 35px;
+}
+
+/* Truncate long category names in badges */
+.cat-badge {
+  max-width: 240px;
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 992px) {
+  .cat-badge {
+    max-width: 180px;
+  }
+}
+@media (max-width: 576px) {
+  .cat-badge {
+    max-width: 130px;
+  }
+}

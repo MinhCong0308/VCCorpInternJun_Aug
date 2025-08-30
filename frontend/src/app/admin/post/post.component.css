@@ -56,6 +56,9 @@
 .posts-table .col-language {
   width: 130px;
 }
+.posts-table .col-original {
+  width: 140px;
+}
 /* Title column takes remaining space without pushing others */
 .posts-table .col-title {
   width: auto;
@@ -70,4 +73,12 @@
   word-break: break-word;
   display: block;
   width: 100%;
+}
+
+/* Truncate long category names in filter select visually */
+select.form-control option {
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

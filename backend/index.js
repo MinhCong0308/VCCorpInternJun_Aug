@@ -17,17 +17,17 @@ const cronUtils = require('utils/cronUtils');
 async function initializeServices() {
   try {
     await globalFilter.initialize();
-    console.log('✅ Global bad words filter initialized successfully');
+    console.log('Global bad words filter initialized successfully');
   } catch (error) {
-    console.error('❌ Failed to initialize global bad words filter:', error);
+    console.error('Failed to initialize global bad words filter:', error);
     process.exit(1);
   }
   
   try {
     cronUtils.start();
-    console.log('✅ Cron services started successfully');
+    console.log('Cron services started successfully');
   } catch (error) {
-    console.error('❌ Failed to start cron jobs:', error);
+    console.error('Failed to start cron jobs:', error);
     process.exit(1);
   }
 }

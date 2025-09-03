@@ -234,8 +234,8 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       await this.loadUserProfile();      
       await this.loadLanguages();      
       await this.handleRouteParams();
-      await this.restoreDraft();    // <-- ADD
-      this.setUpAutosave();         // <-- ADD
+      await this.restoreDraft();   
+      this.setUpAutosave();        
       console.log('Initialization completed successfully');
     } catch (error) {
       console.error('Error during initialization:', error);
@@ -468,6 +468,14 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
   async loadPostForEditing(editPostId: number): Promise<void> {
     try {
       console.log('Loading post for editing:', editPostId);
+      // check for current draft existed, if existed, it mean that we only need to reload from draft instead of initializing new
+      const key = this.getDraftKey();
+      const draft = await this.draftService.load<BlogDraft>(key);
+      if(draft) {
+        // editmode and be updated, no need to reload from server
+        console.log("This content is being updated");
+        return;
+      }
       this.languageTabs = [];
       this.translations = [];
       this.activeTabIndex = 0;
@@ -787,7 +795,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     this.blogForm.patchValue({ tags: Array.from(this.selectedTags) });
   }
 
-  submitBlog(): void {
+  async submitBlog(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) {
       // this.errorMessage = 'This feature is only available in the browser.';
       return;
@@ -861,6 +869,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     const sub = this.http[method](endpoint, payload, { withCredentials: true }).subscribe({
       next: async (response) => {
         const action = this.isEditMode ? 'updated' : 'submitted';
+        this.stopAutosave();
         await this.clearDraft(); 
         this.notificationService.success(
           'Success!',
@@ -868,6 +877,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
           2000
         );
         this.isLoading = false;
+        console.log("Draft cleared");
         setTimeout(() => {
           this.router.navigate(['/home']);
         }, 2000);
@@ -910,6 +920,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
   private async restoreDraft() {
     const key = this.getDraftKey();
     const draft = await this.draftService.load<BlogDraft>(key);
+    console.log("Current drafts when restoring: ", draft);
     if (!draft) return;
 
     // Basic guards (shape, mode)
@@ -945,6 +956,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       if(!this.quillEditor.quillEditor) return;
       this.quillEditor.quillEditor.on('text-change', () => {
+        console.log("Run this auto update");
         this.saveCurrentTabData();
         this.saveDraft();
       });
@@ -964,6 +976,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
   private async saveDraft(silent=  false) {
     this.saveCurrentTabData();
     const key = this.getDraftKey();
+    console.log("Current Language Tabs after saving: ", this.languageTabs);
     const payload: BlogDraft = {
       languageTabs: this.languageTabs,
       selectedTags: Array.from(this.selectedTags),
@@ -978,6 +991,17 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
   private async clearDraft() {
     const key = this.getDraftKey();
     await this.draftService.clear(key);
+    console.log("Draft cleared for key:", key);
     this.lastSavedAt = null;
+  }
+  private stopAutosave(): void {
+    if (!this.destroy$.closed) {
+      this.destroy$.next();
+      this.destroy$.complete();
+    }    
+    if (this.quillEditor?.quillEditor) {
+      this.quillEditor.quillEditor.off('text-change');
+    }
+    console.log('Auto-save stopped completely');
   }
 }

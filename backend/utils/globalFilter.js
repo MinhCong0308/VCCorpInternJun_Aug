@@ -1,18 +1,24 @@
 const leo = require('leo-profanity');
+const fs = require('fs');
+const englishWords = require('word-list-json'); 
+const frenchWords  = require('an-array-of-french-words');    // array
+// const viWords = require('dictionary-vi');
+
 
 class GlobalFilterManager {
     constructor() {
         this.initialized = false;
         this.customBadWords = [];
+        this.defaultBadWordsSet = new Set();
+        this.englishListWordsSet = new Set();
+        this.frenchListWordsSet  = new Set();
+        this.viWordSet           = new Set();
     }
-
-    initialize() {
+    async initialize() {
         try {
-            console.log('Initializing global bad words filter...');
-            
+            console.log('Initializing global bad words filter...');       
             // Load the default dictionary
             leo.loadDictionary();
-            
             // Add custom bad words if needed
             this.customBadWords = [
                 'spam', 'scam', 'fraud', 'fake', 'cheat',
@@ -24,8 +30,23 @@ class GlobalFilterManager {
             let defaultDictionary = leo.getDictionary();
             // convert to set for better lookup performance
             this.defaultBadWordsSet = new Set(defaultDictionary);
-            this.initialized = true;
             console.log(`Global filter initialized with built-in + ${this.customBadWords.length} custom bad words`);
+            console.log('Load English word list...');
+            this.englishListWordsSet = new Set(englishWords.filter(Boolean));
+            console.log('en words:', this.englishListWordsSet.size);
+            console.log('Loading French word list...');
+            this.frenchListWordsSet = new Set(frenchWords.filter(Boolean));
+            console.log('fr words:', this.frenchListWordsSet.size);
+            console.log('Loading Vietnamese Hunspell dictionary (ESM)...');
+            const vi  = await import('dictionary-vi'); // ESM
+            const lines = vi.default.dic.toString('utf8');
+            const arr = lines.split(/\r?\n/).map(s => s.trim()).filter(Boolean);  
+            // console.log("Current lines: ", arr[arr.length - 1]);
+            // console.log("Lines: ", arr.length);
+            this.viWordSet = new Set(arr);
+            console.log('vi words:', this.viWordSet.size);
+            this.initialized = true; 
+
         } catch (error) {
             console.error('Error initializing global filter:', error);
             throw new Error('Failed to initialize global bad words filter');

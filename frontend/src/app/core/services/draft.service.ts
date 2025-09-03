@@ -1,6 +1,6 @@
 import { Injectable, Inject, PLATFORM_ID} from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import {createStore, get, set, del} from 'idb-keyval';
+import {createStore, get, set, del, keys} from 'idb-keyval';
 @Injectable({
   providedIn: 'root'
 })
@@ -22,8 +22,32 @@ export class DraftService {
     if (!this.store) return;
     await set(key, value, this.store);
   }
-  async clear(key: IDBValidKey): Promise<void> {
+  async debugListKeys() {
     if (!this.store) return;
+    const ks = await keys(this.store);
+    console.log('[IDB] keys in blog-db/drafts =', ks);
+  }
+  async clear(key: IDBValidKey): Promise<boolean> {
+    if (!this.store) {
+      console.log("No store huhhu");
+      return false;
+    }
+    this.debugListKeys();
+    const before = await get(key, this.store);
+    console.log('[IDB] before delete exists?', before !== undefined, 'key=', key, 'type=', typeof key);
+
     await del(key, this.store);
+
+    // Optional: small microtask yield to let DevTools catch up; not strictly required.
+    await Promise.resolve();
+
+    const after = await get(key, this.store);
+    console.log('[IDB] after delete exists?', after !== undefined);
+
+    // Extra diagnostics: list keys to confirm we’re in the same store
+    const ks = await keys(this.store);
+    console.log('[IDB] keys now:', ks);
+
+    return after === undefined;
   }
 }

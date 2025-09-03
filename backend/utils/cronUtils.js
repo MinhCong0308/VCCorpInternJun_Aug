@@ -24,9 +24,9 @@ class CronUtils {
                 where: {
                     status: config.config.statuspostenum.PENDING,
                     original_postid: { [Op.eq]: col("postid") },
-                    // createdAt: {
-                    //     [Op.lte]: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) 
-                    // }
+                    createdAt: {
+                        [Op.lte]: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) 
+                    }
                 },
                 attributes: ['postid']
 

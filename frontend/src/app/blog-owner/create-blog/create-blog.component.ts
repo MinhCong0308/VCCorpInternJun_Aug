@@ -13,7 +13,9 @@ import { LanguageService, Language } from '../../core/services/language.service'
 import { TranslateService } from '../../core/services/translate.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { Subscription } from 'rxjs';
-
+import { DraftService } from '../../core/services/draft.service';
+import { fromEvent, Subject } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs';
 interface PostLanguageTab {
   title: string;
   content: string;
@@ -22,7 +24,14 @@ interface PostLanguageTab {
   isOriginal: boolean;
   isTranslating: boolean;
 }
-
+interface BlogDraft {
+  languageTabs: PostLanguageTab[];
+  selectedTags: string[];
+  activeTabIndex: number;
+  lastSavedAt: number;
+  isEditMode: boolean;
+  editPostId: number | null;
+}
 @Component({
   selector: 'app-create-blog',
   templateUrl: './create-blog.component.html',
@@ -55,6 +64,9 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   private isUserScrolling = false;
   private scrollTimeout: any;
+  private destroy$ = new Subject<void>();        // you already have subscriptions[], this is simpler for autosave
+  lastSavedAt: number | null = null;             // (optional) show autosave time
+
 
   quillModules = {
     toolbar: [
@@ -78,7 +90,8 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     private categoryService: CategoryService,
     private languageService: LanguageService,
     private translateService: TranslateService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private draftService: DraftService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -117,6 +130,8 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     }
     this.subscriptions.forEach(sub => sub.unsubscribe());
     this.resetQuillEditor();
+    this.destroy$.next();
+    this.destroy$.complete();       
   }
 
   setUpAutoScroll(): void {
@@ -219,6 +234,8 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       await this.loadUserProfile();      
       await this.loadLanguages();      
       await this.handleRouteParams();
+      await this.restoreDraft();   
+      this.setUpAutosave();        
       console.log('Initialization completed successfully');
     } catch (error) {
       console.error('Error during initialization:', error);
@@ -451,6 +468,14 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
   async loadPostForEditing(editPostId: number): Promise<void> {
     try {
       console.log('Loading post for editing:', editPostId);
+      // check for current draft existed, if existed, it mean that we only need to reload from draft instead of initializing new
+      const key = this.getDraftKey();
+      const draft = await this.draftService.load<BlogDraft>(key);
+      if(draft) {
+        // editmode and be updated, no need to reload from server
+        console.log("This content is being updated");
+        return;
+      }
       this.languageTabs = [];
       this.translations = [];
       this.activeTabIndex = 0;
@@ -770,7 +795,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     this.blogForm.patchValue({ tags: Array.from(this.selectedTags) });
   }
 
-  submitBlog(): void {
+  async submitBlog(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) {
       // this.errorMessage = 'This feature is only available in the browser.';
       return;
@@ -842,14 +867,17 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     }
 
     const sub = this.http[method](endpoint, payload, { withCredentials: true }).subscribe({
-      next: (response) => {
+      next: async (response) => {
         const action = this.isEditMode ? 'updated' : 'submitted';
+        this.stopAutosave();
+        await this.clearDraft(); 
         this.notificationService.success(
           'Success!',
           `Your blog "${payload.originalPost.title}" and its ${payload.translations.length} translation(s) were ${action} successfully! Redirecting...`,
           2000
         );
         this.isLoading = false;
+        console.log("Draft cleared");
         setTimeout(() => {
           this.router.navigate(['/home']);
         }, 2000);
@@ -883,5 +911,97 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
   clearMessages(): void {
     this.successMessage = '';
     this.errorMessage = '';
+  }
+  private getDraftKey(): string {
+    const uid = this.userProfile?.userid ?? 'anon';
+    const mode = this.isEditMode ? `edit-${this.editPostId}` : 'create';
+    return `draft:${uid}:${mode}`;
+  }
+  private async restoreDraft() {
+    const key = this.getDraftKey();
+    const draft = await this.draftService.load<BlogDraft>(key);
+    console.log("Current drafts when restoring: ", draft);
+    if (!draft) return;
+
+    // Basic guards (shape, mode)
+    if (draft.isEditMode !== this.isEditMode || draft.editPostId !== this.editPostId) return;
+
+    // Restore data
+    this.languageTabs = draft.languageTabs ?? this.languageTabs;
+    this.selectedTags = new Set(draft.selectedTags ?? []);
+    this.activeTabIndex = draft.activeTabIndex ?? 0;
+
+    // Patch form + Quill
+    this.updateFormWithActiveTab();
+    this.blogForm.patchValue({ tags: Array.from(this.selectedTags) }, { emitEvent: false });
+
+    // Ensure Quill reflects the active tab's delta/content
+    setTimeout(() => {
+      const tab = this.languageTabs[this.activeTabIndex];
+      if (this.quillEditor?.quillEditor && tab) {
+        if (tab.delta?.ops?.length) {
+          this.quillEditor.quillEditor.setContents(tab.delta);
+        } else if (tab.content) {
+          this.quillEditor.quillEditor.clipboard.dangerouslyPasteHTML(tab.content);
+        } else {
+          this.quillEditor.quillEditor.setText('');
+        }
+      }
+    }, 150);
+
+    this.lastSavedAt = draft.lastSavedAt ?? null;
+  }
+  private setUpAutosave() {
+    this.blogForm.valueChanges.pipe(debounceTime(400), takeUntil(this.destroy$)).subscribe(() => this.saveDraft());
+    setTimeout(() => {
+      if(!this.quillEditor.quillEditor) return;
+      this.quillEditor.quillEditor.on('text-change', () => {
+        console.log("Run this auto update");
+        this.saveCurrentTabData();
+        this.saveDraft();
+      });
+    }, 0);
+    if (isPlatformBrowser(this.platformId)) {
+      fromEvent(window, 'beforeunload').pipe(takeUntil(this.destroy$)).subscribe(() => {
+        this.saveCurrentTabData();
+        // Fire & forget (browser may ignore async)
+        this.saveDraft(/*silent=*/true);
+      });
+      fromEvent(window, 'pagehide').pipe(takeUntil(this.destroy$)).subscribe(() => {
+        this.saveCurrentTabData();
+        this.saveDraft(true);
+      });
+    }
+  }
+  private async saveDraft(silent=  false) {
+    this.saveCurrentTabData();
+    const key = this.getDraftKey();
+    console.log("Current Language Tabs after saving: ", this.languageTabs);
+    const payload: BlogDraft = {
+      languageTabs: this.languageTabs,
+      selectedTags: Array.from(this.selectedTags),
+      activeTabIndex: this.activeTabIndex,
+      lastSavedAt: Date.now(),
+      isEditMode: this.isEditMode,
+      editPostId: this.editPostId ?? null,
+    };
+    await this.draftService.save(key, payload);
+    if (!silent) this.lastSavedAt = payload.lastSavedAt;
+  }
+  private async clearDraft() {
+    const key = this.getDraftKey();
+    await this.draftService.clear(key);
+    console.log("Draft cleared for key:", key);
+    this.lastSavedAt = null;
+  }
+  private stopAutosave(): void {
+    if (!this.destroy$.closed) {
+      this.destroy$.next();
+      this.destroy$.complete();
+    }    
+    if (this.quillEditor?.quillEditor) {
+      this.quillEditor.quillEditor.off('text-change');
+    }
+    console.log('Auto-save stopped completely');
   }
 }

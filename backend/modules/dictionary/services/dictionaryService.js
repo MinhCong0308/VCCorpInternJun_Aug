@@ -2,8 +2,7 @@ const db = require("models/index");
 const globalFilter = require("utils/globalFilter");
 
 const dictionaryService = {
-  // Supports filters: search (substring on word), status (0|1), locale (exact match)
-  getAll: async ({ limit = 10, page = 1, search = "", status, locale }) => {
+  getAll: async ({ limit = 5, page = 1, search = "", status, locale }) => {
     const offset = (page - 1) * limit;
     const where = {};
     if (search && search.trim()) {
@@ -31,6 +30,14 @@ const dictionaryService = {
   create: async (data) => {
     const word = (data.word || "").trim().toLowerCase();
     if (!word) throw new Error("Word is required");
+    // Require locale and validate against active languages
+    let locale = (data.locale || "").trim();
+    if (!locale) throw new Error("Locale code is required");
+    locale = locale.toLowerCase();
+    const language = await db.Language.findOne({
+      where: { locale_code: locale, status: 1 },
+    });
+    if (!language) throw new Error("Invalid locale code");
     const existed = await db.Dictionary.findOne({
       where: db.sequelize.where(
         db.sequelize.fn("LOWER", db.sequelize.col("word")),
@@ -40,10 +47,9 @@ const dictionaryService = {
     if (existed) throw new Error("Word already exists");
     const created = await db.Dictionary.create({
       word,
-      locale: data.locale || null,
+      locale,
       status: data.status !== undefined ? data.status : 1,
     });
-    // update global filter
     globalFilter.addBadWords([word]);
     return created;
   },
@@ -63,29 +69,25 @@ const dictionaryService = {
     await record.destroy();
     globalFilter.removeWords([record.word]);
   },
-  bulkDelete: async (ids = []) => {
-    if (!Array.isArray(ids) || !ids.length) return 0;
-    const records = await db.Dictionary.findAll({ where: { wordid: ids } });
-    const words = records.map((r) => r.word);
-    const deleted = await db.Dictionary.destroy({ where: { wordid: ids } });
-    if (words.length) globalFilter.removeWords(words);
-    return deleted;
-  },
   reloadAllToGlobalFilter: async () => {
     const all = await db.Dictionary.findAll({ where: { status: 1 } });
     const words = all.map((r) => r.word);
     globalFilter.loadDatabaseWords(words);
   },
   getLocales: async () => {
-    const rows = await db.Dictionary.findAll({
+    // Return all active language locale codes instead of only those already used in dictionary
+    const langs = await db.Language.findAll({
+      where: { status: 1 },
       attributes: [
-        [db.Sequelize.fn("LOWER", db.Sequelize.col("locale")), "locale"],
+        [
+          db.Sequelize.fn("LOWER", db.Sequelize.col("locale_code")),
+          "locale_code",
+        ],
       ],
-      where: { locale: { [db.Sequelize.Op.ne]: null } },
-      group: ["locale"],
       raw: true,
+      order: [[db.Sequelize.col("locale_code"), "ASC"]],
     });
-    return rows.map((r) => r.locale).filter(Boolean);
+    return langs.map((l) => l.locale_code).filter(Boolean);
   },
 };
 

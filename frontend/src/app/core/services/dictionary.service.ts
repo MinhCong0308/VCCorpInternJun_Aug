@@ -145,20 +145,7 @@ export class DictionaryService {
       );
   }
 
-  bulkDelete(ids: number[]) {
-    return this.http
-      .delete<ApiResponse<{ deleted: number }>>(`${this.baseUrl}/dictionary`, {
-        headers: this.getHeaders(),
-        withCredentials: true,
-        body: { ids },
-      })
-      .pipe(
-        map((resp) => {
-          if (resp.success) return resp.data;
-          throw new Error(resp.message || 'Bulk delete failed');
-        })
-      );
-  }
+  // bulkDelete removed
 
   private getHeaders(): HttpHeaders {
     return new HttpHeaders({ 'Content-Type': 'application/json' });

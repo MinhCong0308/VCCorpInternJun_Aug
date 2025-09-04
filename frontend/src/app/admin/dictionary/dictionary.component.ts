@@ -21,7 +21,7 @@ import {
 declare const $: any;
 
 interface ConfirmModalState {
-  action: 'delete-one' | 'bulk-delete' | 'status' | null;
+  action: 'delete-one' | 'status' | null;
   ids: number[];
   title: string;
   message: string;
@@ -39,16 +39,14 @@ export class DictionaryComponent implements OnInit, AfterViewInit {
   searchForm: FormGroup;
   wordForm: FormGroup;
   words: BadWord[] = [];
-  // Edit functionality removed
+  // Simplified: only add / toggle status / delete
   errorMsg = '';
   keyword = '';
   statusFilter: '' | 0 | 1 = '';
   localeFilter = '';
   currentPage = 1;
   totalPages = 0;
-  // totalItems removed (not displayed)
-  limit = 10; // fixed page size
-  bulkSelection = new Set<number>();
+  limit = 5; // default page size (can be overridden by ?limit= in URL)
   localeOptions: string[] = [];
 
   confirmModal: ConfirmModalState = {
@@ -69,6 +67,7 @@ export class DictionaryComponent implements OnInit, AfterViewInit {
     this.searchForm = this.fb.group({
       keyword: [''],
       status: [''],
+      // locale filter is optional
       locale: [''],
     });
     this.wordForm = this.fb.group({
@@ -80,7 +79,8 @@ export class DictionaryComponent implements OnInit, AfterViewInit {
           Validators.maxLength(191),
         ],
       ],
-      locale: [''],
+      // locale must be selected when adding a word
+      locale: ['', [Validators.required]],
       status: [1],
     });
   }
@@ -88,14 +88,19 @@ export class DictionaryComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     // Avoid making HTTP calls during SSR to prevent Vite internal timeout
     if (isPlatformBrowser(this.platformId)) {
-      this.loadWords(1); // immediate first load
+      // Initial data
       this.loadLocales();
       this.route.queryParamMap.subscribe((q) => {
+        // Page
         const pageParam = Number(q.get('page'));
         if (pageParam && pageParam !== this.currentPage) {
           this.currentPage = pageParam;
-          this.loadWords(this.currentPage);
         }
+        const limitParam = Number(q.get('limit'));
+        if (!isNaN(limitParam) && limitParam > 0 && limitParam <= 200) {
+          this.limit = limitParam;
+        }
+        this.loadWords(this.currentPage);
       });
     }
   }
@@ -124,10 +129,8 @@ export class DictionaryComponent implements OnInit, AfterViewInit {
         next: (res) => {
           this.words = res.words;
           this.currentPage = res.page;
-          // totalItems removed
           this.totalPages = res.totalPages;
           this.errorMsg = '';
-          this.bulkSelection.clear();
           this.updateRouteQuery();
         },
         error: (err) => {
@@ -171,17 +174,22 @@ export class DictionaryComponent implements OnInit, AfterViewInit {
   }
 
   openAddModal(): void {
-    // only adding new word now
     this.wordForm.reset({ word: '', locale: '', status: 1 });
+    this.loadLocales();
     this.wordForm.get('word')?.enable({ emitEvent: false });
     this.errorMsg = '';
     (window as any).$('#wordAddModal').modal('show');
   }
 
-  // openEditModal removed
-
   submitAdd(): void {
-    if (this.wordForm.invalid) return;
+    this.wordForm.markAllAsTouched();
+
+    if (this.wordForm.invalid) {
+      this.errorMsg = '';
+      return;
+    }
+
+    this.errorMsg = '';
     const payload = this.wordForm.value;
     this.service.create(payload).subscribe({
       next: () => {
@@ -196,28 +204,74 @@ export class DictionaryComponent implements OnInit, AfterViewInit {
   // submitEdit removed
 
   private handleCrudError(err: any): void {
-    const ctrl = this.wordForm.get('word');
-    const msg = (err?.error?.message || err?.message || '').toLowerCase();
-    if (msg.includes('exist')) {
-      ctrl?.setErrors({ ...(ctrl.errors || {}), duplicate: true });
-    } else if (msg.includes('required')) {
-      ctrl?.setErrors({ ...(ctrl.errors || {}), required: true });
-    } else {
-      this.errorMsg = err?.error?.message || err?.message || 'Operation failed';
+    let msgRaw: string = '';
+    if (err?.error) {
+      if (typeof err.error === 'string') {
+        // Try JSON parse
+        try {
+          const parsed = JSON.parse(err.error);
+          msgRaw = parsed?.message || err.error;
+        } catch {
+          msgRaw = err.error; // plain text
+        }
+      } else {
+        msgRaw = err.error.message || '';
+      }
     }
-  }
+    if (!msgRaw) msgRaw = err?.message || '';
+    const msg = msgRaw.toLowerCase();
+    const wordCtrl = this.wordForm.get('word');
+    const localeCtrl = this.wordForm.get('locale');
 
-  toggleSelect(id: number, checked: boolean) {
-    if (checked) this.bulkSelection.add(id);
-    else this.bulkSelection.delete(id);
-  }
+    // Clear previous server errors before setting new ones
+    if (wordCtrl?.errors?.['duplicate']) {
+      const { duplicate, ...rest } = wordCtrl.errors;
+      wordCtrl.setErrors(Object.keys(rest).length ? rest : null);
+    }
+    if (localeCtrl?.errors?.['invalidLocale']) {
+      const { invalidLocale, ...rest } = localeCtrl.errors;
+      localeCtrl.setErrors(Object.keys(rest).length ? rest : null);
+    }
 
-  toggleSelectAll(ev: Event) {
-    const target = ev.target as HTMLInputElement | null;
-    if (!target) return;
-    if (target.checked)
-      this.words.forEach((w) => this.bulkSelection.add(w.wordid));
-    else this.bulkSelection.clear();
+    if (err.status === 422) {
+      if (
+        msg.includes('word already exists') ||
+        msg.includes('already exists')
+      ) {
+        wordCtrl?.setErrors({ ...(wordCtrl.errors || {}), duplicate: true });
+        this.errorMsg = 'Word already exists. Please enter a different word.';
+        return;
+      }
+    }
+
+    if (
+      (err.status === 400 || err.status === 422) &&
+      !msg.includes('word ') &&
+      !msg.includes('locale')
+    ) {
+      if (wordCtrl?.value && wordCtrl.value.trim().length > 0) {
+        wordCtrl.setErrors({ ...(wordCtrl.errors || {}), duplicate: true });
+        this.errorMsg = ''; // rely on field-level error
+        return;
+      }
+    }
+
+    // Handle other specific backend errors
+    if (msg.includes('invalid locale code') || msg.includes('invalid locale')) {
+      localeCtrl?.setErrors({
+        ...(localeCtrl.errors || {}),
+        invalidLocale: true,
+      });
+    } else if (
+      msg.includes('locale code is required') ||
+      (msg.includes('locale') && msg.includes('required'))
+    ) {
+      localeCtrl?.setErrors({ ...(localeCtrl.errors || {}), required: true });
+    } else if (msg.includes('word is required')) {
+      wordCtrl?.setErrors({ ...(wordCtrl.errors || {}), required: true });
+    } else {
+      this.errorMsg = msgRaw || 'Operation failed';
+    }
   }
 
   openConfirm(word: BadWord, action: 'status' | 'delete-one'): void {
@@ -243,18 +297,6 @@ export class DictionaryComponent implements OnInit, AfterViewInit {
     (window as any).$('#dictActionModal').modal('show');
   }
 
-  openBulkDelete(): void {
-    if (!this.bulkSelection.size) return;
-    this.confirmModal = {
-      action: 'bulk-delete',
-      ids: Array.from(this.bulkSelection),
-      title: 'Confirm Bulk Delete',
-      message: `Delete ${this.bulkSelection.size} selected words?`,
-      btnClass: 'btn-danger',
-    };
-    (window as any).$('#dictActionModal').modal('show');
-  }
-
   confirmAction(): void {
     const { action, ids } = this.confirmModal;
     if (!action || !ids.length) return;
@@ -267,16 +309,6 @@ export class DictionaryComponent implements OnInit, AfterViewInit {
         },
         error: (err) =>
           (this.errorMsg = err?.error?.message || 'Delete failed'),
-      });
-    } else if (action === 'bulk-delete') {
-      this.service.bulkDelete(ids).subscribe({
-        next: () => {
-          if (this.words.length === ids.length && this.currentPage > 1)
-            this.currentPage--;
-          this.loadWords(this.currentPage);
-        },
-        error: (err) =>
-          (this.errorMsg = err?.error?.message || 'Bulk delete failed'),
       });
     } else if (action === 'status') {
       const row = this.words.find((w) => w.wordid === ids[0]);
@@ -303,12 +335,6 @@ export class DictionaryComponent implements OnInit, AfterViewInit {
       error: (err) =>
         (this.errorMsg = err?.error?.message || 'Status update failed'),
     });
-  }
-
-  onRowCheckbox(ev: Event, id: number) {
-    const target = ev.target as HTMLInputElement | null;
-    if (!target) return;
-    this.toggleSelect(id, target.checked);
   }
 
   loadLocales() {

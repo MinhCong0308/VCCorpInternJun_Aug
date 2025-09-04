@@ -5,3 +5,17 @@ table th {
 .badge {
   font-size: 90%;
 }
+
+/* Truncate long locale codes similar to category select styling */
+select.form-control option {
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* For Bootstrap dropdown-menu with many locales (if using custom dropdown in future) */
+.dropdown-menu.locale-dropdown {
+  max-height: 240px;
+  overflow-y: auto;
+}

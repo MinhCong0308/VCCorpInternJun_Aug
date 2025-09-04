@@ -5,7 +5,7 @@ const dictionaryController = {
   getAll: async (req, res) => {
     try {
       const {
-        limit = 10,
+        limit = 5,
         page = 1,
         search = "",
         status = "",
@@ -46,15 +46,6 @@ const dictionaryController = {
       const { wordid } = req.params;
       await dictionaryService.delete(wordid);
       return responseUtils.ok(res, { message: "Deleted successfully" });
-    } catch (e) {
-      return responseUtils.badRequest(res, e.message);
-    }
-  },
-  bulkDelete: async (req, res) => {
-    try {
-      const { ids } = req.body || {};
-      const total = await dictionaryService.bulkDelete(ids || []);
-      return responseUtils.ok(res, { deleted: total });
     } catch (e) {
       return responseUtils.badRequest(res, e.message);
     }

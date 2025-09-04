@@ -265,7 +265,7 @@ router.group(
     router.put("/:wordid/enable", dictionaryController.enable);
     router.put("/:wordid/disable", dictionaryController.disable);
     router.delete("/:wordid", dictionaryController.delete);
-    router.delete("/", dictionaryController.bulkDelete);
+    // bulk delete removed
   }
 );
 

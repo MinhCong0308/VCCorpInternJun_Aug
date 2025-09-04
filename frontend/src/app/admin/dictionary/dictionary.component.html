@@ -1,0 +1,370 @@
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Manage Dictionary</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item">
+            <a routerLink="/admin/dashboard">Home</a>
+          </li>
+          <li class="breadcrumb-item active">Dictionary</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card card-default">
+      <div class="card-body">
+        <form (submit)="onSearch($event, kw.value)" [formGroup]="searchForm">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group mb-2">
+                <input
+                  type="text"
+                  #kw
+                  [value]="keyword || ''"
+                  class="form-control"
+                  placeholder="Search word..."
+                />
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group mb-2">
+                <select
+                  class="form-control"
+                  formControlName="status"
+                  (change)="onSearch($event, kw.value)"
+                >
+                  <option value="">--All Status--</option>
+                  <option value="1">Active</option>
+                  <option value="0">Inactive</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group mb-2">
+                <select
+                  class="form-control"
+                  formControlName="locale"
+                  (change)="onSearch($event, kw.value)"
+                >
+                  <option value="">--All Locales--</option>
+                  <option *ngFor="let lc of localeOptions" [value]="lc">
+                    {{ lc }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-2 ml-auto">
+              <div class="form-group mb-2">
+                <button type="submit" class="btn btn-primary btn-block">
+                  <i class="fas fa-search"></i> Search
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Bad Words</h3>
+        <div class="card-tools d-flex">
+          <!-- <button
+            class="btn btn-danger mr-2"
+            (click)="openBulkDelete()"
+            [disabled]="!bulkSelection.size"
+          >
+            <i class="fas fa-trash-alt mr-1"></i> Delete Selected ({{
+              bulkSelection.size
+            }})
+          </button> -->
+          <a
+            href="#"
+            class="btn btn-primary"
+            (click)="$event.preventDefault(); openAddModal()"
+          >
+            <i class="fas fa-plus-circle mr-1"></i> Add Word
+          </a>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-striped" id="dictionary-table">
+          <thead>
+            <tr>
+              <!-- <th style="width: 50px">
+                <input
+                  type="checkbox"
+                  (change)="toggleSelectAll($event)"
+                  [checked]="
+                    bulkSelection.size === words.length && words.length
+                  "
+                />
+              </th> -->
+              <th style="width: 70px">#</th>
+              <th>Word</th>
+              <th style="width: 140px">Locale</th>
+              <th style="width: 120px; text-align: center">Status</th>
+              <th style="width: 120px; text-align: center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let w of words; let i = index">
+              <!-- <td>
+                <input
+                  type="checkbox"
+                  [checked]="bulkSelection.has(w.wordid)"
+                  (change)="onRowCheckbox($event, w.wordid)"
+                />
+              </td> -->
+              <td>{{ (currentPage - 1) * limit + i + 1 }}.</td>
+              <td>{{ w.word }}</td>
+              <td>{{ w.locale || "-" }}</td>
+              <td style="text-align: center">
+                <span
+                  class="badge"
+                  [ngClass]="w.status ? 'badge-success' : 'badge-secondary'"
+                  >{{ w.status ? "Active" : "Inactive" }}</span
+                >
+              </td>
+              <td style="text-align: center">
+                <div class="btn-group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    title="Actions"
+                  >
+                    <i class="fas fa-ellipsis-h"></i>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right p-0">
+                    <button
+                      class="dropdown-item"
+                      (click)="openConfirm(w, 'status')"
+                    >
+                      <i
+                        class="fas"
+                        [ngClass]="
+                          w.status
+                            ? 'fa-ban text-warning'
+                            : 'fa-check text-success'
+                        "
+                      ></i>
+                      <span class="ml-2">{{
+                        w.status ? "Deactivate" : "Activate"
+                      }}</span>
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button
+                      class="dropdown-item"
+                      (click)="openConfirm(w, 'delete-one')"
+                    >
+                      <i class="fas fa-trash text-danger mr-2"></i>Delete
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="words.length === 0">
+              <td colspan="6" class="text-center text-muted p-3">
+                No words found
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer clearfix">
+        <div class="d-flex justify-content-end align-items-center">
+          <ul class="pagination pagination-sm m-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="onPageChange(currentPage - 1)">«</a>
+            </li>
+            <li
+              class="page-item"
+              *ngFor="let p of getPagesArray()"
+              [class.active]="p === currentPage"
+            >
+              <a class="page-link" (click)="onPageChange(p)">{{ p }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <a class="page-link" (click)="onPageChange(currentPage + 1)">»</a>
+            </li>
+          </ul>
+          <!-- total removed -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Action Confirmation Modal -->
+<div
+  class="modal fade"
+  id="dictActionModal"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div
+        class="modal-header py-2"
+        [ngClass]="{
+          'bg-warning': confirmModal.action === 'status',
+          'bg-danger': confirmModal.action?.includes('delete')
+        }"
+      >
+        <h5 class="modal-title">{{ confirmModal.title }}</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-0">{{ confirmModal.message }}</p>
+      </div>
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn"
+          [ngClass]="confirmModal.btnClass"
+          (click)="confirmAction()"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Word Modal -->
+<div
+  class="modal fade"
+  id="wordAddModal"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Word</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="wordForm" (ngSubmit)="submitAdd()">
+          <div class="form-group">
+            <label>Word</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="word"
+              placeholder="Enter word"
+              [ngClass]="{
+                'is-invalid':
+                  wordForm.get('word')?.touched &&
+                  wordForm.get('word')?.invalid ||
+                  wordForm.get('word')?.errors?.['duplicate']
+              }"
+            />
+            <div
+              class="invalid-feedback d-block"
+              *ngIf="wordForm.get('word')?.errors && (wordForm.get('word')?.touched || wordForm.get('word')?.errors?.['duplicate'])"
+            >
+              <div *ngIf="wordForm.get('word')?.errors?.['required']">
+                Word is required.
+              </div>
+              <div *ngIf="wordForm.get('word')?.errors?.['minlength']">
+                Minimum 1 character.
+              </div>
+              <div *ngIf="wordForm.get('word')?.errors?.['maxlength']">
+                Maximum 191 characters.
+              </div>
+              <div *ngIf="wordForm.get('word')?.errors?.['duplicate']">
+                Word already exists. Please enter a different word.
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Locale</label>
+            <select
+              class="form-control locale-select"
+              formControlName="locale"
+              [ngClass]="{
+                'is-invalid':
+                  wordForm.get('locale')?.touched &&
+                  wordForm.get('locale')?.invalid
+              }"
+            >
+              <option value="">-- Select Locale --</option>
+              <option *ngFor="let lc of localeOptions" [value]="lc">
+                {{ lc }}
+              </option>
+            </select>
+            <div
+              class="invalid-feedback d-block"
+              *ngIf="
+                wordForm.get('locale')?.touched &&
+                wordForm.get('locale')?.invalid
+              "
+            >
+              <div *ngIf="wordForm.get('locale')?.errors?.['required']">
+                Locale code is required.
+              </div>
+              <div *ngIf="wordForm.get('locale')?.errors?.['invalidLocale']">
+                Invalid locale code.
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-control" formControlName="status">
+              <option [value]="1">Active</option>
+              <option [value]="0">Inactive</option>
+            </select>
+          </div>
+        </form>
+        <div *ngIf="errorMsg" class="alert alert-danger mt-2">
+          {{ errorMsg }}
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="submitAdd()"
+          [disabled]="wordForm.invalid"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit modal removed entirely -->

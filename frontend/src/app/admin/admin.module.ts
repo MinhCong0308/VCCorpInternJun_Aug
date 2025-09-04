@@ -7,6 +7,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { LanguageComponent } from './language/language.component';
 import { UserComponent } from './user/user.component';
 import { PostComponent } from './post/post.component';
+import { DictionaryComponent } from './dictionary/dictionary.component';
 
 @NgModule({
   imports: [
@@ -18,6 +19,7 @@ import { PostComponent } from './post/post.component';
     LanguageComponent,
     UserComponent,
     PostComponent,
+    DictionaryComponent,
   ],
 })
 export class AdminModule {}

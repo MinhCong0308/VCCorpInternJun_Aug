@@ -23,6 +23,8 @@ const postAdminController = require("modules/post-admin/controllers/postAdminCon
 const userController = require("modules/user/controllers/userController");
 const userValidation = require("modules/user/validations/userValidation");
 const postsController = require("modules/post/controllers/postsController");
+const dictionaryController = require("modules/dictionary/controllers/dictionaryController");
+const dictionaryValidation = require("modules/dictionary/validations/dictionaryValidation");
 const router = express.Router({ mergeParams: true });
 const oauthController = require("modules/oauth/controllers/oauthController");
 const dashboardController = require("modules/dashboard/controllers/dashboardController");
@@ -245,6 +247,25 @@ router.group(
   middlewares([authenticated, checkRole(["admin"])]),
   (router) => {
     router.get("/", dashboardController.getDashboardData);
+  }
+);
+
+// ===== ADMIN DICTIONARY (Bad Words) =====
+router.group(
+  "/dictionary",
+  middlewares([authenticated, checkRole(["admin"])]),
+  (router) => {
+    router.get("/", dictionaryController.getAll);
+    router.get("/locales", dictionaryController.locales);
+    router.post(
+      "/",
+      validate([dictionaryValidation.create]),
+      dictionaryController.create
+    );
+    router.put("/:wordid/enable", dictionaryController.enable);
+    router.put("/:wordid/disable", dictionaryController.disable);
+    router.delete("/:wordid", dictionaryController.delete);
+    // bulk delete removed
   }
 );
 

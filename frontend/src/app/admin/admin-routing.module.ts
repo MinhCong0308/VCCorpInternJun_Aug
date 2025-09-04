@@ -7,6 +7,7 @@ import { UserComponent } from './user/user.component';
 import { PostComponent } from './post/post.component';
 import { adminGuard } from '../core/guards/admin.guard';
 import { ViewPostComponent } from './view-post/view-post.component';
+import { DictionaryComponent } from './dictionary/dictionary.component';
 
 const routes: Routes = [
   {
@@ -20,6 +21,7 @@ const routes: Routes = [
       { path: 'users', component: UserComponent },
       { path: 'posts', component: PostComponent },
       { path: 'posts/:postid', component: ViewPostComponent },
+      { path: 'dictionary', component: DictionaryComponent },
     ],
   },
 

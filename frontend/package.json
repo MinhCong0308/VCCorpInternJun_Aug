@@ -21,6 +21,8 @@
     "@angular/router": "^19.2.0",
     "@angular/ssr": "^19.2.15",
     "@fortawesome/fontawesome-free": "^7.0.0",
+    "@ngx-translate/core": "^17.0.0",
+    "@ngx-translate/http-loader": "^17.0.0",
     "admin-lte": "3.2",
     "bootstrap": "^4.6.2",
     "express": "^4.18.2",

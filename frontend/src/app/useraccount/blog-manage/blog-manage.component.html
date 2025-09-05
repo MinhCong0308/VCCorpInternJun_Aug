@@ -2,7 +2,7 @@
   <!-- Loading Container -->
   <div *ngIf="isInitializing" class="loading-container">
     <div class="loading-spinner">
-      <p>Loading your profile...</p>
+      <p>{{ 'ACCOUNT.LOADING' | translate }}</p>
     </div>
   </div>
 
@@ -19,41 +19,68 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <div class="flex-grow-1 mx-4 d-none d-md-block">
-            <div class="search-bar-group input-group" style="margin-left: -16px;">
-              <span class="input-group-text bg-transparent border-0">
-                <i class="ti-search"></i>
-              </span>
-              <input type="text" class="form-control bg-transparent border-0" 
-                     placeholder="Search" style="box-shadow: none;" />
+          <div class="flex-grow-1 mx-4 d-none d-md-block" style="position: relative;">
+            <form (submit)="submit()" class="search-bar-group input-group" style="margin-left: -16px;">
+                <span class="input-group-text bg-transparent border-0">
+                    <i class="ti-search"></i>
+                </span>
+                <input
+                    type="search"
+                    class="form-control bg-transparent border-0"
+                    placeholder="{{ 'NAV.SEARCH' | translate }}"
+                    style="box-shadow: none;"
+                    [(ngModel)]="query"
+                    name="q"
+                    (focus)="onSearchFocus()"
+                    (blur)="onSearchBlur()"
+                    (keydown.enter)="submit()"
+                    autocomplete="off"
+                />
+            </form>
+            <!-- Recent Searches Dropdown -->
+            <div *ngIf="dropdownOpen && !query && recentSearches.length > 0" class="recent-searches-dropdown shadow"
+                (mousedown)="$event.preventDefault()">
+                <div class="recent-title">
+                    {{ 'SEARCH.RECENT_TITLE' | translate }}
+                    <span class="clear-all" (click)="clearRecent($event)">{{ 'SEARCH.CLEAR_ALL' | translate }}</span>
+                </div>
+                <div class="recent-item" *ngFor="let item of search.recent; let i = index">
+                    <i class="ti-search"></i>
+                    <span (click)="clickRecent(item)">{{ item }}</span>
+                    <i class="ti-close" (click)="removeRecent(i, $event)"></i>
+                </div>
             </div>
           </div>
           <div class="d-flex align-items-center gap-3 ms-auto">
             <a routerLink="/blog-owner/create" class="btn btn-write">
-              <i class="ti-pencil-alt"></i> Write
+              <i class="ti-pencil-alt"></i> {{ 'NAV.WRITE' | translate }}
             </a>
             <div class="dropdown">
-                <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
-                    type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <ng-container *ngIf="currentLanguage as lang; else noLang">
-                        <img [src]="lang.flag_image" class="flag-icon me-1" alt="{{ lang.locale_code }}" />
-                    </ng-container>
-                    <ng-template #noLang>
-                        <span class="d-none d-lg-inline">Language</span>
-                    </ng-template>
-                    <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="langDropdown">
-                    <li *ngFor="let lang of languages">
-                        <a class="dropdown-item d-flex align-items-center gap-2" (click)="selectLanguage(lang)" style="cursor: pointer;">
-                            <img [src]="lang.flag_image" class="flag-icon" alt="{{ lang.locale_code }}" />
-                            <span class="flex-grow-1">{{ lang.languagename }}</span>
-                            <i *ngIf="currentLanguage?.languageid === lang.languageid" class="ti-check text-success" aria-hidden="true"></i>
-                        </a>
-                    </li>
-                </ul>
+              <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
+                  type="button" id="langDropdown" data-bs-toggle="dropdown"
+                  [attr.aria-haspopup]="'true'"
+                  [attr.aria-expanded]="null"
+                  [attr.aria-label]="'NAV.LANGUAGE' | translate"
+                  [title]="currentLanguage?.languagename || ('NAV.LANGUAGE' | translate)">
+                  <ng-container *ngIf="currentLanguage as lang; else noLang">
+                      <img [src]="lang.flag_image" class="flag-icon me-1" alt="{{ lang.locale_code }}" />
+                  </ng-container>
+                  <ng-template #noLang>
+                      <span class="d-none d-lg-inline">{{ 'NAV.LANGUAGE' | translate }}</span>
+                  </ng-template>
+                  <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="langDropdown">
+                  <li *ngFor="let lang of languages">
+                      <a class="dropdown-item d-flex align-items-center gap-2" (click)="selectLanguage(lang)" style="cursor: pointer;">
+                          <img [src]="lang.flag_image" class="flag-icon" alt="{{ lang.locale_code }}" />
+                          <span class="flex-grow-1">{{ lang.languagename }}</span>
+                          <i *ngIf="currentLanguage?.languageid === lang.languageid" class="ti-check text-success" aria-hidden="true"></i>
+                      </a>
+                  </li>
+              </ul>
             </div>
-            <a href="#" class="text-secondary text-decoration-none ms-2 me-1">
+            <a href="#" class="text-secondary text-decoration-none mt-1 ms-2 me-2">
               <i class="ti-bell fs-5"></i>
             </a>
             <div class="dropdown">
@@ -62,9 +89,9 @@
                      width="32" height="32" alt="Profile" />
               </a>
               <ul class="dropdown-menu dropdown-menu-end mt-2">
-                <li><a class="dropdown-item" routerLink="/useraccount/profile">Profile</a></li>
+                <li><a class="dropdown-item" routerLink="/useraccount/profile">{{ 'NAV.PROFILE' | translate }}</a></li>
                 <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" (click)="logout()">Sign out</a></li>
+                <li><a class="dropdown-item" (click)="logout()">{{ 'NAV.SIGNOUT' | translate }}</a></li>
               </ul>
             </div>
           </div>
@@ -86,13 +113,13 @@
                 <a class="nav-link" 
                    [class.active]="activeTab === 'home'"
                    href="#" 
-                   (click)="switchTab('home', $event)">Your Blogs</a>
+                   (click)="switchTab('home', $event)">{{ 'YOUR_BLOG.TITLE' | translate }}</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" 
                    [class.active]="activeTab === 'about'"
                    href="#" 
-                   (click)="switchTab('about', $event)">About</a>
+                   (click)="switchTab('about', $event)">{{ 'YOUR_BLOG.ABOUT' | translate }}</a>
               </li>
             </ul>
           </nav>
@@ -100,11 +127,11 @@
           <!-- Home Content -->
           <div *ngIf="activeTab === 'home'" id="home-content">
             <div *ngIf="isLoading" class="text-center">
-              <p class="text-muted">Loading posts...</p>
+              <p class="text-muted">{{ 'YOUR_BLOG.LOADING' | translate }}</p>
             </div>
             
             <div *ngIf="!isLoading && posts.length === 0" class="text-center">
-              <p class="text-muted">No post found.</p>
+              <p class="text-muted">{{ 'YOUR_BLOG.NO_POST' | translate }}</p>
             </div>
 
             <article *ngFor="let post of posts; trackBy: trackByPostId" class="blog-post">
@@ -138,7 +165,7 @@
                               (click)="editPost(post.postid, $event)"
                               title="Edit post">
                         <i class="ti-pencil"></i>
-                        <span class="d-none d-sm-inline ms-1">Edit</span>
+                        <span class="d-none d-sm-inline ms-1">{{ 'YOUR_BLOG.EDIT' | translate }}</span>
                       </button>
                       
                       <!-- Delete button - always visible -->
@@ -146,14 +173,14 @@
                               (click)="deletePost(post.postid, $event)"
                               title="Delete post">
                         <i class="ti-trash"></i>
-                        <span class="d-none d-sm-inline ms-1">Delete</span>
+                        <span class="d-none d-sm-inline ms-1">{{ 'YOUR_BLOG.DELETE' | translate }}</span>
                       </button>
                       <button *ngIf="post.status === 'REJECTED'" 
                               class="btn btn-sm btn-outline-warning post-action-btn"
                               (click)="appealPost(post.postid, $event)"
                               title="Appeal post">
                         <i class="ti-flag"></i>
-                        <span class="d-none d-sm-inline ms-1">Appeal</span>
+                        <span class="d-none d-sm-inline ms-1">{{ 'YOUR_BLOG.APPEAL' | translate }}</span>
                       </button>
                     </div>
                   </div>
@@ -162,10 +189,10 @@
             </article>
             <div class="d-flex justify-content-between align-items-center mt-3" *ngIf="!isLoading && total > 0">
               <div class="text-muted small">
-                {{ (page - 1) * limit + 1 }}–{{ Math.min(page * limit, total) }} / {{ total }} posts
+                {{ (page - 1) * limit + 1 }}–{{ Math.min(page * limit, total) }} / {{ total }} {{ 'YOUR_BLOG.POSTS' | translate }}
               </div>
               <div class="d-flex align-items-center">
-                <label class="me-2 mb-0 small text-muted">Per page</label>
+                <label class="me-2 mb-0 small text-muted">{{ 'YOUR_BLOG.PER_PAGE' | translate }}</label>
                 <select class="form-select form-select-sm" style="width: auto;"
                         [ngModel]="limit"
                         (ngModelChange)="changePageSize($event)">
@@ -177,7 +204,7 @@
               </div>
             </div>
 
-            <nav *ngIf="!isLoading && totalPages > 1" class="mt-2" aria-label="Post pagination">
+            <nav *ngIf="!isLoading && totalPages > 1" class="mt-2" [attr.aria-label]="'YOUR_BLOG.POST_PAGINATION' | translate">
               <ul class="pagination pagination-sm mb-0">
                 <li class="page-item" [class.disabled]="page === 1">
                   <a class="page-link" href="#" (click)="goToPage(page - 1, $event)">«</a>
@@ -199,7 +226,7 @@
           <!-- About Content -->
           <div *ngIf="activeTab === 'about'" id="about-content">
             <div class="py-3">
-              <p>{{ userProfile.bio || 'Write a short description about yourself' }}</p>
+              <p>{{ userProfile.bio || 'YOUR_BLOG.BIO' | translate }}</p>
             </div>
           </div>
         </main>
@@ -212,7 +239,7 @@
                    [alt]="userProfile.fullname">
               <div class="profile-info">
                 <h3 class="profile-name-small">{{ userProfile.fullname }}</h3>
-                <a routerLink="/useraccount/account" class="edit-profile-link">Edit profile</a>
+                <a routerLink="/useraccount/account" class="edit-profile-link">{{ 'SIDEBAR.EDIT' | translate }}</a>
               </div>
             </div>
           </div>
@@ -224,22 +251,22 @@
     <footer class="main-footer mt-1">
       <hr class="footer-divider mb-4" />
       <div class="footer-links">
-        <a href="#">Help</a>
-        <a href="#">Status</a>
-        <a href="#">About</a>
-        <a href="#">Careers</a>
-        <a href="#">Press</a>
-        <a href="#">Blog</a>
-        <a href="#">Privacy</a>
-        <a href="#">Rules</a>
-        <a href="#">Terms</a>
-        <a href="#">Text to speech</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.HELP' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.STATUS' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.ABOUT' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.CAREERS' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.PRESS' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.BLOG' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.PRIVACY' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.RULES' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.TERMS' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.TTS' | translate }}</a>
       </div>
     </footer>
   </div>
 
   <!-- Error Container -->
   <div *ngIf="!isInitializing && !userProfile" class="error-container">
-    <button (click)="navigateToLogin()">Go to Login</button>
+    <button (click)="navigateToLogin()">{{ 'ACCOUNT.GO_TO_LOGIN' | translate }}</button>
   </div>
 </div>

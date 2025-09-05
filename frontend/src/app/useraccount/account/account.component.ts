@@ -5,6 +5,8 @@ import { ProfileService, UserProfile} from '../../core/services/profile.service'
 import { isPlatformBrowser } from '@angular/common';
 import { Language, LanguageService} from '../../core/services/language.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { TranslateService } from '@ngx-translate/core';
+import { SearchService } from '../../core/services/search.service';
 
 @Component({
   selector: 'app-account',
@@ -31,13 +33,23 @@ export class AccountComponent implements OnInit {
   defaultLanguage: Language | null = null;
   currentLanguage: Language | null = null;
   languages: Language[] = [];
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private authService: AuthService, private profileService: ProfileService, private languageService: LanguageService, private notificationService: NotificationService) {}
+  loadingLang = false;
+  isBrowser: boolean;
+  initialLang = 'en';
+  query = '';
+  dropdownOpen = false;
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private authService: AuthService, private profileService: ProfileService, private languageService: LanguageService, private notificationService: NotificationService, private translate: TranslateService, public search: SearchService) { this.isBrowser = isPlatformBrowser(this.platformId); }
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) {
       this.isInitializing = false;
       return;
     }
+    const saved = this.isBrowser ? (localStorage.getItem('lang') || '') : '';
+    const code = saved || this.translate.getCurrentLang?.() || 'en';
+    this.initialLang = code;
+    this.translate.use(code);
+    if (this.isBrowser) document.documentElement.lang = code;
     // console.log('ACCOUNT COMPONENT: Starting profile load...');
     this.isLoading = true;
     this.profileService.getUserProfile().subscribe({
@@ -179,15 +191,97 @@ export class AccountComponent implements OnInit {
     });
   }
   loadLanguage(): void {
-    this.languageService.getLanguages().subscribe({
-      next: (response) => {
-        this.languages = response.data.languages || [];
-        this.defaultLanguage = this.languages.find(lang => lang.is_default) || null;
-        this.currentLanguage = this.defaultLanguage;
+    if (!this.isBrowser) return;
+    try {
+      const cached = localStorage.getItem('languages');
+      if (cached) {
+        this.languages = JSON.parse(cached) as Language[];
+        this.normalizeLanguages();
+        const code = this.translate.getCurrentLang?.() || this.initialLang;
+        this.syncCurrentLanguageByCode(code);
       }
-    })
+    } catch {}
+    this.languageService.getLanguages().subscribe({
+      next: (res: any) => {
+        const list: Language[] = (res?.data?.languages || res?.languages || res || []) as Language[];
+        this.languages = list;
+        this.normalizeLanguages();
+        if (this.isBrowser) {
+          try { localStorage.setItem('languages', JSON.stringify(this.languages)); } catch {}
+        }
+        this.syncCurrentLanguageByCode(this.translate.getCurrentLang?.());
+      },
+      error: (e) => console.warn('loadLanguages error', e)
+    });
   }
-  selectLanguage(language: Language): void {
-    this.currentLanguage = language;
+  normalizeLanguages(): void {
+    this.languages = this.languages
+      .filter(l => l.status === 1 || l.status === undefined)
+      .map(l => ({
+        ...l,
+        locale_code: (l.locale_code || '').trim() || (l.languagename === 'Vietnamese' ? 'vi' : 'en')
+      }));
   }
+  syncCurrentLanguageByCode(code?: string): void {
+    const cc = (code || 'en').toLowerCase();
+    this.currentLanguage =
+      this.languages.find(l => (l.locale_code || '').toLowerCase() === cc)
+      || this.languages.find(l => !!l.is_default)
+      || this.languages[0];
+  }
+  selectLanguage(lang: Language): void {
+    if (!lang || this.loadingLang) return;
+    // nếu chọn lại chính ngôn ngữ đang dùng → thôi
+    if (this.currentLanguage?.languageid === lang.languageid) {
+      this.applyUiLanguage(lang); // vẫn gọi để đồng bộ document.lang/localStorage
+      return;
+    }
+
+    this.loadingLang = true;
+    this.applyUiLanguage(lang);
+    this.currentLanguage = lang;
+    this.loadingLang = false;
+  }
+  applyUiLanguage(lang: Language): void {
+    if (!lang?.locale_code) return;
+    const id = lang?.languageid;
+    this.translate.use(lang.locale_code);
+    if (this.isBrowser) {
+      try { 
+        localStorage.setItem('lang', lang.locale_code);
+        localStorage.setItem('languageId', String(id));
+      } catch {}
+      document.documentElement.lang = lang.locale_code;
+    }
+  }
+
+  onSearchFocus() { this.dropdownOpen = true; }
+  onSearchBlur()  { setTimeout(() => this.dropdownOpen = false, 120); }
+
+  submit() {
+    const q = (this.query || '').trim();
+    if (!q) return;
+    this.search.addRecent(q);
+    this.search.setQuery(q);
+    this.dropdownOpen = false;
+    // điều hướng về /home?q=...
+    this.router.navigate(['/home'], { queryParams: { q } });
+  }
+
+  clickRecent(item: string) {
+    this.query = item;
+    this.submit();
+  }
+
+  removeRecent(i: number, ev: MouseEvent) {
+    ev.stopPropagation();
+    this.search.removeRecent(i);
+  }
+
+  clearRecent(ev: MouseEvent) {
+    ev.stopPropagation();
+    this.search.clearRecent();
+  }
+
+  get recentSearches(): string[] { return this.search.recent; }
 }

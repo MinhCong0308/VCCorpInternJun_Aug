@@ -12,11 +12,27 @@
 
         <!-- CTA tùy chọn -->
         <button type="button" class="btn-toast" (click)="goLogin()">
-            Log in
+            {{ 'NAV.LOGIN' | translate }}
         </button>
 
         <!-- nút đóng (nếu muốn) -->
-        <button type="button" class="btn-toast-close" (click)="dismissAuthToast()" aria-label="Close">
+        <button type="button" class="btn-toast-close" (click)="dismissAuthToast()" [attr.aria-label]="'TOAST.CLOSE' | translate">
+            ×
+        </button>
+    </div>
+
+    <div
+    class="error-toast"
+    *ngIf="showErrorWarn"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+    >
+        <i class="ti-alert" aria-hidden="true"></i>
+        <span class="msg">{{ errorWarnText }}</span>
+
+        <!-- nút đóng (nếu muốn) -->
+        <button type="button" class="btn-toast-close" (click)="dismissAuthToast()" [attr.aria-label]="'TOAST.CLOSE' | translate">
             ×
         </button>
     </div>
@@ -42,7 +58,7 @@
                     <input
                         type="search"
                         class="form-control bg-transparent border-0"
-                        placeholder="Search"
+                        placeholder="{{ 'NAV.SEARCH' | translate }}"
                         style="box-shadow: none;"
                         [(ngModel)]="query"
                         name="q"
@@ -56,8 +72,8 @@
                 <div *ngIf="dropdownOpen && !query && recentSearches.length > 0" class="recent-searches-dropdown shadow"
                     (mousedown)="$event.preventDefault()">
                     <div class="recent-title">
-                        RECENT SEARCHES
-                        <span class="clear-all" (click)="clearRecent($event)">Clear all</span>
+                        {{ 'SEARCH.RECENT_TITLE' | translate }}
+                        <span class="clear-all" (click)="clearRecent($event)">{{ 'SEARCH.CLEAR_ALL' | translate }}</span>
                     </div>
                     <div class="recent-item" *ngFor="let item of search.recent; let i = index">
                         <i class="ti-search"></i>
@@ -68,13 +84,35 @@
             </div>
             <!-- Nếu chưa login -->
             <div *ngIf="!isLoggedIn" class="d-flex align-items-center gap-3 ms-auto">
-                <a routerLink="/auth/login"><button class="btn btn-login">Log in</button></a>
-                <a routerLink="/auth/signup"><button class="btn btn-signup">Sign up</button></a>
+                <!-- Language Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
+                        type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <ng-container *ngIf="currentLanguage as lang; else noLang">
+                            <img [src]="lang.flag_image" class="flag-icon me-1" alt="{{ lang.locale_code }}" />
+                        </ng-container>
+                        <ng-template #noLang>
+                            <span class="d-none d-lg-inline">{{ 'NAV.LANGUAGE' | translate }}</span>
+                        </ng-template>
+                        <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="langDropdown">
+                        <li *ngFor="let lang of languages">
+                            <a class="dropdown-item d-flex align-items-center gap-2" (click)="selectLanguage(lang)" style="cursor: pointer;">
+                                <img [src]="lang.flag_image" class="flag-icon" alt="{{ lang.locale_code }}" />
+                                <span class="flex-grow-1">{{ lang.languagename }}</span>
+                                <i *ngIf="currentLanguage?.languageid === lang.languageid" class="ti-check text-success" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <a routerLink="/auth/login"><button class="btn btn-login">{{ 'NAV.LOGIN' | translate }}</button></a>
+                <a routerLink="/auth/signup"><button class="btn btn-signup">{{ 'NAV.SIGNUP' | translate }}</button></a>
             </div>
             <!-- Nếu đã login -->
             <div *ngIf="isLoggedIn" class="d-flex align-items-center gap-3 ms-auto">
                 <a routerLink="/blog-owner/create" class="btn btn-write">
-                    <i class="ti-pencil-alt"></i> Write
+                    <i class="ti-pencil-alt"></i> {{ 'NAV.WRITE' | translate }}
                 </a>
                 <!-- Language Dropdown -->
                 <div class="dropdown">
@@ -84,7 +122,7 @@
                             <img [src]="lang.flag_image" class="flag-icon me-1" alt="{{ lang.locale_code }}" />
                         </ng-container>
                         <ng-template #noLang>
-                            <span class="d-none d-lg-inline">Language</span>
+                            <span class="d-none d-lg-inline">{{ 'NAV.LANGUAGE' | translate }}</span>
                         </ng-template>
                         <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
                     </button>
@@ -103,12 +141,12 @@
                 </a>
                 <div class="dropdown">
                     <a class="d-block" data-bs-toggle="dropdown" aria-expanded="false" style="cursor:pointer;">
-                        <img [src]="avatarUrl" class="rounded-circle" width="32" height="32" alt="Profile" />
+                        <img [src]="avatarUrl || appSettings.defaults.userAvatar" class="rounded-circle" width="32" height="32" alt="Profile" />
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end mt-2">
-                        <li><a class="dropdown-item" routerLink="/">Profile</a></li>
+                        <li><a class="dropdown-item" routerLink="/">{{ 'NAV.PROFILE' | translate }}</a></li>
                         <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" (click)="logout()" style="cursor: pointer">Sign out</a></li>
+                        <li><a class="dropdown-item" (click)="logout()" style="cursor: pointer">{{ 'NAV.SIGNOUT' | translate }}</a></li>
                     </ul>
                 </div>
             </div>
@@ -124,7 +162,7 @@
             <h1 class="post-title">{{ post?.title }}</h1>
             <div class="post-meta-detail mb-3" *ngIf="post">
                 <a style="cursor: pointer;">
-                    <img [src]="post.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'" alt="Author" class="author-avatar" />
+                    <img [src]="post.User?.avatar || appSettings.defaults.userAvatar" alt="Author" class="author-avatar" />
                 </a>
                 <div class="post-author">
                     <a style="cursor: pointer;">
@@ -162,7 +200,7 @@
             </div>
 
             <!-- Cover image -->
-            <img class="cover-img" [src]="coverImageUrl" alt="Cover" />
+            <img class="cover-img" [src]="coverImageUrl || appSettings.defaults.postCover" alt="Cover" />
             
             <!-- Main post content -->
             <article class="post-content" [innerHTML]="post?.content">
@@ -207,12 +245,12 @@
 
             <!-- Responses -->
             <section id="responses" class="post-responses mt-5 mb-4">
-                <h4 class="fw-bold mb-4" style="font-size: 1.35rem;">Responses ({{ comments.length }})</h4>
+                <h4 class="fw-bold mb-4" style="font-size: 1.35rem;">{{ 'RESP.TITLE' | translate }} ({{ comments.length }})</h4>
                 <!-- Nếu chưa login -->
                 <div *ngIf="!isLoggedIn" class="mb-4" (click)="goLogin()" style="cursor: pointer;"> 
                     <div class="reply-form d-flex align-items-start">
-                        <a><img src="https://randomuser.me/api/portraits/lego/1.jpg" class="rounded-circle" style="width:32px;height:32px;margin-right:12px;"></a>
-                        <textarea class="form-control" rows="3" placeholder="Login/Create an account to write a response." style="resize:none; cursor: pointer;"></textarea>
+                        <a><img [src]="appSettings.defaults.userAvatar" class="rounded-circle" style="width:32px;height:32px;margin-right:12px;"></a>
+                        <textarea class="form-control" rows="3" placeholder="{{ 'RESP.REMINDER' | translate }}" style="resize:none; cursor: pointer;"></textarea>
                     </div>
                 </div>
                 <!-- Nếu đã login -->
@@ -220,11 +258,11 @@
                 <div *ngIf="isLoggedIn" class="mb-4">
                     <div class="reply-form d-flex align-items-start">
                         <a><img [src]="avatarUrl" class="rounded-circle" style="width:32px;height:32px;margin-right:12px;"></a>
-                        <textarea [(ngModel)]="newComment" class="form-control" rows="3" placeholder="What are your thoughts?" style="resize:none;"></textarea>
+                        <textarea [(ngModel)]="newComment" class="form-control" rows="3" placeholder="{{ 'RESP.THOUGHTS' | translate }}" style="resize:none;"></textarea>
                     </div>
                     <div class="text-end mt-2">
-                        <button class="btn btn-white btn-sm rounded-pill px-4" (click)="newComment = ''">Cancel</button>
-                        <button class="btn btn-dark btn-sm rounded-pill px-4" (click)="sendNewComment()">Send</button>
+                        <button class="btn btn-white btn-sm rounded-pill px-4" (click)="newComment = ''">{{ 'RESP.CANCEL' | translate }}</button>
+                        <button class="btn btn-dark btn-sm rounded-pill px-4" (click)="sendNewComment()">{{ 'RESP.SEND' | translate }}</button>
                     </div>
                 </div>
 
@@ -233,7 +271,7 @@
                     <div *ngFor="let root of rootComments | slice:0:visibleRootCount; trackBy: trackByUiId" class="response mb-4 pb-3 border-bottom">
                         <div class="d-flex align-items-center mb-2">
                             <a routerLink="/">
-                                <img [src]="root.User.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'"
+                                <img [src]="root.User.avatar || appSettings.defaults.userAvatar"
                                     class="rounded-circle"
                                     style="width:30px;height:30px;object-fit:cover;margin-right:10px;">
                             </a>
@@ -243,22 +281,22 @@
                         <div style="font-size:14px;">{{ root.content }}</div>
                         <div class="interact d-flex align-items-center mt-1" style="font-size: 13px;">
                             <button *ngIf="isLoggedIn" class="btn btn-link px-0 me-3 text-decoration-underline btn-reply"
-                            (click)="openReplyForm(root)">Reply</button>
+                            (click)="openReplyForm(root)">{{ 'RESP.REPLY' | translate }}</button>
                             <button *ngIf="getDirectChildCount(root) > 0" class="btn btn-link btn-see-more-child px-0 py-1"
                             (click)="toggleReplies(root)">
                                 <i class="ti-comment"></i>
                                 <ng-container *ngIf="!expandedRootIds.has(root.commentid); else hideLbl">
-                                {{ getDirectChildCount(root) }} replies
+                                {{ getDirectChildCount(root) }} {{ 'RESP.NUM_REP' | translate }}
                                 </ng-container>
-                                <ng-template #hideLbl> Hide replies</ng-template>
+                                <ng-template #hideLbl> {{ 'RESP.HIDE_REP' | translate }}</ng-template>
                             </button>
                         </div>
                         <div *ngIf="replyTo === root.commentid" class="mt-2" [style.marginLeft.px]="32">
                             <textarea [(ngModel)]="replyContent" class="form-control" rows="2"
-                            placeholder="Write a reply..." style="resize:none;"></textarea>
+                            placeholder="{{ 'RESP.WRITE_REP' | translate }}" style="resize:none;"></textarea>
                             <div class="text-end mt-2">
-                                <button class="btn btn-white btn-sm rounded-pill px-3 me-2" (click)="cancelReply()">Cancel</button>
-                                <button class="btn btn-dark btn-sm rounded-pill px-3" (click)="sendReply(root)">Reply</button>
+                                <button class="btn btn-white btn-sm rounded-pill px-3 me-2" (click)="cancelReply()">{{ 'RESP.CANCEL' | translate }}</button>
+                                <button class="btn btn-dark btn-sm rounded-pill px-3" (click)="sendReply(root)">{{ 'RESP.REPLY' | translate }}</button>
                             </div>
                         </div>
                         <div class="response-child-list mt-2" *ngIf="expandedRootIds.has(root.commentid)">
@@ -273,7 +311,7 @@
                     <div class="response-child" [style.marginLeft.px]="node.depth * 10">
                         <div class="d-flex align-items-center mb-1">
                             <a routerLink="/">
-                                <img [src]="node.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'"
+                                <img [src]="node.User?.avatar || appSettings.defaults.userAvatar"
                                     class="rounded-circle"
                                     style="width:26px;height:26px;object-fit:cover;margin-right:8px;">
                             </a>
@@ -286,16 +324,16 @@
                         <div class="interact d-flex align-items-center mt-1" style="font-size:12px;">
                             <button *ngIf="isLoggedIn"
                                     class="btn btn-link px-0 me-2 text-decoration-underline btn-reply"
-                                    (click)="openReplyForm(node)">Reply</button>
+                                    (click)="openReplyForm(node)">{{ 'RESP.REPLY' | translate }}</button>
                         </div>
 
                         <!-- Form reply cho node con -->
                         <div *ngIf="replyTo === node.commentid" class="mt-2" [style.marginLeft.px]="32">
                             <textarea [(ngModel)]="replyContent" class="form-control" rows="2"
-                                        placeholder="Write a reply..." style="resize:none;"></textarea>
+                                        placeholder="{{ 'RESP.WRITE_REP' | translate }}" style="resize:none;"></textarea>
                             <div class="text-end mt-2">
-                                <button class="btn btn-white btn-sm rounded-pill px-3 me-2" (click)="cancelReply()">Cancel</button>
-                                <button class="btn btn-dark btn-sm rounded-pill px-3" (click)="sendReply(node)">Reply</button>
+                                <button class="btn btn-white btn-sm rounded-pill px-3 me-2" (click)="cancelReply()">{{ 'RESP.CANCEL' | translate }}</button>
+                                <button class="btn btn-dark btn-sm rounded-pill px-3" (click)="sendReply(node)">{{ 'RESP.REPLY' | translate }}</button>
                             </div>
                         </div>
                     </div>
@@ -308,21 +346,21 @@
                     </div>
                 </ng-template>
                 <button class="btn btn-more-res px-4" 
-                        *ngIf="rootComments.length > visibleRootCount" (click)="showMoreRoots()">See more responses</button>
+                        *ngIf="rootComments.length > visibleRootCount" (click)="showMoreRoots()">{{ 'RESP.MORE_RESP' | translate }}</button>
                 <button class="btn btn-hide-res px-4" 
-                        *ngIf="visibleRootCount > 4" (click)="hideRoots()">Hide responses</button>
+                        *ngIf="visibleRootCount > 4" (click)="hideRoots()">{{ 'RESP.HIDE_RESP' | translate }}</button>
             </section>
 
             <!-- Recommendation -->
             <section class="recommended-posts py-4 mt-5 border-top">
-                <h4 class="fw-bold mb-4" style="font-size: 1.35rem;">Recommended from MSTBlog</h4>
+                <h4 class="fw-bold mb-4" style="font-size: 1.35rem;">{{ 'REC.TITLE' | translate }} MSTBlog</h4>
                 <div class="row">
                     <div *ngFor="let post of recommendedPosts" class="rec col-md-6 mb-5" (click)="goToPost(post.postid)" style="cursor:pointer">
                         <a [routerLink]="['/post-detail', post.postid]" (click)="$event.stopPropagation()">
-                            <img [src]="post.coverImage || defaultThumb" alt="Preview" class="rec-article-cover mb-2"></a>
+                            <img [src]="post.coverImage || appSettings.defaults.postCover" alt="Preview" class="rec-article-cover mb-2"></a>
                         <div class="rec-author d-flex align-items-center mb-2">
                             <a routerLink="#" (click)="$event.stopPropagation()">
-                                <img [src]="post.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'"
+                                <img [src]="post.User?.avatar || appSettings.defaults.userAvatar"
                                 class="rounded-circle" style="width:28px;height:28px;object-fit:cover;margin-right:8px;">
                             </a>
                             <a routerLink="#" (click)="$event.stopPropagation()">
@@ -342,8 +380,8 @@
                         </div>
                     </div>
                 </div>
-                <div *ngIf="recommendedPosts.length === 0" class="text-secondary small">Loading recommendations…</div>
-                <a href="home.html"><button class="btn btn-more-rec ms-auto">See more recommendations</button></a>
+                <div *ngIf="recommendedPosts.length === 0" class="text-secondary small">{{ 'REC.LOADING' | translate }}</div>
+                <a href="home.html"><button class="btn btn-more-rec ms-auto">{{ 'REC.MORE_REC' | translate }}</button></a>
             </section>
         </div>
     </div>
@@ -353,15 +391,15 @@
 <footer class="main-footer mt-1">
     <hr class="footer-divider mb-4" />
     <div class="footer-links">
-        <a href="#">Help</a>
-        <a href="#">Status</a>
-        <a href="#">About</a>
-        <a href="#">Careers</a>
-        <a href="#">Press</a>
-        <a href="#">Blog</a>
-        <a href="#">Privacy</a>
-        <a href="#">Rules</a>
-        <a href="#">Terms</a>
-        <a href="#">Text to speech</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.HELP' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.STATUS' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.ABOUT' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.CAREERS' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.PRESS' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.BLOG' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.PRIVACY' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.RULES' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.TERMS' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.TTS' | translate }}</a>
     </div>
 </footer>

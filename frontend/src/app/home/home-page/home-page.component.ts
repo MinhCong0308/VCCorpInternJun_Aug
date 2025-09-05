@@ -7,6 +7,8 @@ import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { LanguageService, Language} from '../../core/services/language.service';
 import { SearchService } from '../../core/services/search.service';
+import { TranslateService } from '@ngx-translate/core';
+import { AppSettingsService } from '../../core/config/app-settings.service';
 
 @Component({
   selector: 'app-home-page',
@@ -62,6 +64,8 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     private languageService: LanguageService,
     private route: ActivatedRoute,
     public searchService: SearchService,
+    private translate: TranslateService,
+    public appSettings: AppSettingsService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -452,6 +456,9 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     }
 
     this.getTrendingPreviewPosts(langId);
+    this.translate.use(lang.locale_code);            // đổi ngôn ngữ UI
+    localStorage.setItem('lang', lang.locale_code);  // lưu lựa chọn
+    document.documentElement.lang = lang.locale_code; // tốt cho SEO/a11y
   }
 
   scrollToCategoryBar() {

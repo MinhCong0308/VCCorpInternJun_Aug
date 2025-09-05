@@ -1,0 +1,165 @@
+{
+    "TOAST": {
+        "CLOSE": "Đóng",
+        "PLEASE_LOGIN": "Vui lòng đăng nhập để tiếp tục",
+        "LOGIN_TO_LIKE": "Bạn cần đăng nhập để like bài viết",
+        "LOGIN_TO_COMMENT": "Bạn cần đăng nhập để bình luận bài viết",
+        "NO_TRANSLATED_POST": "Không có bản dịch cho ngôn ngữ này"
+    },
+    "NAV": {
+        "SEARCH": "Tìm kiếm",
+        "LANGUAGE": "Ngôn ngữ",
+        "LOGIN": "Đăng nhập",
+        "SIGNUP": "Đăng ký",
+        "WRITE": "Viết bài",
+        "PROFILE": "Tài khoản cá nhân",
+        "SIGNOUT": "Đăng xuất",
+        "NOTIFICATIONS": "Thông báo"
+    },
+    "SEARCH": {
+        "RECENT_TITLE": "TÌM KIẾM GẦN ĐÂY",
+        "CLEAR_ALL": "Xoá tất cả",
+        "RESULTS_FOR": "Kết quả cho"
+    },
+    "CATEGORIES": {
+        "ARIA_LABEL": "Chuyên mục",
+        "SCROLL_LEFT": "Cuộn danh mục sang trái",
+        "SCROLL_RIGHT": "Cuộn danh mục sang phải",
+        "CURRENT": "Đang xem",
+        "ALL": "Tất cả"
+    },
+    "SIDEBAR": {
+        "TOP_PICKS": "Các bài viết nổi bật",
+        "SEE_FULL_LIST": "Xem toàn bộ",
+        "WRITING_ON_BLOG": {
+        "TITLE": "Viết trên Blog",
+        "NEW_WRITER_FAQ": "Hỏi đáp cho người mới viết",
+        "EXPERT_ADVICE": "Lời khuyên từ chuyên gia",
+        "GROW_READERS": "Phát triển độc giả",
+        "START_WRITING": "Bắt đầu viết"
+        },
+        "RECOMMENDED_CATEGORIES": "Chuyên mục gợi ý",
+        "SEE_MORE": "Xem thêm chuyên mục",
+        "SEE_LESS": "Thu gọn",
+        "READING_LIST": {
+        "TITLE": "Danh sách đọc",
+        "DESCRIPTION": "Nhấn bookmark ở bất kỳ bài viết nào để thêm vào danh sách đọc hoặc danh sách tuỳ chỉnh có thể chia sẻ."
+        },
+        "FOOTER": {
+        "HELP": "Trợ giúp",
+        "STATUS": "Trạng thái",
+        "ABOUT": "Giới thiệu",
+        "CAREERS": "Tuyển dụng",
+        "PRESS": "Báo chí",
+        "BLOG": "Blog",
+        "PRIVACY": "Quyền riêng tư",
+        "RULES": "Quy định",
+        "TERMS": "Điều khoản",
+        "TTS": "Đọc văn bản"
+        },
+        "SUGGEST": {
+            "TITLE": "Các bài viết trợ giúp được đề xuất",
+            "SIGNIN_SIGNUP": "Đăng nhập hoặc đăng ký MSTBlog",
+            "PROFILE_PAGE": "Trang hồ sơ của bạn",
+            "WRITING": "Viết và xuất bản bài viết đầu tiên của bạn",
+            "ABOUT": "Giới thiệu về hệ thống phân phối của MSTBlog",
+            "GET_STARTED": "Bắt đầu với Chương trình Đối tác"
+        },
+        "EDIT": "Chỉnh sửa hồ sơ"
+    },
+    "COMMON": {
+        "BY": "bởi",
+        "SAVE": "Lưu",
+        "SAVING": "Đang lưu...",
+        "CANCEL": "Hủy"
+    },
+    "RESP": {
+        "TITLE": "Phản hồi",
+        "REMINDER": "Đăng nhập/Tạo tài khoản để viết phản hồi.",
+        "THOUGHTS": "Suy nghĩ của bạn về bài viết này?",
+        "CANCEL": "Hủy",
+        "SEND": "Gửi",
+        "REPLY": "Trả lời",
+        "NUM_REP": "trả lời",
+        "HIDE_REP": "Thu gọn các câu trả lời",
+        "WRITE_REP": "Viết câu trả lời...",
+        "MORE_RESP": "Xem thêm các câu trả lời",
+        "HIDE_RESP": "Thu gọn các câu trả lời"
+    },
+    "REC": {
+        "TITLE": "Đề xuất từ",
+        "LOADING": "Đang tải các đề xuất...",
+        "MORE_REC": "Xem thêm các đề xuất"
+    },
+    "ACCOUNT": {
+        "SETTINGS_TITLE": "Cài đặt",
+        "TAB_ACCOUNT": "Tài khoản",
+        "TAB_PUBLISHING": "Xuất bản",
+        "TAB_NOTIFICATIONS": "Thông báo",
+        "EMAIL": "Địa chỉ email",
+        "USERNAME": "Tên người dùng và tên miền con",
+        "PROFILE_PHOTO": "Ảnh đại diện",
+        "PROFILE_PHOTO_DESC": "Tải ảnh đại diện của bạn",
+        "UPLOADING": "Đang tải lên...",
+        "CHANGE_PHOTO": "Đổi ảnh",
+        "FORMAT_HINT": "JPG, PNG hoặc GIF. Tối đa 2MB.",
+        "FULLNAME": "Họ và tên",
+        "FULLNAME_DESC": "Chỉnh sửa tên hiển thị",
+        "DEACTIVATE": "Vô hiệu hoá tài khoản",
+        "DEACTIVATE_DESC": "Vô hiệu hoá sẽ tạm dừng tài khoản cho đến khi bạn đăng nhập lại.",
+        "GO_TO_LOGIN": "Đi tới Đăng nhập",
+        "LOADING": "Đang tải tài khoản của bạn..."
+    },
+    "YOUR_BLOG": {
+        "TITLE": "Blog của bạn",
+        "ABOUT": "Giới thiệu",
+        "LOADING": "Đang tải bài viết...",
+        "NO_POST": "Không tìm thấy bài viết nào.",
+        "EDIT": "Chỉnh sửa",
+        "DELETE": "Xóa",
+        "APPEAL": "Khiếu nại",
+        "POSTS": "bài viết",
+        "PER_PAGE": "Mỗi trang",
+        "BIO": "Viết một đoạn mô tả ngắn về bản thân bạn",
+        "POST_PAGINATION": "Phân trang"
+    },
+    "AUTH": {
+        "WELCOME_BACK": "Chào mừng bạn trở lại",
+        "LOGGING": "Đang đăng nhập...",
+        "LOG_IN_GG": "Đăng nhập bằng Google",
+        "OR": "hoặc",
+        "EMAIL_REQ": "Cần nhập email",
+        "EMAIL_WARN": "Vui lòng nhập email hợp lệ",
+        "PASSWORD": "Mật khẩu",
+        "FORGOT_PASSWORD": "Quên mật khẩu?",
+        "PASSWORD_REQ": "Cần nhập mật khẩu",
+        "PASSWORD_WARN": "Mật khẩu phải có ít nhất 6 ký tự",
+        "DONT_HAVE_ACCOUNT": "Bạn chưa có tài khoản?",
+        "CREATE_ACCOUNT": "Tạo tài khoản",
+        "SIGNING": "Đang đăng ký...",
+        "SIGN_IN_GG": "Đăng ký bằng Google",
+        "FIRST_NAME": "Tên",
+        "FIRST_NAME_REQ": "Bắt buộc phải nhập tên",
+        "LAST_NAME": "Họ",
+        "LAST_NAME_REQ": "Bắt buộc phải nhập họ",
+        "USERNAME": "Tên người dùng",
+        "USERNAME_REQ": "Tên người dùng bắt buộc",
+        "USERNAME_WARN": "Tên người dùng phải có ít nhất 3 ký tự",
+        "CONFIRM_PASSWORD": "Xác nhận mật khẩu",
+        "CONFIRM_PASSWORD_REQ": "Vui lòng xác nhận mật khẩu của bạn",
+        "CONFIRM_PASSWORD_ERR": "Mật khẩu không khớp",
+        "CREATING": "Đang tạo tài khoản...",
+        "ALREADY_HAVE_ACC": "Bạn đã có tài khoản?",
+        "CHECK_UR_EMAIL": "Kiểm tra email của bạn",
+        "SENT_CODE": "Chúng tôi đã gửi mã gồm 6 chữ số đến",
+        "MIKU_NUMBER_1": "Vui lòng nhập mã bên dưới.",
+        "VERIFYING": "Đang xác minh...",
+        "VERIFY_CODE": "Mã xác minh",
+        "CODE_IN_TRAFFIC_JAM": "Không nhận được mã?",
+        "SENDING": "Đang gửi lại...",
+        "RESEND_CODE": "Gửi lại mã",
+        "RESEND_COOLDOWN": "Gửi lại trong",
+        "WRONG_EMAIL": "Email sai?",
+        "GO_BACK_TO_SIGNUP": "Quay lại đăng ký"
+    }
+}

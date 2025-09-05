@@ -1,0 +1,164 @@
+{
+    "TOAST": {
+        "CLOSE": "Fermer",
+        "PLEASE_LOGIN": "Veuillez vous connecter pour continuer",
+        "LOGIN_TO_LIKE": "Vous devez vous connecter pour aimer la publication",
+        "LOGIN_TO_COMMENT": "Vous devez vous connecter pour commenter",
+        "NO_TRANSLATED_POST": "Aucune publication traduite pour cette langue"
+    },
+    "NAV": {
+        "SEARCH": "Rechercher",
+        "LANGUAGE": "Langue",
+        "LOGIN": "Se connecter",
+        "SIGNUP": "S'inscrire",
+        "WRITE": "Écrire",
+        "PROFILE": "Profil",
+        "SIGNOUT": "Se déconnecter",
+        "NOTIFICATIONS": "Notifications"
+    },
+    "SEARCH": {
+        "RECENT_TITLE": "RECHERCHES RÉCENTES",
+        "CLEAR_ALL": "Effacer tout",
+        "RESULTS_FOR": "Résultats pour"
+    },
+    "CATEGORIES": {
+        "ARIA_LABEL": "Catégories",
+        "SCROLL_LEFT": "Défiler les catégories vers la gauche",
+        "SCROLL_RIGHT": "Défiler les catégories vers la droite",
+        "CURRENT": "Actuel",
+        "ALL": "Tous"
+    },
+    "SIDEBAR": {
+        "TOP_PICKS": "Meilleurs choix",
+        "SEE_FULL_LIST": "Voir la liste complète",
+        "WRITING_ON_BLOG": {
+        "TITLE": "Écrire sur le blog",
+        "NEW_WRITER_FAQ": "FAQ pour les nouveaux auteurs",
+        "EXPERT_ADVICE": "Conseils d'écriture d'experts",
+        "GROW_READERS": "Développez votre lectorat",
+        "START_WRITING": "Commencez à écrire"
+        },
+        "RECOMMENDED_CATEGORIES": "Catégories recommandées",
+        "SEE_MORE": "Voir plus de catégories",
+        "SEE_LESS": "Voir moins",
+        "READING_LIST": {
+        "TITLE": "Liste de lecture",
+        "DESCRIPTION": "Cliquez sur le signet d'un article pour l'ajouter facilement à votre liste de lecture ou à une liste personnalisée que vous pouvez partager." },
+        "FOOTER": {
+        "HELP": "Aide",
+        "STATUS": "Statut",
+        "ABOUT": "À propos",
+        "CAREERS": "Carrières",
+        "PRESS": "Presse",
+        "BLOG": "Blog",
+        "PRIVACY": "Confidentialité",
+        "RULES": "Règles",
+        "TERMS": "Conditions",
+        "TTS": "Synthèse vocale"
+        },
+        "SUGGEST": {
+        "TITLE": "Articles d'aide suggérés",
+        "SIGNIN_SIGNUP": "Connectez-vous ou inscrivez-vous à MSTBlog",
+        "PROFILE_PAGE": "Votre page de profil",
+        "WRITING": "Rédaction et publication de votre premier article",
+        "ABOUT": "À propos du système de distribution de MSTBlog",
+        "GET_STARTED": "Démarrer avec le programme de partenariat"
+        },
+        "EDIT": "Modifier le profil"
+    },
+    "COMMON": {
+        "BY": "par",
+        "SAVE": "Enregistrer",
+        "SAVING": "Enregistrement...",
+        "CANCEL": "Annuler"
+    },
+    "RESP": {
+        "TITLE": "Réponses",
+        "REMINDER": "Connexion/Créer un compte pour écrire une réponse.",
+        "THOUGHTS": "Qu'en pensez-vous?",
+        "CANCEL": "Annuler",
+        "SEND": "Envoyer",
+        "REPLY": "Répondre",
+        "NUM_REP": "réponses",
+        "HIDE_REP": "Masquer les réponses",
+        "WRITE_REP": "Écrire une réponse...",
+        "MORE_RESP": "Voir plus de réponses",
+        "HIDE_RESP": "Masquer les réponses"
+    },
+    "REC": {
+        "TITLE": "Recommandé par",
+        "LOADING": "Chargement des recommandations...",
+        "MORE_REC": "Voir plus de recommandations"
+    },
+    "ACCOUNT": {
+        "SETTINGS_TITLE": "Paramètres",
+        "TAB_ACCOUNT": "Compte",
+        "TAB_PUBLISHING": "Publication",
+        "TAB_NOTIFICATIONS": "Notifications",
+        "EMAIL": "Adresse e-mail",
+        "USERNAME": "Nom d'utilisateur et sous-domaine",
+        "PROFILE_PHOTO": "Photo de profil",
+        "PROFILE_PHOTO_DESC": "Télécharger votre photo de profil",
+        "UPLOADING": "Téléchargement...",
+        "CHANGE_PHOTO": "Changer de photo",
+        "FORMAT_HINT": "JPG, PNG ou GIF. Max. 2 Mo.",
+        "FULLNAME": "Nom complet",
+        "FULLNAME_DESC": "Modifier votre nom d'affichage",
+        "DEACTIVATE": "Désactiver le compte",
+        "DEACTIVATE_DESC": "La désactivation suspendra votre compte jusqu'à votre reconnexion.",
+        "GO_TO_LOGIN": "Accéder à la connexion",
+        "LOADING": "Chargement en cours votre profil..."
+    },
+    "YOUR_BLOG": {
+        "TITLE": "Vos blogs",
+        "ABOUT": "À propos",
+        "LOADING": "Chargement des articles...",
+        "NO_POST": "Aucun article trouvé.",
+        "EDIT": "Modifier",
+        "DELETE": "Supprimer",
+        "APPEAL": "Appel",
+        "POSTS": "articles",
+        "PER_PAGE": "Par page",
+        "BIO": "Rédigez une courte description de vous-même",
+        "POST_PAGINATION": "Pagination des articles"
+    },
+    "AUTH": {
+        "WELCOME_BACK": "Bienvenue",
+        "LOGGING": "Connexion...",
+        "LOG_IN_GG": "Se connecter avec Google",
+        "OR": "ou",
+        "EMAIL_REQ": "L'adresse e-mail est obligatoire",
+        "EMAIL_WARN": "Veuillez saisir une adresse e-mail valide",
+        "PASSWORD": "Mot de passe",
+        "FORGOT_PASSWORD": "Mot de passe oublié?",
+        "PASSWORD_REQ": "Mot de passe requis",
+        "PASSWORD_WARN": "Le mot de passe doit comporter au moins 6 caractères",
+        "DONT_HAVE_ACCOUNT": "Vous n'avez pas de compte?",
+        "CREATE_ACCOUNT": "Créer votre compte",
+        "SIGNING": "Inscription...",
+        "SIGN_IN_GG": "Inscription avec Google",
+        "FIRST_NAME": "Prénom",
+        "FIRST_NAME_REQ": "Le prénom est requis",
+        "LAST_NAME": "Nom de famille",
+        "LAST_NAME_REQ": "Le nom de famille est obligatoire",
+        "USERNAME": "Nom d'utilisateur",
+        "USERNAME_REQ": "Le nom d'utilisateur est obligatoire",
+        "USERNAME_WARN": "Le nom d'utilisateur doit comporter au moins 3 caractères",
+        "CONFIRM_PASSWORD": "Confirmer le mot de passe",
+        "CONFIRM_PASSWORD_REQ": "Veuillez confirmer votre mot de passe",
+        "CONFIRM_PASSWORD_ERR": "Les mots de passe ne correspondent pas",
+        "CREATING": "Création du compte...",
+        "ALREADY_HAVE_ACC": "Vous avez déjà un compte?",
+        "CHECK_UR_EMAIL": "Vérifiez votre adresse e-mail",
+        "SENT_CODE": "Nous avons envoyé un code à 6 chiffres à",
+        "MIKU_NUMBER_1": "Veuillez le saisir ci-dessous.",
+        "VERIFYING": "Vérification...",
+        "VERIFY_CODE": "Vérifier le code",
+        "CODE_IN_TRAFFIC_JAM": "Vous n'avez pas reçu le code?",
+        "SENDING": "Envoi en cours…",
+        "RESEND_CODE": "Renvoyer le code",
+        "RESEND_COOLDOWN": "Renvoyer disponible dans",
+        "WRONG_EMAIL": "Mauvaise adresse e-mail?",
+        "GO_BACK_TO_SIGNUP": "Revenir à l'inscription"
+    }
+}

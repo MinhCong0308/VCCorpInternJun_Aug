@@ -18,7 +18,7 @@
                     <input
                         type="text"
                         class="form-control bg-transparent border-0"
-                        placeholder="Search"
+                        placeholder="{{ 'NAV.SEARCH' | translate }}"
                         style="box-shadow: none;"
                         [(ngModel)]="searchQuery"
                         name="search"
@@ -31,8 +31,14 @@
                 <div *ngIf="showRecentSearches && !searchQuery && recentSearches.length > 0" class="recent-searches-dropdown shadow"
                     (mousedown)="$event.preventDefault()">
                     <div class="recent-title">
-                        RECENT SEARCHES
-                        <span class="clear-all" (click)="clearAllRecentSearches()">Clear all</span>
+                        {{ 'SEARCH.RECENT_TITLE' | translate }}
+                        <button
+                            type="button"
+                            class="btn-clear-all"
+                            (click)="clearAllRecentSearches()"
+                            [attr.aria-label]="'SEARCH.CLEAR_ALL' | translate"
+                            [title]="'SEARCH.CLEAR_ALL' | translate"
+                        >{{ 'SEARCH.CLEAR_ALL' | translate }}</button>
                     </div>
                     <div class="recent-item" *ngFor="let term of recentSearches">
                         <i class="ti-search"></i>
@@ -51,7 +57,7 @@
                             <img [src]="lang.flag_image" class="flag-icon me-1" alt="{{ lang.locale_code }}" />
                         </ng-container>
                         <ng-template #noLang>
-                            <span class="d-none d-lg-inline">Language</span>
+                            <span class="d-none d-lg-inline">{{ 'NAV.LANGUAGE' | translate }}</span>
                         </ng-template>
                         <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
                     </button>
@@ -65,13 +71,13 @@
                         </li>
                     </ul>
                 </div>
-                <a routerLink="/auth/login"><button class="btn btn-login">Log in</button></a>
-                <a routerLink="/auth/signup"><button class="btn btn-signup">Sign up</button></a>
+                <a routerLink="/auth/login"><button class="btn btn-login">{{ 'NAV.LOGIN' | translate }}</button></a>
+                <a routerLink="/auth/signup"><button class="btn btn-signup">{{ 'NAV.SIGNUP' | translate }}</button></a>
             </div>
             <!-- Nếu đã login -->
             <div *ngIf="isLoggedIn" class="d-flex align-items-center gap-3 ms-auto">
                 <a routerLink="/blog-owner/create" class="btn btn-write">
-                    <i class="ti-pencil-alt"></i> Write
+                    <i class="ti-pencil-alt"></i> {{ 'NAV.WRITE' | translate }}
                 </a>
                 <!-- Language Dropdown -->
                 <div class="dropdown">
@@ -81,7 +87,7 @@
                             <img [src]="lang.flag_image" class="flag-icon me-1" alt="{{ lang.locale_code }}" />
                         </ng-container>
                         <ng-template #noLang>
-                            <span class="d-none d-lg-inline">Language</span>
+                            <span class="d-none d-lg-inline">{{ 'NAV.LANGUAGE' | translate }}</span>
                         </ng-template>
                         <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
                     </button>
@@ -103,9 +109,9 @@
                         <img [src]="avatarUrl" class="rounded-circle" width="32" height="32" alt="Profile" />
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end mt-2">
-                        <li><a class="dropdown-item" routerLink="/useraccount/profile">Profile</a></li>
+                        <li><a class="dropdown-item" routerLink="/useraccount/profile">{{ 'NAV.PROFILE' | translate }}</a></li>
                         <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" (click)="logout()" style="cursor: pointer">Sign out</a></li>
+                        <li><a class="dropdown-item" (click)="logout()" style="cursor: pointer">{{ 'NAV.SIGNOUT' | translate }}</a></li>
                     </ul>
                 </div>
             </div>
@@ -122,7 +128,7 @@
             <div class="center">
                 <!-- Search Result Display -->
                 <div *ngIf="searchTermDisplay" class="search-result-title">
-                    <span class="search-prefix">Results for </span>
+                    <span class="search-prefix">{{ 'SEARCH.RESULTS_FOR' | translate }} </span>
                     <span class="search-term">{{ searchTermDisplay }}</span>
                 </div>
 
@@ -133,7 +139,7 @@
                         type="button"
                         class="cat-scroll-btn left"
                         (click)="scrollBy(-1)"
-                        aria-label="Scroll categories left">
+                        [attr.aria-label]="'CATEGORIES.SCROLL_LEFT' | translate">
                         <i class="ti-angle-left" aria-hidden="true"></i>
                         </button>
 
@@ -148,7 +154,7 @@
                         <div class="nav-category-scroll flex-grow-1" #navCategoryScroll
                         (scroll)="onTabScroll()"
                         (wheel)="onWheel($event)">
-                            <nav id="nav-category-list" role="tablist" aria-label="Categories">
+                            <nav id="nav-category-list" role="tablist" [attr.aria-label]="'CATEGORIES.ARIA_LABEL' | translate">
                                 <a *ngFor="let cat of categories" #catLink
                                     class="nav-link"
                                     role="tab"
@@ -165,7 +171,7 @@
                         type="button"
                         class="cat-scroll-btn right"
                         (click)="scrollBy(1)"
-                        aria-label="Scroll categories right">
+                        [attr.aria-label]="'CATEGORIES.SCROLL_RIGHT' | translate">
                         <i class="ti-angle-right" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -177,7 +183,7 @@
                 <div class="post-item" *ngFor="let post of posts" (click)="goToPost(post.postid)" style="cursor:pointer">
                     <div class="post-info">
                         <div class="d-flex align-items-center mb-1">
-                            <a routerLink="#" (click)="$event.stopPropagation()"><img [src]="post.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'" class="author-avatar" alt="Author"></a>
+                            <a routerLink="#" (click)="$event.stopPropagation()"><img [src]="post.User?.avatar || appSettings.defaults.userAvatar" class="author-avatar" alt="Author"></a>
                             <span class="author-name">
                                 <a routerLink="#" (click)="$event.stopPropagation()">{{ post.User?.firstname }} {{ post.User?.lastname }}</a>
                             </span>
@@ -193,7 +199,7 @@
                         </div>
                     </div>
                     <a [routerLink]="['/post-detail', post.postid]" (click)="$event.stopPropagation()">
-                        <img [src]="post.coverImage || 'https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg'" class="post-img-thumb" alt="Preview">
+                        <img [src]="post.coverImage || appSettings.defaults.postCover" class="post-img-thumb" alt="Preview">
                     </a>
                 </div>
 
@@ -280,7 +286,7 @@
             </div>
         </main>
         <!-- Sidebar -->
-        <aside class="col-lg-3 col-md-3 d-none d-md-block border-start bg-white pt-4 pb-4" #sidebarContainer>
+        <div class="col-lg-3 col-md-3 d-none d-md-block border-start bg-white pt-4 pb-4" #sidebarContainer>
             <!-- KHUNG TĨNH của sidebar: dùng để đo top/bottom -->
             <div class="sidebar-outer ps-4" #sidebarOuter>
                 <!-- Sentinel trên: đánh dấu “đầu” container -->
@@ -289,12 +295,12 @@
                 <!-- PHẦN NỘI DUNG CÓ THỂ STICKY -->
                 <div class="sidebar-inner" #sidebarInner>
                     <div class="sidebar-section">
-                        <h6>Top Picks</h6>
+                        <h6>{{ 'SIDEBAR.TOP_PICKS' | translate }}</h6>
 
                         <div *ngFor="let post of trendingPreviewPosts" class="mb-3" (click)="goToPost(post.postid)" style="cursor: pointer;">
                             <div class="d-flex align-items-center mb-1">
                                 <img
-                                    [src]="post.User?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'"
+                                    [src]="post.User?.avatar || appSettings.defaults.userAvatar"
                                     class="author-avatar"
                                     alt="Author"
                                 />
@@ -313,43 +319,43 @@
                         </div>
 
                         <div class="mb-3 full-list">
-                            <a (click)="selectCategory('trending')">See the full list</a>
+                            <a (click)="selectCategory('trending')">{{ 'SIDEBAR.SEE_FULL_LIST' | translate }}</a>
                         </div>
                     </div>
                     <div class="sidebar-section bg-light p-3 rounded">
-                        <h6>Writing on Blog</h6>
+                        <h6>{{ 'SIDEBAR.WRITING_ON_BLOG.TITLE' | translate }}</h6>
                         <ul class="list-unstyled mb-2 ps-1">
-                            <li>New writer FAQ</li>
-                            <li>Expert writing advice</li>
-                            <li>Grow your readership</li>
+                            <li>{{ 'SIDEBAR.WRITING_ON_BLOG.NEW_WRITER_FAQ' | translate }}</li>
+                            <li>{{ 'SIDEBAR.WRITING_ON_BLOG.EXPERT_ADVICE' | translate }}</li>
+                            <li>{{ 'SIDEBAR.WRITING_ON_BLOG.GROW_READERS' | translate }}</li>
                         </ul>
-                        <a routerLink="/blog-owner/create"><button class="btn btn-dark btn-sm rounded-pill">Start writing</button></a>
+                        <a routerLink="/blog-owner/create"><button class="btn btn-dark btn-sm rounded-pill">{{ 'SIDEBAR.WRITING_ON_BLOG.START_WRITING' | translate }}</button></a>
                     </div>
                     <div class="sidebar-section">
-                        <h6>Recommended categories</h6>
+                        <h6>{{ 'SIDEBAR.RECOMMENDED_CATEGORIES' | translate }}</h6>
                         <a *ngFor="let cat of showAllRecommended ? allCategories : recommendedCategories" (click)="selectCategory(cat.categoryid)" style="cursor: pointer;">
                             <span class="category-tag">{{ cat.categoryname }}</span>
                         </a>
                         <div class="mb-3 full-list">
-                            <a (click)="toggleRecommended()">{{ showAllRecommended ? 'See less' : 'See more categories' }}</a>
+                            <a (click)="toggleRecommended()">{{ (showAllRecommended ? 'SIDEBAR.SEE_LESS' : 'SIDEBAR.SEE_MORE') | translate }}</a>
                         </div>
                     </div>
                     <div class="sidebar-section">
-                        <h6>Reading list</h6>
-                        <p style="font-size:15px;">Click the <i class="ti-bookmark"></i> on any story to easily add it to your reading list or a custom list that you can share.</p>
+                        <h6>{{ 'SIDEBAR.READING_LIST.TITLE' | translate }}</h6>
+                        <p style="font-size:15px;">{{ 'SIDEBAR.READING_LIST.DESCRIPTION' | translate }}</p>
                     </div>
                     <div class="sidebar-footer">
                         <div class="sidebar-footer-links">
-                            <a routerLink="#">Help</a>
-                            <a routerLink="#">Status</a>
-                            <a routerLink="#">About</a>
-                            <a routerLink="#">Careers</a>
-                            <a routerLink="#">Press</a>
-                            <a routerLink="#">Blog</a>
-                            <a routerLink="#">Privacy</a>
-                            <a routerLink="#">Rules</a>
-                            <a routerLink="#">Terms</a>
-                            <a routerLink="#">Text to speech</a>
+                            <a routerLink="#">{{ 'SIDEBAR.FOOTER.HELP' | translate }}</a>
+                            <a routerLink="#">{{ 'SIDEBAR.FOOTER.STATUS' | translate }}</a>
+                            <a routerLink="#">{{ 'SIDEBAR.FOOTER.ABOUT' | translate }}</a>
+                            <a routerLink="#">{{ 'SIDEBAR.FOOTER.CAREERS' | translate }}</a>
+                            <a routerLink="#">{{ 'SIDEBAR.FOOTER.PRESS' | translate }}</a>
+                            <a routerLink="#">{{ 'SIDEBAR.FOOTER.BLOG' | translate }}</a>
+                            <a routerLink="#">{{ 'SIDEBAR.FOOTER.PRIVACY' | translate }}</a>
+                            <a routerLink="#">{{ 'SIDEBAR.FOOTER.RULES' | translate }}</a>
+                            <a routerLink="#">{{ 'SIDEBAR.FOOTER.TERMS' | translate }}</a>
+                            <a routerLink="#">{{ 'SIDEBAR.FOOTER.TTS' | translate }}</a>
                         </div>
                     </div>
                 </div>
@@ -357,6 +363,6 @@
                 <!-- Sentinel dưới: đánh dấu “cuối” container -->
                 <div class="sb-sentinel sb-sentinel-bottom" aria-hidden="true"></div>
             </div>
-        </aside>
+        </div>
     </div>
 </div>

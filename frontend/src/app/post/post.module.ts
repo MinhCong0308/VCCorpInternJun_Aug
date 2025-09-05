@@ -4,6 +4,7 @@ import { PostDetailComponent } from './post-detail/post-detail.component';
 import { PostRoutingModule } from './post-routing.module';
 import { FormsModule } from '@angular/forms';
 import { ExcerptPipe } from '../home/home-page/excerpt.pipe';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [PostDetailComponent],
@@ -12,6 +13,7 @@ import { ExcerptPipe } from '../home/home-page/excerpt.pipe';
     PostRoutingModule,
     FormsModule,
     ExcerptPipe,
+    TranslateModule,
   ]
 })
 export class PostModule { }

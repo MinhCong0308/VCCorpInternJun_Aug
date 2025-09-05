@@ -3,7 +3,7 @@ const { Sequelize, Op } = require('sequelize');
 const { extractCoverImage } = require('utils/postUtils');
 
 const postsService = {
-    getPublishedPosts: async (categoryId, userId, languageId, limit = 5, page = 1, search = '') => {
+    getPublishedPosts: async (categoryId, userId, languageId, original_postId, limit = 5, page = 1, search = '') => {
         const offset = (page - 1) * limit;
 
         const options = {
@@ -36,6 +36,9 @@ const postsService = {
         if (categoryId) {
             categoryInclude.where = { categoryid: categoryId };
             categoryInclude.required = true;
+        };
+        if (original_postId) {
+            options.where = { ...options.where, original_postId };
         }
 
         const { count, rows } = await db.Post.findAndCountAll({

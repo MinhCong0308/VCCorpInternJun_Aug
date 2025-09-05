@@ -6,8 +6,33 @@
         <img src="assets/img/logo.png" class="logo-img" alt="logo-image" style="align-items: center;">
         MSTBlog
       </a>
-      <div class="ms-auto">
-        <a routerLink="/auth/signup" class="btn btn-primary">Sign up</a>
+      <div class="d-flex align-items-center gap-3 ms-auto">
+        <div class="dropdown">
+          <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
+              type="button" id="langDropdown" data-bs-toggle="dropdown"
+              [attr.aria-haspopup]="'true'"
+              [attr.aria-expanded]="null"
+              [attr.aria-label]="'NAV.LANGUAGE' | translate"
+              [title]="currentLanguage?.languagename || ('NAV.LANGUAGE' | translate)">
+              <ng-container *ngIf="currentLanguage as lang; else noLang">
+                  <img [src]="lang.flag_image" class="flag-icon me-1" alt="{{ lang.locale_code }}" />
+              </ng-container>
+              <ng-template #noLang>
+                  <span class="d-none d-lg-inline">{{ 'NAV.LANGUAGE' | translate }}</span>
+              </ng-template>
+              <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="langDropdown">
+              <li *ngFor="let lang of languages">
+                  <a class="dropdown-item d-flex align-items-center gap-2" (click)="selectLanguage(lang)" style="cursor: pointer;">
+                      <img [src]="lang.flag_image" class="flag-icon" alt="{{ lang.locale_code }}" />
+                      <span class="flex-grow-1">{{ lang.languagename }}</span>
+                      <i *ngIf="currentLanguage?.languageid === lang.languageid" class="ti-check text-success" aria-hidden="true"></i>
+                  </a>
+              </li>
+          </ul>
+        </div>
+        <a routerLink="/auth/signup" class="btn btn-primary">{{ 'NAV.SIGNUP' | translate }}</a>
       </div>
     </div>
   </nav>
@@ -16,7 +41,7 @@
   <main class="container my-5 flex-grow-1">
     <div class="row justify-content-center">
       <div class="col-md-6 col-lg-5">
-        <h2 class="mb-4 text-center">Welcome back</h2>
+        <h2 class="mb-4 text-center">{{ 'AUTH.WELCOME_BACK' | translate }}</h2>
         
         <!-- Google Login Button -->
         <button 
@@ -28,16 +53,16 @@
             src="https://www.svgrepo.com/show/475656/google-color.svg" 
             alt="Google icon" 
             class="google-icon" />
-          {{isLoading ? 'Logging in...' : 'Log in with Google'}}
+          {{ (isLoading ? 'AUTH.LOGGING' : 'AUTH.LOG_IN_GG') | translate }}
         </button>
         
-        <div class="text-center mb-3 text-muted">or</div>
+        <div class="text-center mb-3 text-muted">{{ 'AUTH.OR' | translate }}</div>
         
         <!-- Login Form -->
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
           <!-- Email Field -->
           <div class="mb-3">
-            <label for="email" class="form-label">Email address</label>
+            <label for="email" class="form-label">{{ 'ACCOUNT.EMAIL' | translate }}</label>
             <input 
               type="email" 
               class="form-control"
@@ -46,16 +71,16 @@
               formControlName="email"
               placeholder="name@example.com" />
             <div *ngIf="isFieldInvalid('email')" class="invalid-feedback">
-              <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</span>
-              <span *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+              <span *ngIf="loginForm.get('email')?.errors?.['required']">{{ 'AUTH.EMAIL_REQ' | translate }}</span>
+              <span *ngIf="loginForm.get('email')?.errors?.['email']">{{ 'AUTH.EMAIL_WARN' | translate }}</span>
             </div>
           </div>
           
           <!-- Password Field -->
           <div class="mb-3">
             <label for="password" class="form-label d-flex justify-content-between">
-              Password
-              <a href="#" class="small text-decoration-none">Forgot password?</a>
+              {{ 'AUTH.PASSWORD' | translate }}
+              <a href="#" class="small text-decoration-none">{{ 'AUTH.FORGOT_PASSWORD' | translate }}</a>
             </label>
             <input 
               type="password" 
@@ -65,8 +90,8 @@
               formControlName="password"
               placeholder="••••••••" />
             <div *ngIf="isFieldInvalid('password')" class="invalid-feedback">
-              <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</span>
-              <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</span>
+              <span *ngIf="loginForm.get('password')?.errors?.['required']">{{ 'AUTH.PASSWORD_REQ' | translate }}</span>
+              <span *ngIf="loginForm.get('password')?.errors?.['minlength']">{{ 'AUTH.PASSWORD_WARN' | translate }}</span>
             </div>
           </div>
           
@@ -86,12 +111,12 @@
               type="submit" 
               class="btn btn-dark"
               [disabled]="loginForm.invalid || isLoading">
-              {{isLoading ? 'Logging in...' : 'Log in'}}
+              {{ (isLoading ? 'AUTH.LOGGING' : 'NAV.LOGIN') | translate }}
             </button>
           </div>
           
           <p class="text-center mt-3">
-            Don't have an account? <a routerLink="/auth/signup">Sign up</a>
+            {{ 'AUTH.DONT_HAVE_ACCOUNT' | translate }} <a routerLink="/auth/signup">{{ 'NAV.SIGNUP' | translate }}</a>
           </p>
         </form>
       </div>
@@ -102,16 +127,16 @@
   <footer class="main-footer mt-1">
     <hr class="footer-divider mb-4" />
     <div class="footer-links">
-      <a href="#">Help</a>
-      <a href="#">Status</a>
-      <a href="#">About</a>
-      <a href="#">Careers</a>
-      <a href="#">Press</a>
-      <a href="#">Blog</a>
-      <a href="#">Privacy</a>
-      <a href="#">Rules</a>
-      <a href="#">Terms</a>
-      <a href="#">Text to speech</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.HELP' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.STATUS' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.ABOUT' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.CAREERS' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.PRESS' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.BLOG' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.PRIVACY' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.RULES' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.TERMS' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.TTS' | translate }}</a>
     </div>
   </footer>
 </div>

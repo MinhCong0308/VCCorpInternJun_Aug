@@ -7,6 +7,8 @@ import { ProfileService, UserProfile} from '../../core/services/profile.service'
 import { PostService } from '../../core/services/post.service';
 import { LanguageService, Language } from '../../core/services/language.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { TranslateService } from '@ngx-translate/core';
+import { SearchService } from '../../core/services/search.service';
 @Component({
   selector: 'app-blog-manage',
   templateUrl: './blog-manage.component.html',
@@ -26,19 +28,30 @@ export class BlogManageComponent implements OnInit {
   limit = 10;
   total = 0;
   Math = Math;
+  loadingLang = false;
+  isBrowser: boolean;
+  initialLang = 'en';
+  query = '';
+  dropdownOpen = false;
 
   get totalPages(): number {
     return Math.max(1, Math.ceil(this.total / this.limit));
   }
 
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService, private postOnlyService: PostService, private languageService: LanguageService, private notificationService: NotificationService) {
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService, private postOnlyService: PostService, private languageService: LanguageService, private notificationService: NotificationService, private translate: TranslateService, public search: SearchService) {
     this.posts = []; // Ensure posts is always initialized as an empty array
+    this.isBrowser = isPlatformBrowser(this.platformId);
   }
   async ngOnInit(): Promise<void> {
     if(!isPlatformBrowser(this.platformId)) {
       this.isInitializing = false;
       return;
     }
+    const saved = this.isBrowser ? (localStorage.getItem('lang') || '') : '';
+    const code = saved || this.translate.getCurrentLang?.() || 'en';
+    this.initialLang = code;
+    this.translate.use(code);
+    if (this.isBrowser) document.documentElement.lang = code;
     this.isInitializing = true;
     this.profileService.getUserProfile().subscribe({
       next: (profile) => {
@@ -92,12 +105,25 @@ export class BlogManageComponent implements OnInit {
   }
   loadLanguages(): void {
     this.isLoading = true;
+    if (!this.isBrowser) return;
+    try {
+      const cached = localStorage.getItem('languages');
+      if (cached) {
+        this.languages = JSON.parse(cached) as Language[];
+        this.normalizeLanguages();
+        const code = this.translate.getCurrentLang?.() || this.initialLang;
+        this.syncCurrentLanguageByCode(code);
+      }
+    } catch {}
     this.languageService.getLanguages().subscribe({
       next: (response) => {
-        // console.log('Languages loaded:', response);
-        this.languages = response.data.languages || [];
-        this.defaultLanguage = this.languages?.find(lang => lang.is_default) || null;
-        this.currentLanguage = this.defaultLanguage;
+        const list: Language[] = (response?.data?.languages || response?.languages || response || []) as Language[];
+        this.languages = list;
+        this.normalizeLanguages();
+        if (this.isBrowser) {
+          try { localStorage.setItem('languages', JSON.stringify(this.languages)); } catch {}
+        }
+        this.syncCurrentLanguageByCode(this.translate.getCurrentLang?.());
       },
       error: (error) => {
         // console.error('Error loading languages:', error);
@@ -105,6 +131,21 @@ export class BlogManageComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+  normalizeLanguages(): void {
+    this.languages = this.languages
+      .filter(l => l.status === 1 || l.status === undefined)
+      .map(l => ({
+        ...l,
+        locale_code: (l.locale_code || '').trim() || (l.languagename === 'Vietnamese' ? 'vi' : 'en')
+      }));
+  }
+  syncCurrentLanguageByCode(code?: string): void {
+    const cc = (code || 'en').toLowerCase();
+    this.currentLanguage =
+      this.languages.find(l => (l.locale_code || '').toLowerCase() === cc)
+      || this.languages.find(l => !!l.is_default)
+      || this.languages[0];
   }
   formatDate(dateString: string): string {
     const date = new Date(dateString);
@@ -226,8 +267,30 @@ export class BlogManageComponent implements OnInit {
   navigateToLogin(): void {
     this.router.navigate(['/auth/login']);
   }
-  selectLanguage(language: Language): void {
-    this.currentLanguage = language;
+  selectLanguage(lang: Language): void {
+    if (!lang || this.loadingLang) return;
+    // nếu chọn lại chính ngôn ngữ đang dùng → thôi
+    if (this.currentLanguage?.languageid === lang.languageid) {
+      this.applyUiLanguage(lang); // vẫn gọi để đồng bộ document.lang/localStorage
+      return;
+    }
+
+    this.loadingLang = true;
+    this.applyUiLanguage(lang);
+    this.currentLanguage = lang;
+    this.loadingLang = false;
+  }
+  applyUiLanguage(lang: Language): void {
+    if (!lang?.locale_code) return;
+    const id = lang?.languageid;
+    this.translate.use(lang.locale_code);
+    if (this.isBrowser) {
+      try { 
+        localStorage.setItem('lang', lang.locale_code);
+        localStorage.setItem('languageId', String(id));
+      } catch {}
+      document.documentElement.lang = lang.locale_code;
+    }
   }
 
   goToPage(p: number, ev?: Event) {
@@ -247,4 +310,34 @@ export class BlogManageComponent implements OnInit {
     event.preventDefault();
     this.notificationService.error('Post Status', `Only approved post can be seen`);
   }
+
+  onSearchFocus() { this.dropdownOpen = true; }
+  onSearchBlur()  { setTimeout(() => this.dropdownOpen = false, 120); }
+
+  submit() {
+    const q = (this.query || '').trim();
+    if (!q) return;
+    this.search.addRecent(q);
+    this.search.setQuery(q);
+    this.dropdownOpen = false;
+    // điều hướng về /home?q=...
+    this.router.navigate(['/home'], { queryParams: { q } });
+  }
+
+  clickRecent(item: string) {
+    this.query = item;
+    this.submit();
+  }
+
+  removeRecent(i: number, ev: MouseEvent) {
+    ev.stopPropagation();
+    this.search.removeRecent(i);
+  }
+
+  clearRecent(ev: MouseEvent) {
+    ev.stopPropagation();
+    this.search.clearRecent();
+  }
+
+  get recentSearches(): string[] { return this.search.recent; }
 }

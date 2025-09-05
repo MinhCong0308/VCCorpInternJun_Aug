@@ -1,0 +1,165 @@
+{
+    "TOAST": {
+        "CLOSE": "Close",
+        "PLEASE_LOGIN": "Please log in to continue",
+        "LOGIN_TO_LIKE": "You need to log in to like the post",
+        "LOGIN_TO_COMMENT": "You need to log in to comment",
+        "NO_TRANSLATED_POST": "No translated post for this language"
+    },
+    "NAV": {
+        "SEARCH": "Search",
+        "LANGUAGE": "Language",
+        "LOGIN": "Log in",
+        "SIGNUP": "Sign up",
+        "WRITE": "Write",
+        "PROFILE": "Profile",
+        "SIGNOUT": "Sign out",
+        "NOTIFICATIONS": "Notifications"
+    },
+    "SEARCH": {
+        "RECENT_TITLE": "RECENT SEARCHES",
+        "CLEAR_ALL": "Clear all",
+        "RESULTS_FOR": "Results for"
+    },
+    "CATEGORIES": {
+        "ARIA_LABEL": "Categories",
+        "SCROLL_LEFT": "Scroll categories left",
+        "SCROLL_RIGHT": "Scroll categories right",
+        "CURRENT": "Current",
+        "ALL": "All"
+    },
+    "SIDEBAR": {
+        "TOP_PICKS": "Top Picks",
+        "SEE_FULL_LIST": "See the full list",
+        "WRITING_ON_BLOG": {
+        "TITLE": "Writing on Blog",
+        "NEW_WRITER_FAQ": "New writer FAQ",
+        "EXPERT_ADVICE": "Expert writing advice",
+        "GROW_READERS": "Grow your readership",
+        "START_WRITING": "Start writing"
+        },
+        "RECOMMENDED_CATEGORIES": "Recommended categories",
+        "SEE_MORE": "See more categories",
+        "SEE_LESS": "See less",
+        "READING_LIST": {
+        "TITLE": "Reading list",
+        "DESCRIPTION": "Click the bookmark on any story to easily add it to your reading list or a custom list that you can share."
+        },
+        "FOOTER": {
+        "HELP": "Help",
+        "STATUS": "Status",
+        "ABOUT": "About",
+        "CAREERS": "Careers",
+        "PRESS": "Press",
+        "BLOG": "Blog",
+        "PRIVACY": "Privacy",
+        "RULES": "Rules",
+        "TERMS": "Terms",
+        "TTS": "Text to speech"
+        },
+        "SUGGEST": {
+            "TITLE": "Suggested help articles",
+            "SIGNIN_SIGNUP": "Sign in or sign up to MSTBlog",
+            "PROFILE_PAGE": "Your profile page",
+            "WRITING": "Writing and publishing your first story",
+            "ABOUT": "About MSTBlog's distribution system",
+            "GET_STARTED": "Get started with the Partner Program"
+        },
+        "EDIT": "Edit profile"
+    },
+    "COMMON": {
+        "BY": "by",
+        "SAVE": "Save",
+        "SAVING": "Saving...",
+        "CANCEL": "Cancel"
+    },
+    "RESP": {
+        "TITLE": "Responses",
+        "REMINDER": "Login/Create an account to write a response.",
+        "THOUGHTS": "What are your thoughts?",
+        "CANCEL": "Cancel",
+        "SEND": "Send",
+        "REPLY": "Reply",
+        "NUM_REP": "replies",
+        "HIDE_REP": "Hide replies",
+        "WRITE_REP": "Write a reply...",
+        "MORE_RESP": "See more responses",
+        "HIDE_RESP": "Hide responses"
+    },
+    "REC": {
+        "TITLE": "Recommended from",
+        "LOADING": "Loading recommendations...",
+        "MORE_REC": "See more recommendations"
+    },
+    "ACCOUNT": {
+        "SETTINGS_TITLE": "Settings",
+        "TAB_ACCOUNT": "Account",
+        "TAB_PUBLISHING": "Publishing",
+        "TAB_NOTIFICATIONS": "Notifications",
+        "EMAIL": "Email address",
+        "USERNAME": "Username and subdomain",
+        "PROFILE_PHOTO": "Profile photo",
+        "PROFILE_PHOTO_DESC": "Upload your profile picture",
+        "UPLOADING": "Uploading...",
+        "CHANGE_PHOTO": "Change Photo",
+        "FORMAT_HINT": "JPG, PNG or GIF. Max 2MB.",
+        "FULLNAME": "Full name",
+        "FULLNAME_DESC": "Edit your display name",
+        "DEACTIVATE": "Deactivate account",
+        "DEACTIVATE_DESC": "Deactivating will suspend your account until you sign back in.",
+        "GO_TO_LOGIN": "Go to Login",
+        "LOADING": "Loading your profile..."
+    },
+    "YOUR_BLOG": {
+        "TITLE": "Your Blogs",
+        "ABOUT": "About",
+        "LOADING": "Loading posts...",
+        "NO_POST": "No post found.",
+        "EDIT": "Edit",
+        "DELETE": "Delete",
+        "APPEAL": "Appeal",
+        "POSTS": "posts",
+        "PER_PAGE": "Per page",
+        "BIO": "Write a short description about yourself",
+        "POST_PAGINATION": "Post pagination"
+    },
+    "AUTH": {
+        "WELCOME_BACK": "Welcome back",
+        "LOGGING": "Logging in...",
+        "LOG_IN_GG": "Log in with Google",
+        "OR": "or",
+        "EMAIL_REQ": "Email is required",
+        "EMAIL_WARN": "Please enter a valid email",
+        "PASSWORD": "Password",
+        "FORGOT_PASSWORD": "Forgot password?",
+        "PASSWORD_REQ": "Password is required",
+        "PASSWORD_WARN": "Password must be at least 6 characters",
+        "DONT_HAVE_ACCOUNT": "Don't have an account?",
+        "CREATE_ACCOUNT": "Create your account",
+        "SIGNING": "Signing up...",
+        "SIGN_IN_GG": "Sign up with Google",
+        "FIRST_NAME": "First name",
+        "FIRST_NAME_REQ": "First name is required",
+        "LAST_NAME": "Last name",
+        "LAST_NAME_REQ": "Last name is required",
+        "USERNAME": "Username",
+        "USERNAME_REQ": "Username is required",
+        "USERNAME_WARN": "Username must be at least 3 characters",
+        "CONFIRM_PASSWORD": "Confirm password",
+        "CONFIRM_PASSWORD_REQ": "Please confirm your password",
+        "CONFIRM_PASSWORD_ERR": "Passwords do not match",
+        "CREATING": "Creating account...",
+        "ALREADY_HAVE_ACC": "Already have an account?",
+        "CHECK_UR_EMAIL": "Check your email",
+        "SENT_CODE": "We've sent a 6-digit code to ",
+        "MIKU_NUMBER_1": "Please enter it below.",
+        "VERIFYING": "Verifying...",
+        "VERIFY_CODE": "Verify Code",
+        "CODE_IN_TRAFFIC_JAM": "Didn't receive the code?",
+        "SENDING": "Sending again...",
+        "RESEND_CODE": "Resend Code",
+        "RESEND_COOLDOWN": "Resend available in",
+        "WRONG_EMAIL": "Wrong email?",
+        "GO_BACK_TO_SIGNUP": "Go back to signup"
+    }
+}

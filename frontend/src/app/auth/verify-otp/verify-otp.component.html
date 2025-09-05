@@ -6,8 +6,33 @@
         <img src="assets/img/logo.png" class="logo-img" alt="logo-image" style="align-items: center;">
         MSTBlog
       </a>
-      <div class="ms-auto">
-        <a routerLink="/auth/login" class="btn btn-outline-dark">Log in</a>
+      <div class="d-flex align-items-center gap-3 ms-auto">
+        <div class="dropdown">
+          <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
+              type="button" id="langDropdown" data-bs-toggle="dropdown"
+              [attr.aria-haspopup]="'true'"
+              [attr.aria-expanded]="null"
+              [attr.aria-label]="'NAV.LANGUAGE' | translate"
+              [title]="currentLanguage?.languagename || ('NAV.LANGUAGE' | translate)">
+              <ng-container *ngIf="currentLanguage as lang; else noLang">
+                  <img [src]="lang.flag_image" class="flag-icon me-1" alt="{{ lang.locale_code }}" />
+              </ng-container>
+              <ng-template #noLang>
+                  <span class="d-none d-lg-inline">{{ 'NAV.LANGUAGE' | translate }}</span>
+              </ng-template>
+              <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="langDropdown">
+              <li *ngFor="let lang of languages">
+                  <a class="dropdown-item d-flex align-items-center gap-2" (click)="selectLanguage(lang)" style="cursor: pointer;">
+                      <img [src]="lang.flag_image" class="flag-icon" alt="{{ lang.locale_code }}" />
+                      <span class="flex-grow-1">{{ lang.languagename }}</span>
+                      <i *ngIf="currentLanguage?.languageid === lang.languageid" class="ti-check text-success" aria-hidden="true"></i>
+                  </a>
+              </li>
+          </ul>
+        </div>
+        <a routerLink="/auth/login" class="btn btn-outline-dark">{{ 'NAV.LOGIN' | translate }}</a>
       </div>
     </div>
   </nav>
@@ -17,11 +42,11 @@
     <div class="row justify-content-center">
       <div class="col-md-6 col-lg-5">
         <div class="text-center">
-          <h2 class="mb-3">Check your email</h2>
+          <h2 class="mb-3">{{ 'AUTH.CHECK_UR_EMAIL' | translate }}</h2>
           <p class="text-muted mb-4">
-            We've sent a 6-digit code to 
+            {{ 'AUTH.SENT_CODE' | translate }}
             <strong>{{ userEmail }}</strong>. 
-            Please enter it below.
+            {{ 'AUTH.MIKU_NUMBER_1' | translate }}
           </p>
         </div>
 
@@ -57,14 +82,14 @@
               type="submit" 
               class="btn btn-dark"
               [disabled]="otpForm.invalid || isLoading">
-              {{ isLoading ? 'Verifying...' : 'Verify Code' }}
+              {{ (isLoading ? 'AUTH.VERIFYING' : 'AUTH.VERIFY_CODE') | translate }}
             </button>
           </div>
 
           <!-- Resend Section -->
           <div class="text-center mt-3">
             <p class="small mb-2">
-              Didn't receive the code?
+              {{ 'AUTH.CODE_IN_TRAFFIC_JAM' | translate }}
             </p>
             <button 
               *ngIf="!isResendCooldown"
@@ -72,16 +97,16 @@
               class="btn btn-link p-0 small"
               (click)="resendOtp()"
               [disabled]="isResending">
-              {{ isResending ? 'Sending...' : 'Resend Code' }}
+              {{ (isResending ? 'AUTH.SENDING' : 'AUTH.RESEND_CODE') | translate }}
             </button>
             <span *ngIf="isResendCooldown" class="small text-muted">
-              Resend available in {{ resendCountdown }}s
+              {{ 'AUTH.RESEND_COOLDOWN' | translate }} {{ resendCountdown }}s
             </span>
           </div>
 
           <!-- Back to Signup -->
           <p class="text-center mt-3 small">
-            Wrong email? <a routerLink="/auth/signup">Go back to signup</a>
+            {{ 'AUTH.WRONG_EMAIL' | translate }} <a routerLink="/auth/signup">{{ 'AUTH.GO_BACK_TO_SIGNUP' | translate }}</a>
           </p>
         </form>
       </div>
@@ -92,16 +117,16 @@
   <footer class="main-footer mt-1">
     <hr class="footer-divider mb-4" />
     <div class="footer-links">
-      <a href="#">Help</a>
-      <a href="#">Status</a>
-      <a href="#">About</a>
-      <a href="#">Careers</a>
-      <a href="#">Press</a>
-      <a href="#">Blog</a>
-      <a href="#">Privacy</a>
-      <a href="#">Rules</a>
-      <a href="#">Terms</a>
-      <a href="#">Text to speech</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.HELP' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.STATUS' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.ABOUT' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.CAREERS' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.PRESS' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.BLOG' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.PRIVACY' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.RULES' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.TERMS' | translate }}</a>
+      <a href="#">{{ 'SIDEBAR.FOOTER.TTS' | translate }}</a>
     </div>
   </footer>
 </div>

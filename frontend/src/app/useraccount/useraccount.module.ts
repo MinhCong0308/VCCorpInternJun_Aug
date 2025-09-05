@@ -6,13 +6,15 @@ import { UseraccountRoutingModule } from './useraccount-routing.module';
 import { AccountComponent } from './account/account.component';
 import { BlogManageComponent } from './blog-manage/blog-manage.component';
 import { UseraccountService } from './useraccount.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [AccountComponent, BlogManageComponent],
   imports: [
     CommonModule,
     UseraccountRoutingModule,
-    FormsModule
+    FormsModule,
+    TranslateModule
   ]
 })
 export class UseraccountModule { }

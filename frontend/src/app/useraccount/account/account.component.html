@@ -2,7 +2,7 @@
   <!-- Loading Container -->
   <div *ngIf="isInitializing || isLoading" class="loading-container">
     <div class="loading-spinner">
-      <p>Loading your profile...</p>
+      <p>{{ 'ACCOUNT.LOADING' | translate }}</p>
     </div>
   </div>
 
@@ -19,28 +19,55 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <div class="flex-grow-1 mx-4 d-none d-md-block">
-            <div class="search-bar-group input-group" style="margin-left: -16px;">
-              <span class="input-group-text bg-transparent border-0">
-                <i class="ti-search"></i>
-              </span>
-              <input type="text" class="form-control bg-transparent border-0" 
-                     placeholder="Search" style="box-shadow: none;" />
+          <div class="flex-grow-1 mx-4 d-none d-md-block" style="position: relative;">
+            <form (submit)="submit()" class="search-bar-group input-group" style="margin-left: -16px;">
+                <span class="input-group-text bg-transparent border-0">
+                    <i class="ti-search"></i>
+                </span>
+                <input
+                    type="search"
+                    class="form-control bg-transparent border-0"
+                    placeholder="{{ 'NAV.SEARCH' | translate }}"
+                    style="box-shadow: none;"
+                    [(ngModel)]="query"
+                    name="q"
+                    (focus)="onSearchFocus()"
+                    (blur)="onSearchBlur()"
+                    (keydown.enter)="submit()"
+                    autocomplete="off"
+                />
+            </form>
+            <!-- Recent Searches Dropdown -->
+            <div *ngIf="dropdownOpen && !query && recentSearches.length > 0" class="recent-searches-dropdown shadow"
+                (mousedown)="$event.preventDefault()">
+                <div class="recent-title">
+                    {{ 'SEARCH.RECENT_TITLE' | translate }}
+                    <span class="clear-all" (click)="clearRecent($event)">{{ 'SEARCH.CLEAR_ALL' | translate }}</span>
+                </div>
+                <div class="recent-item" *ngFor="let item of search.recent; let i = index">
+                    <i class="ti-search"></i>
+                    <span (click)="clickRecent(item)">{{ item }}</span>
+                    <i class="ti-close" (click)="removeRecent(i, $event)"></i>
+                </div>
             </div>
           </div>
           <div class="d-flex align-items-center gap-3 ms-auto">
             <a routerLink="/blog-owner/create" class="btn btn-write">
-              <i class="ti-pencil-alt"></i> Write
+              <i class="ti-pencil-alt"></i> {{ 'NAV.WRITE' | translate }}
             </a>
             <!-- Language Dropdown -->
             <div class="dropdown">
                 <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
-                    type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    type="button" id="langDropdown" data-bs-toggle="dropdown" 
+                    [attr.aria-haspopup]="'true'"
+                    [attr.aria-expanded]="null"
+                    [attr.aria-label]="'NAV.LANGUAGE' | translate"
+                    [title]="currentLanguage?.languagename || ('NAV.LANGUAGE' | translate)">
                     <ng-container *ngIf="currentLanguage as lang; else noLang">
                         <img [src]="lang.flag_image" class="flag-icon me-1" alt="{{ lang.locale_code }}" />
                     </ng-container>
                     <ng-template #noLang>
-                        <span class="d-none d-lg-inline">Language</span>
+                        <span class="d-none d-lg-inline">{{ 'NAV.LANGUAGE' | translate }}</span>
                     </ng-template>
                     <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
                 </button>
@@ -54,7 +81,7 @@
                     </li>
                 </ul>
             </div>
-            <a href="#" class="text-secondary text-decoration-none ms-2 me-1">
+            <a href="#" class="text-secondary text-decoration-none mt-1 ms-2 me-2">
               <i class="ti-bell fs-5"></i>
             </a>
             <div class="dropdown">
@@ -63,9 +90,9 @@
                      width="32" height="32" alt="Profile" />
               </a>
               <ul class="dropdown-menu dropdown-menu-end mt-2">
-                <li><a class="dropdown-item" routerLink="/useraccount/profile">Profile</a></li>
+                <li><a class="dropdown-item" routerLink="/useraccount/profile">{{ 'NAV.PROFILE | translate }}</a></li>
                 <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" (click)="logout()">Sign out</a></li>
+                <li><a class="dropdown-item" (click)="logout()">{{ 'NAV.SIGNOUT' | translate }}</a></li>
               </ul>
             </div>
           </div>
@@ -79,17 +106,17 @@
         <!-- Main Section -->
         <main class="col-lg-9 col-md-9">
           <div class="bg-white rounded shadow-sm p-4">
-            <h2 class="mb-4">Settings</h2>
+            <h2 class="mb-4">{{ 'ACCOUNT.SETTINGS_TITLE' | translate }}</h2>
             <!-- Settings Tabs -->
             <ul class="nav settings-tabs">
               <li class="nav-item">
-                <a class="nav-link active" routerLink="/account" data-tab="account">Account</a>
+                <a class="nav-link active" routerLink="/account" data-tab="account">{{ 'ACCOUNT.TAB_ACCOUNT' | translate }}</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" routerLink="/publishing" data-tab="publishing">Publishing</a>
+                <a class="nav-link" routerLink="/publishing" data-tab="publishing">{{ 'ACCOUNT.TAB_PUBLISHING' | translate }}</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" routerLink="/notification" data-tab="notifications">Notifications</a>
+                <a class="nav-link" routerLink="/notification" data-tab="notifications">{{ 'ACCOUNT.TAB_NOTIFICATIONS' | translate }}</a>
               </li>
             </ul>
             
@@ -98,7 +125,7 @@
               <!-- Email address -->
               <div class="settings-section">
                 <div>
-                  <div class="settings-label">Email address</div>
+                  <div class="settings-label">{{ 'ACCOUNT.EMAIL' | translate }}</div>
                   <div id="email-display" class="settings-value">{{ userProfile.email }}</div>
                 </div>
               </div>
@@ -106,7 +133,7 @@
               <!-- Username and subdomain -->
               <div class="settings-section">
                 <div>
-                  <div class="settings-label">Username and subdomain</div>
+                  <div class="settings-label">{{ 'ACCOUNT.USERNAME' | translate }}</div>
                   <div id="username-display" class="settings-value" style="cursor: pointer;" (click)="toggleEdit('username')">
                     {{ '@' + userProfile.username }}
                   </div>
@@ -116,10 +143,10 @@
                            id="username-input" [(ngModel)]="editValues.username" name="username" />
                     <div class="mt-2">
                       <button type="submit" class="btn btn-primary btn-sm" [disabled]="isLoading">
-                        {{ isLoading ? 'Saving...' : 'Save' }}
+                        {{ (isLoading ? 'COMMON.SAVING' : 'COMMON.SAVE') | translate }}
                       </button>
                       <button type="button" class="btn btn-secondary btn-sm ms-2" 
-                              (click)="cancelEdit('username')">Cancel</button>
+                              (click)="cancelEdit('username')">{{ 'COMMON.CANCEL' | translate }}</button>
                     </div>
                   </form>
                 </div>
@@ -128,8 +155,8 @@
               <!-- Profile photo -->
               <div class="settings-section">
                 <div>
-                  <div class="settings-label">Profile photo</div>
-                  <div class="settings-description">Upload your profile picture</div>
+                  <div class="settings-label">{{ 'ACCOUNT.PROFILE_PHOTO' | translate }}</div>
+                  <div class="settings-description">{{ 'ACCOUNT.PROFILE_PHOTO_DESC' | translate }}</div>
                   
                   <!-- Profile Image Section -->
                   <div class="profile-image-section mt-3">
@@ -140,11 +167,11 @@
                       <div>
                         <button type="button" class="btn btn-outline-primary btn-sm" 
                                 (click)="avatarInput.click()" [disabled]="isUploading">
-                          {{ isUploading ? 'Uploading...' : 'Change Photo' }}
+                          {{ (isUploading ? 'ACCOUNT.UPLOADING' : 'ACCOUNT.CHANGE_PHOTO') | translate }}
                         </button>
                         <input type="file" #avatarInput accept="image/*" 
                                style="display: none;" (change)="handleAvatarChange($event)" />
-                        <div class="small text-muted mt-1">JPG, PNG or GIF. Max 2MB.</div>
+                        <div class="small text-muted mt-1">{{ 'ACCOUNT.FORMAT_HINT' | translate }}</div>
                       </div>
                     </div>
                   </div>
@@ -154,8 +181,8 @@
               <!-- Profile information -->
               <div class="settings-section">
                 <div>
-                  <div class="settings-label">Full name</div>
-                  <div class="settings-description">Edit your display name</div>
+                  <div class="settings-label">{{ 'ACCOUNT.FULLNAME' | translate }}</div>
+                  <div class="settings-description">{{ 'ACCOUNT.FULLNAME_DESC' | translate }}</div>
                   <div id="fullname-display" class="settings-value mt-1" style="cursor: pointer;" (click)="toggleEdit('fullname')">
                       {{ userProfile.fullname }}
                   </div>
@@ -165,10 +192,10 @@
                            id="fullname-input" [(ngModel)]="editValues.fullname" name="fullname" />
                     <div class="mt-2">
                       <button type="submit" class="btn btn-primary btn-sm" [disabled]="isLoading">
-                        {{ isLoading ? 'Saving...' : 'Save' }}
+                        {{ (isLoading ? 'COMMON.SAVING' : 'COMMON.SAVE') | translate }}
                       </button>
                       <button type="button" class="btn btn-secondary btn-sm ms-2" 
-                              (click)="cancelEdit('fullname')">Cancel</button>
+                              (click)="cancelEdit('fullname')">{{ 'COMMON.CANCEL' | translate }}</button>
                     </div>
                   </form>
                 </div>
@@ -178,9 +205,9 @@
               <div class="settings-section">
                 <div>
                   <div class="settings-label danger-text" style="cursor: pointer;" 
-                       (click)="deactivateAccount()">Deactivate account</div>
+                       (click)="deactivateAccount()">{{ 'ACCOUNT.DEACTIVATE' | translate }} </div>
                   <div class="settings-description">
-                    Deactivating will suspend your account until you sign back in.
+                    {{ 'ACCOUNT.DEACTIVATE_DESC' | translate }}
                   </div>
                 </div>
               </div>
@@ -191,13 +218,13 @@
         <!-- Sidebar -->
         <aside class="col-lg-3 col-md-3 d-none d-md-block border-start bg-white pt-4">
           <div class="help-articles">
-            <h6>Suggested help articles</h6>
+            <h6>{{ 'SIDEBAR.SUGGEST.TITLE' | translate }}</h6>
             <ul>
-              <li><a href="#">Sign in or sign up to Medium</a></li>
-              <li><a href="#">Your profile page</a></li>
-              <li><a href="#">Writing and publishing your first story</a></li>
-              <li><a href="#">About Medium's distribution system</a></li>
-              <li><a href="#">Get started with the Partner Program</a></li>
+              <li><a href="#">{{ 'SIDEBAR.SUGGEST.SIGNIN_SIGNUP' | translate }}</a></li>
+              <li><a href="#">{{ 'SIDEBAR.SUGGEST.PROFILE_PAGE' | translate }}</a></li>
+              <li><a href="#">{{ 'SIDEBAR.SUGGEST.WRITING' | translate }}</a></li>
+              <li><a href="#">{{ 'SIDEBAR.SUGGEST.ABOUT' | translate }}</a></li>
+              <li><a href="#">{{ 'SIDEBAR.SUGGEST.GET_STARTED' | translate }}</a></li>
             </ul>
           </div>
         </aside>
@@ -208,22 +235,22 @@
     <footer class="main-footer mt-1">
       <hr class="footer-divider mb-4" />
       <div class="footer-links">
-        <a href="#">Help</a>
-        <a href="#">Status</a>
-        <a href="#">About</a>
-        <a href="#">Careers</a>
-        <a href="#">Press</a>
-        <a href="#">Blog</a>
-        <a href="#">Privacy</a>
-        <a href="#">Rules</a>
-        <a href="#">Terms</a>
-        <a href="#">Text to speech</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.HELP' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.STATUS' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.ABOUT' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.CAREERS' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.PRESS' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.BLOG' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.PRIVACY' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.RULES' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.TERMS' | translate }}</a>
+        <a href="#">{{ 'SIDEBAR.FOOTER.TTS' | translate }}</a>
       </div>
     </footer>
   </div>
 
   <!-- Error Container -->
   <div *ngIf="!isInitializing && !isLoading && !userProfile" class="error-container">
-    <button (click)="logout()">Go to Login</button>
+    <button (click)="logout()">{{ 'ACCOUNT.GO_TO_LOGIN' | translate }}</button>
   </div>
 </div>

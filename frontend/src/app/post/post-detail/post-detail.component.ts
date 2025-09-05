@@ -7,6 +7,8 @@ import { AuthService } from '../../core/services/auth.service';
 import { LanguageService, Language } from '../../core/services/language.service';
 import { ProfileService, UserProfile } from '../../core/services/profile.service';
 import { SearchService } from '../../core/services/search.service';
+import { AppSettingsService } from '../../core/config/app-settings.service';
+import { TranslateService } from '@ngx-translate/core';
 
 type CommentView = Comment & { depth: number };
 type UiComment = Comment & { children: UiComment[]; depth: number };
@@ -31,21 +33,19 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoggedIn: boolean = false; // Biến để kiểm tra trạng thái đăng nhập
   isBrowser: boolean; // Biến để kiểm tra môi trường trình duyệt
   avatarUrl: string = ''; // Biến để lưu trữ URL của avatar người dùng
-  defaultAvatar: string = 'https://randomuser.me/api/portraits/lego/1.jpg'; // URL của avatar mặc định
   isLiked: boolean = false;
   isAnimating: boolean = false;
   coverImageUrl: string = '';
-  defaultCoverImage: string = 'https://picsum.photos/1000';
   userid: any;
   languages: Language[] = [];
   currentLanguage: Language | null = null;
+  loadingLang = false;
   userProfile: UserProfile | null = null;
   rootComments: UiComment[] = [];
   visibleRootCount = 4;
   expandedRootIds = new Set<number>();
   trackByUiId = (_: number, c: UiComment) => c.commentid;
   recommendedPosts: any[] = [];
-  defaultThumb = 'https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg';
   @ViewChild('navbar') navbar!: ElementRef<HTMLElement>;
   isNavHidden = false;
   lastScrollY = 0;
@@ -69,6 +69,15 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   showAuthWarn = false;
   authWarnText = '';
   authToastTimer: any;
+  showErrorWarn = false;
+  errorWarnText = '';
+  errorToastTimer: any;
+
+  private t(key: string, params?: Record<string, any>) {
+    // instant là đủ vì i18n đã load; nếu muốn chắc, có thể dùng .get(...).subscribe(...)
+    const out = this.translate.instant(key, params);
+    return out || key;
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -79,14 +88,17 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     private authService: AuthService,
     private languageService: LanguageService,
     public search: SearchService,
+    public appSettings: AppSettingsService,
+    private translate: TranslateService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
     this.search.query$.subscribe(q => this.query = q || '');
   }
-  
 
   ngOnInit(): void {
+    this.avatarUrl = this.appSettings.defaults.userAvatar;
+    this.coverImageUrl = this.appSettings.defaults.postCover;
     if (this.isBrowser) {
       if ('scrollRestoration' in history) {
         history.scrollRestoration = 'auto';
@@ -112,6 +124,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
       this.loadLanguages();
+      this.watchRoute();
       this.loadPost(this.postId);
       this.loadComments(this.postId);
     });
@@ -169,11 +182,10 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (profile) => {
         this.userProfile = profile;
         this.userid = profile.userid;
-        this.avatarUrl = profile.avatarUrl || this.defaultAvatar;
+        this.avatarUrl = profile.avatarUrl;
       },
       error: (err) => {
         console.error('Failed to load profile', err);
-        this.avatarUrl = this.defaultAvatar;
       }
     });
   }
@@ -182,8 +194,10 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.postService.getPostDetail(id).subscribe({
       next: (res: any) => {
         this.post = res.data;
+        this.applyComputedUrls(id);
+        this.syncCurrentLanguage(true);
         // console.log("this.post=", this.post)
-        this.coverImageUrl = res?.data?.coverImage || this.defaultCoverImage;
+        this.coverImageUrl = res?.data?.coverImage;
         this.loadRecommendations(this.post);
       },
       error: (err) => console.error('Failed to load post', err)
@@ -329,23 +343,106 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadLanguages(): void {
+    if (!this.isBrowser) return;
+    try {
+      const raw = localStorage.getItem('languages');
+      if (raw) {
+        this.languages = JSON.parse(raw) as Language[];
+        this.languages = this.languages.filter(l => l.status === 1 || l.status === undefined);
+        this.syncCurrentLanguage();  // đồng bộ với post nếu đã có
+      }
+    } catch {}
     this.languageService.getLanguages().subscribe({
       next: (res: any) => {
-        const list: Language[] = res?.data?.languages || [];
-        this.languages = list;
-        const byDefault = this.languages.find(l => l.is_default);
-        this.currentLanguage = byDefault || null;
+        const list: Language[] = (res?.data?.languages || res?.languages || res || []) as Language[];
+        let normalized = list.filter(l => l.status === 1 || l.status === undefined)
+                            .map(l => ({
+                                ...l,
+                                locale_code: l.locale_code?.trim() || (l.languagename === 'Vietnamese' ? 'vi' : 'en')
+                            }));
+        this.languages = normalized;
+        if (this.isBrowser) {
+          try { localStorage.setItem('languages', JSON.stringify(this.languages)); } catch {}
+        }
+        this.syncCurrentLanguage(true);
       },
       error: (err) => console.error('Failed to load languages', err),
     });
   }
 
-  selectLanguage(lang: Language) {
+  syncCurrentLanguage(applyUi = false): void {
+    if (!this.post) return;
+
+    // Ưu tiên: ngôn ngữ của post hiện tại
+    let lang =
+      this.languages.find(l => l.languageid === this.post.languageid)
+      // fallback: ngôn ngữ mặc định hệ thống
+      || this.languages.find(l => !!l.is_default)
+      // fallback cuối: lấy phần tử đầu
+      || this.languages[0];
+
+    if (!lang && this.currentLanguage) lang = this.currentLanguage;
+
     this.currentLanguage = lang;
-    if(this.isBrowser) {
-      localStorage.setItem('locale_code', lang.locale_code);
+    if (applyUi && lang) this.applyUiLanguage(lang);
+  }
+
+  selectLanguage(lang: Language): void {
+    if (!this.post || this.loadingLang) return;
+
+    // Nếu bấm lại chính ngôn ngữ hiện tại → chỉ đổi UI (ngx-translate) rồi thoát
+    if (lang.languageid === this.post.languageid) {
+      this.applyUiLanguage(lang);
+      this.currentLanguage = lang;
+      return;
     }
-    // Goi service doi ngon ngu o day
+
+    const originalId = this.post.original_postid || this.post.postid;
+    this.loadingLang = true;
+
+    this.postService.getPostsWithSameOriginalPostId(originalId, lang.languageid)
+      .subscribe({
+        next: (res: any) => {
+          const list = res?.data?.posts ?? res?.posts ?? (Array.isArray(res) ? res : []);
+          const target = Array.isArray(list)
+            ? (list.find((x: any) => x.languageid === lang.languageid) || list[0])
+            : (res?.data?.post || res?.post || null);
+
+          if (!target) {
+            this.loadingLang = false;
+            this.showErrorToast('translate');
+            console.warn('No translated post for language', lang.languageid);
+            return;
+          }
+
+          // Đổi UI language ngay để có phản hồi thị giác
+          this.applyUiLanguage(lang);
+          this.currentLanguage = lang;
+
+          // Điều hướng sang postid mới (URL “đúng bản dịch”)
+          this.router.navigate(['/post-detail', target.postid], { replaceUrl: true })
+            .finally(() => this.loadingLang = false);
+        },
+        error: (e) => {
+          this.loadingLang = false;
+          console.error('switch language error', e);
+        }
+      });
+  }
+
+  applyUiLanguage(lang?: Language): void {
+    const code = lang?.locale_code?.trim();
+    const id = lang?.languageid;
+    if (!code) return;
+
+    this.translate.use(code);
+    if (this.isBrowser) {
+      try { 
+        localStorage.setItem('lang', code);
+        localStorage.setItem('languageId', String(id));
+      } catch {}
+      document.documentElement.lang = code;
+    }
   }
 
   shuffleInPlace<T>(a: T[]): T[] {
@@ -460,7 +557,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onLikePress(ev: Event) {
     if (!this.isLoggedIn) {
-      this.showAuthToast('You need to log in to like this post');
+      this.showAuthToast('like');
       return; 
     }
     if (ev.type === 'touchstart') { ev.preventDefault(); } // tránh click ảo trên mobile
@@ -573,15 +670,22 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     if (idx >= 0) this.plusBubbles.splice(idx, 1);
   }
 
-  showAuthToast(message = 'You need to log in to like the post') {
-    this.authWarnText = message;
+  showAuthToast(kind: 'like' | 'comment' | string = 'generic') {
+    const keyMap: Record<string, string> = {
+      like: 'TOAST.LOGIN_TO_LIKE',
+      comment: 'TOAST.LOGIN_TO_COMMENT',
+      generic: 'TOAST.PLEASE_LOGIN'
+    };
+
+    // Nếu tham số là 1 key đã có dấu chấm (AUTH.XYZ), dùng thẳng; nếu là like/comment/bookmark → map sang key; nếu là text thường → để nguyên
+    const key = kind.includes?.('.') ? kind : (keyMap[kind] || keyMap['generic']);
+    const msg = key.includes('.') ? this.t(key) : kind; // nếu là text thuần thì dùng trực tiếp
+
+    this.authWarnText = msg;
     this.showAuthWarn = true;
 
     clearTimeout(this.authToastTimer);
-    // Tự ẩn sau 3s
-    this.authToastTimer = setTimeout(() => {
-      this.showAuthWarn = false;
-    }, 3000);
+    this.authToastTimer = setTimeout(() => (this.showAuthWarn = false), 3000);
   }
 
   dismissAuthToast() {
@@ -589,9 +693,44 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showAuthWarn = false;
   }
 
+  showErrorToast(kind: 'translate' | string = 'generic') {
+    const keyMap: Record<string, string> = {
+      translate: 'TOAST.NO_TRANSLATED_POST',
+      generic: ''
+    };
+    const key = kind.includes?.('.') ? kind : (keyMap[kind] || keyMap['generic']);
+    const msg = key.includes('.') ? this.t(key) : kind;
+    
+    this.errorWarnText = msg;
+    this.showErrorWarn = true;
+
+    clearTimeout(this.errorToastTimer);
+    this.errorToastTimer = setTimeout(() => (this.showErrorWarn = false), 3000);
+  }
+
+  dismissErrorToast() {
+    clearTimeout(this.errorToastTimer);
+    this.showErrorWarn = false;
+  }
+
   goLogin() {
     this.dismissAuthToast();
     this.router.navigate(['/auth/login']);
+  }
+
+  applyComputedUrls(post: any) {
+    const defaultCover = this.appSettings.defaults.postCover;
+    const cover = (post?.coverImage || '').toString().trim();
+    this.coverImageUrl = cover ? cover : defaultCover;
+  }
+
+  watchRoute(): void {
+    this.route.paramMap.subscribe(p => {
+      const id = Number(p.get('postid') || p.get('postId'));
+      if (!id) return;
+      this.loadPost(id);
+      if (this.isBrowser) window.scrollTo({ top: 0 });
+    });
   }
 
   ngOnDestroy(): void {

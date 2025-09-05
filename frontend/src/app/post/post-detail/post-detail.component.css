@@ -441,7 +441,7 @@ body {
     .post-meta-detail { flex-direction: column; align-items: flex-start; gap: 0.3rem;}
 }
 /* ===== Auth toast (fixed, top-center) ===== */
-:host ::ng-deep .auth-toast {
+:host ::ng-deep .auth-toast, .error-toast {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -458,8 +458,8 @@ body {
   pointer-events: auto;
 }
 
-:host ::ng-deep .auth-toast .ti-alert { font-size: 14px; line-height: 1; }
-:host ::ng-deep .auth-toast .msg { font-weight: 400; white-space: nowrap; }
+:host ::ng-deep .auth-toast .ti-alert, .error-toast .ti-alert { font-size: 14px; line-height: 1; }
+:host ::ng-deep .auth-toast .msg, .error-toast .msg { font-weight: 400; white-space: nowrap; }
 
 :host ::ng-deep .btn-toast {
   background: rgba(255,255,255,0.15);

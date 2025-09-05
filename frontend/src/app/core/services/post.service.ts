@@ -19,6 +19,9 @@ export class PostService {
   getPublishedPosts(languageId: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/posts?languageId=${languageId}`);
   }
+  getPostsWithSameOriginalPostId(original_postId: number, languageId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/posts?original_postId=${original_postId}&languageId=${languageId}`);
+  }
   getPublishedPostsTrending(languageId: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/posts/trending?languageId=${languageId}`);
   }

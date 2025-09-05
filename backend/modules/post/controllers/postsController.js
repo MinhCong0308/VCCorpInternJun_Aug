@@ -12,8 +12,8 @@ function parseCount(input) {
 const postsController = {
     getPublishedPosts: async (req, res) => {
         try {
-            const { categoryId, userId, languageId, limit = 5, page = 1, search = '' } = req.query;
-            const posts = await postsService.getPublishedPosts(categoryId, userId, languageId, +limit, +page, search);
+            const { categoryId, userId, languageId, original_postId, limit = 5, page = 1, search = '' } = req.query;
+            const posts = await postsService.getPublishedPosts(categoryId, userId, languageId, original_postId, +limit, +page, search);
             return responseUtils.ok(res, posts);
         } catch (error) {
             console.error("Error fetching posts:", error);

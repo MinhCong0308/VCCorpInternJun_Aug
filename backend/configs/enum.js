@@ -35,6 +35,11 @@ const StatusNameById = Object.freeze({
   2: "APPROVED",
   3: "REJECTED",
 });
+const languageEnum= Object.freeze({
+  ENGLISH: 1,
+  VIETNAMESE: 2,
+  FRENCH: 3,
+});
 module.exports = {
   roleenum,
   statusenum,
@@ -43,4 +48,5 @@ module.exports = {
   StatusNameById,
   statuscode,
   statusUser,
+  languageEnum,
 };

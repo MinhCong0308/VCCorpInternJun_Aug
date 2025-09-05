@@ -32,6 +32,7 @@ interface BlogDraft {
   isEditMode: boolean;
   editPostId: number | null;
 }
+
 @Component({
   selector: 'app-create-blog',
   templateUrl: './create-blog.component.html',
@@ -77,6 +78,13 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       ['link', 'image'],
       ['clean']
     ]
+  };
+  fieldErrors: {
+    title: boolean;
+    content: boolean;
+  } = {
+    title: false,
+    content: false
   };
 
   constructor(
@@ -456,6 +464,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     }
 
     this.languageTabs.splice(index, 1);
+    this.languageTabs.splice(index, 1);
     
     if (this.activeTabIndex >= index) {
       this.activeTabIndex = Math.max(0, this.activeTabIndex - 1);
@@ -737,7 +746,13 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
         });
       },
       error: (error) => {
-        console.error('Title translation error:', error);
+        console.log("ERROR HERE");
+        console.log('Title translation error:', error.error.message);
+        this.notificationService.error('Translation error', error.error.message + ' Our service will return a draft translation', [{
+          label: 'Retry Translation',
+          action: () => this.translateContent(originalTab, targetTab),
+          style: 'primary'
+        }]);
         targetTab.title = `[${targetLanguage?.languagename}] ${originalTab.title}`;
         this.translateDeltaOps(originalTab.delta, targetLanguage).then((translatedDelta) => {
           targetTab.delta = translatedDelta;  
@@ -802,12 +817,34 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     }
     
     this.saveCurrentTabData();
-    
+    this.fieldErrors.title = false;
+    this.fieldErrors.content = false;
+
+    let hasErrors = false;
+    let errorMessages: string[] = [];
     const originalTab = this.languageTabs.find(tab => tab.isOriginal);
     if (!originalTab || !originalTab.title.trim() || !originalTab.content.trim()) {
+      if(!originalTab) {
+        console.log("Run here for error");
+    
+      }
+      if(!originalTab?.title.trim()) {
+        console.log("Original tab: ", originalTab);
+        this.blogForm.get('title')?.markAsTouched();
+        errorMessages.push('Missing title field');
+        hasErrors = true;
+      }
+      if(!this.quillEditor.quillEditor.getText().trim()) {
+        this.blogForm.get('content')?.markAsTouched();
+        // console.log("It runs here?");
+        console.log("here...");
+        errorMessages.push('Missing content field');
+        hasErrors = true;
+      }
+      console.log("Error Messages List: ", errorMessages);
       this.notificationService.warning(
         'Missing Required Fields',
-        'Please fill in the original title and content.'
+        errorMessages.join(',')
       );
       return;
     }
@@ -887,7 +924,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
         const action = this.isEditMode ? 'update' : 'submit';
         this.notificationService.error(
           'Submission Failed',
-          `Failed to ${action} blog. Please try again.`,
+          err.error?.message || `Failed to ${action} the blog. Please try again.`,
           [
             {
               label: 'Try Again',

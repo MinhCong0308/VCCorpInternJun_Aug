@@ -2,6 +2,7 @@ const leo = require("leo-profanity");
 const fs = require("fs");
 const englishWords = require("word-list-json");
 const frenchWords = require("an-array-of-french-words"); // array
+const config = require('configs');
 // const viWords = require('dictionary-vi');
 
 class GlobalFilterManager {
@@ -169,6 +170,60 @@ class GlobalFilterManager {
     leo.add(words);
     this.dbBadWordsSet = new Set(words);
     console.log(`(Re)loaded ${words.length} DB bad words`);
+  }
+  checkSuitableLanguage(context, languageid) {
+    // const words = context.toLowerCase().match(/\b\w+\b/g) || [];
+    let isValidCount = 0;
+    let words;
+    // console.log(`Current languageid: ${languageid}`);
+    console.log(`Language enum: ${config.config.languageEnum.ENGLISH}`);
+    switch(languageid) {
+      case config.config.languageEnum.ENGLISH: 
+        words = context.toLowerCase().match(/\b[a-z]+\b/g) || [];
+        console.log(`Word list: ${words}`);
+        for (const w of words) {
+          if (this.englishListWordsSet.has(w)) isValidCount++;
+          else {
+            // console.log(`Word ${w} is not found on dictionary`);
+          }
+        }
+        break;
+      case config.config.languageEnum.FRENCH:
+        words = context.toLowerCase().match(/\b[a-zàâäéèêëïîôöùûüÿç]+\b/g) || [];
+        console.log(`Word list: ${words}`);
+        for (const w of words) {
+          if (this.frenchListWordsSet.has(w)) isValidCount++;
+        }
+        break;
+      case config.config.languageEnum.VIETNAMESE:
+        const text = context.normalize('NFC');
+        //  const text = context.normalize('NFC');
+          // Tách bằng mọi ký tự KHÔNG thuộc Letter/Mark/(_ ’ ' -)
+        // words = text
+        //     .split(/[^\p{L}\p{M}_’'-]+/u)
+        //     .filter(Boolean)
+        //     .map(w => w.toLowerCase());
+        // Option A (preferred): Unicode property escapes (Node 14+)
+        // \p{L} = any letter; allow connectors like _, apostrophes, hyphens inside compounds
+        const VI_WORD_RE = /(?<![\p{L}\p{M}])(\p{L}+(?:[_’'-]\p{L}+)*)((?![\p{L}\p{M}]))/gu;
+
+
+        // Option B (fallback if \p{} unsupported): explicit Latin ranges incl. Đ/đ and À–ỵ
+        // Covers Vietnamese precomposed letters; still okay if it captures other Latin letters
+        // const VI_WORD_RE = /\b(?:[A-Za-zĐđÀ-Ỵà-ỵ]+(?:[_’'-][A-Za-zĐđÀ-Ỵà-ỵ]+)*)\b/g;
+
+        words = [...text.matchAll(VI_WORD_RE)].map(m => m[0].toLowerCase());
+        console.log(`Word list: ${words}`);
+        for (const w of words) {
+          if (this.viWordSet.has(w)) isValidCount++;
+        }
+        break;
+      default:
+        // console.log("It is called here");
+        break;
+    }
+    const ratio = words.length ? isValidCount / words.length : 0;
+    return ratio >= 0.7; // at least 70% of words must be valid in the specified language
   }
 }
 

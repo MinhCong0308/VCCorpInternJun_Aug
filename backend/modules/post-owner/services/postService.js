@@ -7,6 +7,19 @@ const globalFilter = require("utils/globalFilter");
 
 const postService = {
     createPost: async (originalPost, translations, userid) => {
+        const cleanContent = await postService.getMainContentFromHTML(originalPost.content);
+        if (!globalFilter.checkSuitableLanguage(cleanContent, originalPost.languageid)) {
+            throw new Error("Inappropriate language detected");
+        }
+        // check for translations
+        if (translations && translations.length > 0) {
+            for (const translation of translations) {
+                const cleanContent = await postService.getMainContentFromHTML(translation.content);
+                if (!globalFilter.checkSuitableLanguage(cleanContent, translation.languageid)) {
+                    throw new Error("Inappropriate language detected in translations");
+                }
+            }
+        }
         try {
             const post = await db.Post.create({
                 userid,
@@ -39,16 +52,10 @@ const postService = {
                     }
                 }
             }
-            // setImmediate(() => {
-            //     postService.processContentApproval(post.postid)
-            //         .catch(error => {
-            //             console.error('Error in background content approval:', error);
-            //         });
-            // });
             return { message: "Post created successfully", post };
         } catch (error) {
-            console.log("Error creating post:", error.message);
-            throw new Error("Error creating post");
+            console.log(error.message);
+            throw new Error("Error creating post: ", error.message);
         }
     },
     processContentApproval: async (postid, upper = 3) => {
@@ -111,6 +118,20 @@ const postService = {
             }
             if (post.status !== config.config.statuspostenum.PENDING) {
                 throw new Error("Only pending posts can be updated");
+            }
+            // check if language be submitted is suitable
+            const cleanContent = await postService.getMainContentFromHTML(originalPost.content);
+            if (!globalFilter.checkSuitableLanguage(cleanContent, originalPost.languageid)) {
+                throw new Error("Inappropriate language detected");
+            }
+            // check for translations
+            if (translations && translations.length > 0) {
+                for (const translation of translations) {
+                    const cleanContent = await postService.getMainContentFromHTML(translation.content);
+                    if (!globalFilter.checkSuitableLanguage(cleanContent, translation.languageid)) {
+                        throw new Error("Inappropriate language detected in translations");
+                    }
+                }
             }
             post.title = originalPost.title;
             post.content = originalPost.content;
@@ -306,6 +327,24 @@ const postService = {
         };
     },
     translate: async (text, sourceLanguage, targetLanguage) => {
+        if (!text || text.trim() === '') {
+            throw new Error("Text to translate cannot be empty");
+        }
+        if (!targetLanguage || !(targetLanguage.toUpperCase() in config.config.languageEnum)) {
+            throw new Error("Invalid target language");
+        }
+        if (sourceLanguage !== 'auto' && !(sourceLanguage.toUpperCase() in config.config.languageEnum)) {
+            throw new Error("Invalid source language");
+        }
+        console.log("Text: ", text);
+        // check for suitable language
+        const upperCaseLanguage = sourceLanguage.toUpperCase();
+        const languageid = config.config.languageEnum[upperCaseLanguage];
+        // console.log("Here: ", languageid);
+        if(!globalFilter.checkSuitableLanguage(text, languageid)) {
+            // console.log("Huhuhuhuhuhuhuhuhuhuhu");
+            throw new Error('Inappropriate language detected');
+        }
         const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
         const apiKey = process.env.GOOGLE_API_KEY;
         const prompt = sourceLanguage === 'auto' 

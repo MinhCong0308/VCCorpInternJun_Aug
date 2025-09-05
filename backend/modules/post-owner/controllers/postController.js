@@ -12,7 +12,7 @@ const postsController = {
             const data = await postService.createPost(originalPost, translations, userid);
             return responseUtils.ok(res, data);
         } catch (error) {
-            console.error("Error creating post:", error);
+            console.error("Error creating post:", error.message);
             return responseUtils.error(res, error.message);
         }
     },

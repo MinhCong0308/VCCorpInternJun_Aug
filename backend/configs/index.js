@@ -8,7 +8,8 @@ const {
   statuspostenum,
   statuscode,
   statusUser,
-  StatusNameById
+  StatusNameById,
+  languageEnum
 } = require("configs/enum");
 const oauthConfig = require("configs/oauth-config");
 
@@ -20,6 +21,7 @@ const config = {
   roleenum,
   statusenum,
   statuspostenum,
+  languageEnum,
   oauth: oauthConfig.oauth,
   statuscode,
   statusUser,

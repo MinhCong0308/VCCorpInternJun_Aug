@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, AfterViewInit, PLATFORM_ID, ViewChild, ElementRef, HostListener, OnDestroy } from '@angular/core';
+import { Component, Inject, OnInit, AfterViewInit, PLATFORM_ID, ViewChild, ElementRef, HostListener, OnDestroy, inject } from '@angular/core';
 import { PostService } from '../../core/services/post.service';
 import { CommentService, Comment } from '../../core/services/comment.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,6 +9,8 @@ import { ProfileService, UserProfile } from '../../core/services/profile.service
 import { SearchService } from '../../core/services/search.service';
 import { AppSettingsService } from '../../core/config/app-settings.service';
 import { TranslateService } from '@ngx-translate/core';
+import { Subject, takeUntil } from 'rxjs';
+import { LocaleService } from '../../core/services/locale.service';
 
 type CommentView = Comment & { depth: number };
 type UiComment = Comment & { children: UiComment[]; depth: number };
@@ -79,6 +81,10 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     return out || key;
   }
 
+  private destroy$ = new Subject<void>();
+  public localeService = inject(LocaleService);
+  public currentLocale = 'en-US';
+
   constructor(
     private route: ActivatedRoute,
     private postService: PostService,
@@ -128,6 +134,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       this.loadPost(this.postId);
       this.loadComments(this.postId);
     });
+    this.localeService.locale$.pipe(takeUntil(this.destroy$)).subscribe((loc: string) => { this.currentLocale = loc || 'en-US' });
   }
 
   ngAfterViewInit(): void {
@@ -418,6 +425,8 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
           // Đổi UI language ngay để có phản hồi thị giác
           this.applyUiLanguage(lang);
           this.currentLanguage = lang;
+          
+          this.localeService.setLocaleFromLangCode(lang.locale_code);
 
           // Điều hướng sang postid mới (URL “đúng bản dịch”)
           this.router.navigate(['/post-detail', target.postid], { replaceUrl: true })
@@ -737,6 +746,8 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     clearTimeout(this.authToastTimer);
     clearTimeout(this.holdTimeout);
     clearInterval(this.repeatInterval);
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // Hàm để đăng xuất

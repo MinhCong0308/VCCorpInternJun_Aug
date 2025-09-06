@@ -193,7 +193,7 @@
                         </div>
                         <div class="post-sneak">{{ post.content | excerpt: { limit: 130, by: 'chars' } }}</div>
                         <div class="post-meta">
-                            <span>{{ post.createdAt | date: 'MMM d' }}</span>
+                            <span>{{ post.createdAt | date: 'mediumDate':undefined:currentLocale }}</span>
                             <span><i class="ti-thumb-up"></i> {{ post.like_cnt }}</span>
                             <span><i class="ti-comment"></i> {{ post.commentCount }}</span>
                         </div>
@@ -314,7 +314,7 @@
                             </div>
 
                             <span class="text-secondary" style="font-size: 11px;">
-                            {{ post.createdAt | date: 'MMM d' }}
+                            {{ post.createdAt | date: 'mediumDate':undefined:currentLocale }}
                             </span>
                         </div>
 

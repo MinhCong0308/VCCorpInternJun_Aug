@@ -1,4 +1,4 @@
-import { AfterViewInit, ElementRef, ViewChild, ViewChildren, QueryList, HostListener, Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { AfterViewInit, ElementRef, ViewChild, ViewChildren, QueryList, HostListener, Component, Inject, OnInit, PLATFORM_ID, inject, OnDestroy } from '@angular/core';
 import { CategoryService } from '../../core/services/category.service';
 import { PostService } from '../../core/services/post.service';
 import { AccountService } from '../../core/services/account.service';
@@ -9,6 +9,8 @@ import { LanguageService, Language} from '../../core/services/language.service';
 import { SearchService } from '../../core/services/search.service';
 import { TranslateService } from '@ngx-translate/core';
 import { AppSettingsService } from '../../core/config/app-settings.service';
+import { Subject, takeUntil } from 'rxjs';
+import { LocaleService } from '../../core/services/locale.service';
 
 @Component({
   selector: 'app-home-page',
@@ -16,7 +18,7 @@ import { AppSettingsService } from '../../core/config/app-settings.service';
   styleUrls: ['./home-page.component.css'],
   standalone: false,
 })
-export class HomePageComponent implements OnInit, AfterViewInit {
+export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
   categories: any[] = [];
   recommendedCategories: any[] = [];
   allCategories: any[] = [];
@@ -54,6 +56,10 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   boundOnScroll = () => this.scheduleUpdate();
   lastScrollTop = 0;
   scrollDir: 'down' | 'up' = 'down';
+
+  private destroy$ = new Subject<void>();
+  public localeService = inject(LocaleService);
+  public currentLocale = 'en-US';
 
   constructor(
     private categoryService: CategoryService,
@@ -124,6 +130,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         this.loadPosts(langId);
       }
     });
+    this.localeService.locale$.pipe(takeUntil(this.destroy$)).subscribe((loc: string) => { this.currentLocale = loc || 'en-US' });
   }
 
   ngAfterViewInit() {
@@ -457,6 +464,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
     this.getTrendingPreviewPosts(langId);
     this.translate.use(lang.locale_code);            // đổi ngôn ngữ UI
+    this.localeService.setLocaleFromLangCode(lang.locale_code);
     localStorage.setItem('lang', lang.locale_code);  // lưu lựa chọn
     document.documentElement.lang = lang.locale_code; // tốt cho SEO/a11y
   }
@@ -713,5 +721,10 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         console.error('Logout error:', error);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

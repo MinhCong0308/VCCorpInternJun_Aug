@@ -168,7 +168,7 @@
                     <a style="cursor: pointer;">
                         <span class="author-name">{{ post.User?.firstname }} {{ post.User?.lastname }}</span>
                     </a>
-                    <span>{{ post.createdAt | date:'MMM d, y'}}</span>
+                    <span>{{ post.createdAt | date:'mediumDate':undefined:currentLocale }}</span>
                 </div>
             </div>
 
@@ -276,7 +276,7 @@
                                     style="width:30px;height:30px;object-fit:cover;margin-right:10px;">
                             </a>
                             <a routerLink="/"><span class="me-2" style="font-size: 14px;">{{ root.User.firstname }} {{ root.User.lastname }}</span></a>
-                            <span style="font-size:13px;color:#888;">·  {{ root.createdAt | date:'mediumDate' }}</span>
+                            <span style="font-size:13px;color:#888;">·  {{ root.createdAt | date:'mediumDate':undefined:currentLocale }}</span>
                         </div>
                         <div style="font-size:14px;">{{ root.content }}</div>
                         <div class="interact d-flex align-items-center mt-1" style="font-size: 13px;">
@@ -318,7 +318,7 @@
                             <a routerLink="/"><span class="me-2" style="font-size:13px;">
                                 {{ node.User?.firstname }} {{ node.User?.lastname }}
                             </span></a>
-                            <span style="font-size:12px;color:#888;">· {{ node.createdAt | date:'mediumDate' }}</span>
+                            <span style="font-size:12px;color:#888;">· {{ node.createdAt | date:'mediumDate':undefined:currentLocale }}</span>
                         </div>
                         <div style="font-size:13px;">{{ node.content }}</div>
                         <div class="interact d-flex align-items-center mt-1" style="font-size:12px;">
@@ -372,7 +372,7 @@
                         </div>
                         <div class="text-secondary mb-2" style="font-size:0.97rem;">{{ post.content | excerpt: { limit: 80, by: 'chars' } }}</div>
                         <div class="d-flex align-items-center mt-2 justify-content-between" style="font-size:0.95rem;">
-                            <span class="text-secondary">{{ post.createdAt | date: 'MMM d' }}</span>
+                            <span class="text-secondary">{{ post.createdAt | date: 'mediumDate':undefined:currentLocale }}</span>
                             <div class="d-flex align-items-center gap-2">
                                 <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-thumb-up"></i> {{ post.like_cnt }}</button>
                                 <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-comment"></i> {{ post.commentCount }}</button>

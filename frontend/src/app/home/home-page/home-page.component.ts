@@ -56,6 +56,15 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
   boundOnScroll = () => this.scheduleUpdate();
   lastScrollTop = 0;
   scrollDir: 'down' | 'up' = 'down';
+  scrollDistance = 0;
+  scrollDistanceUp = 0;
+
+  sbMode: 'top' | 'bottom' | 'free' = 'top';
+  lastClass = '';
+  hysteresis = 4;
+  releaseFromTop = 0; // relTop - topOffset tại thời điểm rời 'top' khi cuộn xuống (<= 0)
+  releaseFromBottom = 0; // viewportH - relBottom tại thời điểm rời 'bottom' khi cuộn lên (>= 0)
+  freeOffset = 0;
 
   private destroy$ = new Subject<void>();
   public localeService = inject(LocaleService);
@@ -620,7 +629,7 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
     const inner = this.sidebarInner.nativeElement;
 
     // reset
-    inner.classList.remove('is-sticky-top', 'is-sticky-bottom');
+    inner.classList.remove('is-sticky-top', 'is-sticky-bottom', 'free');
 
     const topOffset = this.getTopOffset(); // ~80–140px
     const isWindow = this.scrollParent === window || this.scrollParent == null;
@@ -634,24 +643,31 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
     const relTop = outerRect.top - containerTop;
     const relBottom = outerRect.bottom - containerTop;
 
-    // “đệm” chống rung
-    const EPS = 2;
-
     if (this.scrollDir === 'down') {
+      this.setCssVar('--scroll-distance', `0px`);
       // chỉ dính đáy khi đáy khung đã lọt vào đáy viewport
-      if (relBottom <= viewportH + EPS) {
+      if (relBottom <= viewportH) {
+        this.scrollDistance = viewportH - relBottom;
+        console.log('scrollDistance when going DOWN: ', this.scrollDistance); // chỉ sau khi chạm đáy
         inner.classList.add('is-sticky-bottom');
-      } // else: free
+      } else inner.classList.add('free');
     } else {
+      this.setCssVar('--scroll-distance', `${this.scrollDistance}px`);
       // chỉ dính đỉnh khi đỉnh khung đã chạm ngưỡng topOff 
-      if (!(relTop <= topOffset - EPS && relBottom > viewportH + EPS)) {
+      if (!(relTop + this.scrollDistance <= topOffset)) {
+        this.scrollDistance = topOffset - relTop;
+        this.setCssVar('--scroll-distance', `${this.scrollDistance}px`);
         inner.classList.add('is-sticky-top');
-      } // else: free
+      } else {
+        this.scrollDistanceUp = viewportH - relBottom;
+        console.log('scrollDistanceUp: ', this.scrollDistanceUp); // check scrollDistanceUp
+        inner.classList.add('free');
+      }
     }
 
     // (tuỳ chọn) lúc ở sát đầu trang, cho phép “dính đỉnh” để giữ cảm giác mốc:
     const atVeryTop = this.getScrollTop() <= 1;
-    if (atVeryTop && relTop <= topOffset + EPS) {
+    if (atVeryTop && relTop <= topOffset) {
       inner.classList.add('is-sticky-top');
     }
 

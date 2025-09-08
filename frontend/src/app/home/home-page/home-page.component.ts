@@ -1,4 +1,4 @@
-import { AfterViewInit, ElementRef, ViewChild, ViewChildren, QueryList, HostListener, Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { AfterViewInit, ElementRef, ViewChild, ViewChildren, QueryList, HostListener, Component, Inject, OnInit, PLATFORM_ID, inject, OnDestroy } from '@angular/core';
 import { CategoryService } from '../../core/services/category.service';
 import { PostService } from '../../core/services/post.service';
 import { AccountService } from '../../core/services/account.service';
@@ -9,6 +9,9 @@ import { LanguageService, Language} from '../../core/services/language.service';
 import { SearchService } from '../../core/services/search.service';
 import { TranslateService } from '@ngx-translate/core';
 import { AppSettingsService } from '../../core/config/app-settings.service';
+import { Subject, takeUntil } from 'rxjs';
+import { LocaleService } from '../../core/services/locale.service';
+import { UserPermissionService, UserPermissions } from '../../core/services/user-permission.service';
 
 @Component({
   selector: 'app-home-page',
@@ -16,7 +19,7 @@ import { AppSettingsService } from '../../core/config/app-settings.service';
   styleUrls: ['./home-page.component.css'],
   standalone: false,
 })
-export class HomePageComponent implements OnInit, AfterViewInit {
+export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
   categories: any[] = [];
   recommendedCategories: any[] = [];
   allCategories: any[] = [];
@@ -54,6 +57,36 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   boundOnScroll = () => this.scheduleUpdate();
   lastScrollTop = 0;
   scrollDir: 'down' | 'up' = 'down';
+  scrollDistance = 0;
+  scrollDistanceUp = 0;
+  sbMode: 'top' | 'bottom' | 'free' = 'top';
+  lastClass = '';
+  hysteresis = 4;
+  releaseFromTop = 0; // relTop - topOffset tại thời điểm rời 'top' khi cuộn xuống (<= 0)
+  releaseFromBottom = 0; // viewportH - relBottom tại thời điểm rời 'bottom' khi cuộn lên (>= 0)
+  freeOffset = 0;
+  currentUserId = 0;
+  // Toast noti
+  showWriteToast = false;
+  writeToastMsg = '';
+  writeToastTimeout: any;
+
+  private t(key: string, params?: Record<string, any>) {
+    // instant là đủ vì i18n đã load; nếu muốn chắc, có thể dùng .get(...).subscribe(...)
+    const out = this.translate.instant(key, params);
+    return out || key;
+  }
+
+  private destroy$ = new Subject<void>();
+  public localeService = inject(LocaleService);
+  public currentLocale = 'en-US';
+
+  userPermissions: UserPermissions = {
+    can_write_post: true,
+    can_like_post: true,
+    can_write_comment: true,
+    can_edit_comment: true,
+  };
 
   constructor(
     private categoryService: CategoryService,
@@ -66,7 +99,8 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     public searchService: SearchService,
     private translate: TranslateService,
     public appSettings: AppSettingsService,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private permissionService: UserPermissionService
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
@@ -124,6 +158,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         this.loadPosts(langId);
       }
     });
+    this.localeService.locale$.pipe(takeUntil(this.destroy$)).subscribe((loc: string) => { this.currentLocale = loc || 'en-US' });
   }
 
   ngAfterViewInit() {
@@ -225,6 +260,24 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     this.accountService.getProfile().subscribe({
       next: (res: any) => {
         this.avatarUrl = res?.data?.avatarUrl || this.defaultAvatar;
+        this.currentUserId = res?.data?.userid;
+        // Lấy quyền user
+        if (this.currentUserId) {
+          this.permissionService.getUserPermissions(this.currentUserId).subscribe({
+            next: (perms: UserPermissions) => {
+              this.userPermissions = perms;
+            },
+            error: () => {
+              // Nếu chưa có thì mặc định bật hết
+              this.userPermissions = {
+                can_write_post: true,
+                can_like_post: true,
+                can_write_comment: true,
+                can_edit_comment: true,
+              };
+            },
+          });
+        }
       },
       error: (err) => {
         console.error('Failed to load profile', err);
@@ -457,6 +510,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
     this.getTrendingPreviewPosts(langId);
     this.translate.use(lang.locale_code);            // đổi ngôn ngữ UI
+    this.localeService.setLocaleFromLangCode(lang.locale_code);
     localStorage.setItem('lang', lang.locale_code);  // lưu lựa chọn
     document.documentElement.lang = lang.locale_code; // tốt cho SEO/a11y
   }
@@ -612,7 +666,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     const inner = this.sidebarInner.nativeElement;
 
     // reset
-    inner.classList.remove('is-sticky-top', 'is-sticky-bottom');
+    inner.classList.remove('is-sticky-top', 'is-sticky-bottom', 'free');
 
     const topOffset = this.getTopOffset(); // ~80–140px
     const isWindow = this.scrollParent === window || this.scrollParent == null;
@@ -626,24 +680,31 @@ export class HomePageComponent implements OnInit, AfterViewInit {
     const relTop = outerRect.top - containerTop;
     const relBottom = outerRect.bottom - containerTop;
 
-    // “đệm” chống rung
-    const EPS = 2;
-
     if (this.scrollDir === 'down') {
+      this.setCssVar('--scroll-distance', `0px`);
       // chỉ dính đáy khi đáy khung đã lọt vào đáy viewport
-      if (relBottom <= viewportH + EPS) {
+      if (relBottom <= viewportH) {
+        this.scrollDistance = viewportH - relBottom;
+        console.log('scrollDistance when going DOWN: ', this.scrollDistance); // chỉ sau khi chạm đáy
         inner.classList.add('is-sticky-bottom');
-      } // else: free
+      } else inner.classList.add('free');
     } else {
+      this.setCssVar('--scroll-distance', `${this.scrollDistance}px`);
       // chỉ dính đỉnh khi đỉnh khung đã chạm ngưỡng topOff 
-      if (!(relTop <= topOffset - EPS && relBottom > viewportH + EPS)) {
+      if (!(relTop + this.scrollDistance <= topOffset)) {
+        this.scrollDistance = topOffset - relTop;
+        this.setCssVar('--scroll-distance', `${this.scrollDistance}px`);
         inner.classList.add('is-sticky-top');
-      } // else: free
+      } else {
+        this.scrollDistanceUp = viewportH - relBottom;
+        console.log('scrollDistanceUp: ', this.scrollDistanceUp); // check scrollDistanceUp
+        inner.classList.add('free');
+      }
     }
 
     // (tuỳ chọn) lúc ở sát đầu trang, cho phép “dính đỉnh” để giữ cảm giác mốc:
     const atVeryTop = this.getScrollTop() <= 1;
-    if (atVeryTop && relTop <= topOffset + EPS) {
+    if (atVeryTop && relTop <= topOffset) {
       inner.classList.add('is-sticky-top');
     }
 
@@ -713,5 +774,40 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         console.error('Logout error:', error);
       }
     });
+  }
+
+  onWriteClick(): void {
+    if (!this.userPermissions?.can_write_post) {
+      this.showAuthToast('banned');
+      return;
+    }
+    this.router.navigate(['/blog-owner/create']);
+  }
+
+  showAuthToast(kind: 'banned') {
+    const keyMap: Record<string, string> = {
+      banned: 'TOAST.NO_PERMISSION_TO_WRITE_POST'
+    };
+
+    // Nếu tham số là 1 key đã có dấu chấm (AUTH.XYZ), dùng thẳng; nếu là like/comment/bookmark → map sang key; nếu là text thường → để nguyên
+    const key = kind.includes?.('.') ? kind : (keyMap[kind] || keyMap['generic']);
+    const msg = key.includes('.') ? this.t(key) : kind; // nếu là text thuần thì dùng trực tiếp
+
+    this.writeToastMsg = msg;
+    this.showWriteToast = true;
+
+    clearTimeout(this.writeToastTimeout);
+    this.writeToastTimeout = setTimeout(() => (this.showWriteToast = false), 3000);
+  }
+
+  dismissAuthToast() {
+    clearTimeout(this.writeToastTimeout);
+    this.showWriteToast = false;
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.writeToastTimeout);
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

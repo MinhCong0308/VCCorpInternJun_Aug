@@ -175,13 +175,26 @@ const postsService = {
     },
     likePost: async (postId, count = 1) => {
         if (!Number.isFinite(count) || count <= 0) count = 1;
-        const post = await db.Post.findByPk(postId);
-        if (!post) {
-            throw new Error("Post not found");
-        }
-        await post.increment('like_cnt', { by: count });
-        await post.reload();
-        return post.toJSON();
+        return await db.sequelize.transaction(async (t) => {
+            const post = await db.Post.findByPk(postId, { transaction: t });
+            if (!post) throw new Error('Post not found');
+            const original = post.original_postid ?? post.original_postId ?? post.postid;
+            await db.Post.update(
+                { like_cnt: Sequelize.literal(`GREATEST(like_cnt + ${count}, 0)`) },
+                {
+                    where: {
+                        [Op.or]: [
+                        { original_postid: original }, // khi cột là snake_case
+                        { original_postId: original }, // nếu model dùng camelCase
+                        { postid: original },           // phòng trường hợp bài gốc không set original_postid
+                        ],
+                    },
+                    transaction: t,
+                }
+            );
+            await post.reload({ transaction: t });
+            return post.toJSON();
+        });
     },
     unlikePost: async (postId) => {
         const post = await db.Post.findByPk(postId);

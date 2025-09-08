@@ -71,3 +71,29 @@
   border-color: #6aa7e8;
   background: #e9f3ff;
 }
+
+/* Adjust Permissions Modal */
+.adjust-permissions-modal-content {
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+}
+.adjust-permissions-modal-content .modal-header {
+  border-bottom: 1px solid #e9ecef;
+}
+.adjust-permissions-modal-content .modal-title {
+  font-weight: 600;
+}
+.adjust-permissions-modal-content .table {
+  margin-bottom: 0;
+}
+.adjust-permissions-modal-content .btn-success {
+  min-width: 60px;
+  font-weight: 500;
+}
+.adjust-permissions-modal-content .btn-danger {
+  min-width: 60px;
+  font-weight: 500;
+}
+.adjust-permissions-modal-content .modal-footer {
+  border-top: 1px solid #e9ecef;
+}

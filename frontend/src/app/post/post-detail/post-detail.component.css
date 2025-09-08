@@ -441,7 +441,7 @@ body {
     .post-meta-detail { flex-direction: column; align-items: flex-start; gap: 0.3rem;}
 }
 /* ===== Auth toast (fixed, top-center) ===== */
-:host ::ng-deep .auth-toast, .error-toast {
+:host ::ng-deep .auth-toast, .error-toast, .write-toast {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -458,8 +458,25 @@ body {
   pointer-events: auto;
 }
 
-:host ::ng-deep .auth-toast .ti-alert, .error-toast .ti-alert { font-size: 14px; line-height: 1; }
-:host ::ng-deep .auth-toast .msg, .error-toast .msg { font-weight: 400; white-space: nowrap; }
+:host ::ng-deep .success-toast {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 7px;
+  background: green;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(53, 220, 95, 0.35);
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  animation: toastIn 140ms ease-out;
+  pointer-events: auto;
+}
+
+:host ::ng-deep .auth-toast .ti-alert, .error-toast .ti-alert, .write-toast .ti-alert { font-size: 14px; line-height: 1; }
+:host ::ng-deep .auth-toast .msg, .error-toast .msg, .write-toast .msg { font-weight: 400; white-space: nowrap; }
 
 :host ::ng-deep .btn-toast {
   background: rgba(255,255,255,0.15);
@@ -496,4 +513,8 @@ body {
 @keyframes toastIn {
   from { opacity: 0; transform: translate(-50%, -10px); }
   to   { opacity: 1; transform: translate(-50%, 0); }
+}
+.not-allowed {
+  cursor: not-allowed !important;
+  opacity: 0.7;
 }

@@ -32,7 +32,39 @@
         <span class="msg">{{ errorWarnText }}</span>
 
         <!-- nút đóng (nếu muốn) -->
-        <button type="button" class="btn-toast-close" (click)="dismissAuthToast()" [attr.aria-label]="'TOAST.CLOSE' | translate">
+        <button type="button" class="btn-toast-close" (click)="dismissErrorToast()" [attr.aria-label]="'TOAST.CLOSE' | translate">
+            ×
+        </button>
+    </div>
+
+    <div
+    class="write-toast"
+    *ngIf="showWriteToast"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+    >
+        <i class="ti-alert" aria-hidden="true"></i>
+        <span class="msg">{{ writeToastMsg }}</span>
+
+        <!-- nút đóng (nếu muốn) -->
+        <button type="button" class="btn-toast-close" (click)="dismissPermissionToast()" [attr.aria-label]="'TOAST.CLOSE' | translate">
+            ×
+        </button>
+    </div>
+
+    <div
+    class="success-toast"
+    *ngIf="showSuccess"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+    >
+        <i class="ti-alert" aria-hidden="true"></i>
+        <span class="msg">{{ successToastMsg }}</span>
+
+        <!-- nút đóng (nếu muốn) -->
+        <button type="button" class="btn-toast-close" (click)="dismissSuccessToast()" [attr.aria-label]="'TOAST.CLOSE' | translate">
             ×
         </button>
     </div>
@@ -111,9 +143,15 @@
             </div>
             <!-- Nếu đã login -->
             <div *ngIf="isLoggedIn" class="d-flex align-items-center gap-3 ms-auto">
-                <a routerLink="/blog-owner/create" class="btn btn-write">
+                <button
+                    class="btn btn-write"
+                    (click)="onWriteClick()"
+                    [attr.aria-disabled]="!userPermissions.can_write_post ? true : null"
+                    [class.is-disabled]="!userPermissions.can_write_post"
+                    title="{{ !userPermissions.can_write_post ? ('TOAST.NO_PERMISSION_TO_WRITE_POST' | translate) : '' }}"
+                >
                     <i class="ti-pencil-alt"></i> {{ 'NAV.WRITE' | translate }}
-                </a>
+                </button>
                 <!-- Language Dropdown -->
                 <div class="dropdown">
                     <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
@@ -168,7 +206,7 @@
                     <a style="cursor: pointer;">
                         <span class="author-name">{{ post.User?.firstname }} {{ post.User?.lastname }}</span>
                     </a>
-                    <span>{{ post.createdAt | date:'MMM d, y'}}</span>
+                    <span>{{ post.createdAt | date:'mediumDate':undefined:currentLocale }}</span>
                 </div>
             </div>
 
@@ -184,7 +222,10 @@
                     (mouseleave)="onLikeRelease($event)"
                     (touchstart)="onLikePress($event)"
                     (touchend)="onLikeRelease($event)"
-                    (touchcancel)="onLikeRelease($event)">
+                    (touchcancel)="onLikeRelease($event)"
+                    [attr.aria-disabled]="!userPermissions.can_like_post ? true : null"
+                    [class.is-disabled]="!userPermissions.can_like_post"
+                    title="{{ !userPermissions.can_like_post ? ('TOAST.NO_PERMISSION_TO_LIKE' | translate) : '' }}">
                     <i class="ti-thumb-up"></i> {{ post?.like_cnt }}</button>
                     <span
                         *ngFor="let b of plusBubbles; trackBy: trackByBubble"
@@ -228,7 +269,10 @@
                     (mouseleave)="onLikeRelease($event)"
                     (touchstart)="onLikePress($event)"
                     (touchend)="onLikeRelease($event)"
-                    (touchcancel)="onLikeRelease($event)">
+                    (touchcancel)="onLikeRelease($event)"
+                    [attr.aria-disabled]="!userPermissions.can_like_post ? true : null"
+                    [class.is-disabled]="!userPermissions.can_like_post"
+                    title="{{ !userPermissions.can_like_post ? ('TOAST.NO_PERMISSION_TO_LIKE' | translate) : '' }}">
                     <i class="ti-thumb-up"></i> {{ post?.like_cnt }}</button>
                     <span
                         *ngFor="let b of plusBubbles; trackBy: trackByBubble"
@@ -257,12 +301,15 @@
                 <!-- Form bình luận mới (ở đầu) -->
                 <div *ngIf="isLoggedIn" class="mb-4">
                     <div class="reply-form d-flex align-items-start">
-                        <a><img [src]="avatarUrl" class="rounded-circle" style="width:32px;height:32px;margin-right:12px;"></a>
-                        <textarea [(ngModel)]="newComment" class="form-control" rows="3" placeholder="{{ 'RESP.THOUGHTS' | translate }}" style="resize:none;"></textarea>
+                        <a><img [src]="avatarUrl || appSettings.defaults.userAvatar" class="rounded-circle" style="width:32px;height:32px;margin-right:12px;"></a>
+                        <textarea [(ngModel)]="newComment" class="form-control" rows="3" placeholder="{{ 'RESP.THOUGHTS' | translate }}" style="resize:none;" 
+                        [disabled]="!userPermissions.can_write_comment" [ngClass]="!userPermissions.can_write_comment ? 'not-allowed' : ''"
+                        title="{{ !userPermissions.can_write_comment ? ('TOAST.NO_PERMISSION_TO_COMMENT' | translate) : '' }}"></textarea>
                     </div>
                     <div class="text-end mt-2">
                         <button class="btn btn-white btn-sm rounded-pill px-4" (click)="newComment = ''">{{ 'RESP.CANCEL' | translate }}</button>
-                        <button class="btn btn-dark btn-sm rounded-pill px-4" (click)="sendNewComment()">{{ 'RESP.SEND' | translate }}</button>
+                        <button class="btn btn-dark btn-sm rounded-pill px-4" (click)="sendNewComment()" 
+                        [disabled]="!userPermissions.can_write_comment" [ngClass]="!userPermissions.can_write_comment ? 'not-allowed' : ''">{{ 'RESP.SEND' | translate }}</button>
                     </div>
                 </div>
 
@@ -276,12 +323,40 @@
                                     style="width:30px;height:30px;object-fit:cover;margin-right:10px;">
                             </a>
                             <a routerLink="/"><span class="me-2" style="font-size: 14px;">{{ root.User.firstname }} {{ root.User.lastname }}</span></a>
-                            <span style="font-size:13px;color:#888;">·  {{ root.createdAt | date:'mediumDate' }}</span>
+                            <span style="font-size:13px;color:#888;">·  {{ root.createdAt | date:'mediumDate':undefined:currentLocale }}</span>
                         </div>
-                        <div style="font-size:14px;">{{ root.content }}</div>
+                        <!-- Nếu đang edit comment root -->
+                        <div *ngIf="editingId === root.commentid; else viewRootContent" class="mt-1">
+                            <textarea [(ngModel)]="editContent"
+                                        class="form-control"
+                                        rows="3"
+                                        placeholder="{{ 'RESP.EDIT_PLACEHOLDER' | translate }}"
+                                        style="resize:none;"></textarea>
+                            <div class="text-end mt-2">
+                                <button class="btn btn-white btn-sm rounded-pill px-3 me-2" (click)="cancelEdit()">
+                                {{ 'RESP.CANCEL' | translate }}
+                                </button>
+                                <button class="btn btn-dark btn-sm rounded-pill px-3" (click)="saveEdit(root)">
+                                {{ 'RESP.SAVE' | translate }}
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Chế độ xem bình thường -->
+                        <ng-template #viewRootContent>
+                            <div style="font-size:14px;">{{ root.content }}</div>
+                        </ng-template>
                         <div class="interact d-flex align-items-center mt-1" style="font-size: 13px;">
                             <button *ngIf="isLoggedIn" class="btn btn-link px-0 me-3 text-decoration-underline btn-reply"
+                            [ngClass]="!userPermissions.can_write_comment ? 'not-allowed' : ''"
+                            title="{{ !userPermissions.can_write_comment ? ('TOAST.NO_PERMISSION_TO_COMMENT' | translate) : '' }}"
                             (click)="openReplyForm(root)">{{ 'RESP.REPLY' | translate }}</button>
+                            <!-- Nút sửa chỉ cho chính chủ -->
+                            <button *ngIf="isOwner(root) && editingId !== root.commentid"
+                                    class="btn btn-link px-0 me-3 text-decoration-underline" [ngClass]="!userPermissions.can_edit_comment ? 'not-allowed' : ''"
+                                    title="{{ !userPermissions.can_edit_comment ? ('TOAST.NO_PERMISSION_TO_FIX' | translate) : '' }}"
+                                    (click)="startEdit(root)">
+                            {{ 'RESP.EDIT' | translate }}
+                            </button>
                             <button *ngIf="getDirectChildCount(root) > 0" class="btn btn-link btn-see-more-child px-0 py-1"
                             (click)="toggleReplies(root)">
                                 <i class="ti-comment"></i>
@@ -318,22 +393,54 @@
                             <a routerLink="/"><span class="me-2" style="font-size:13px;">
                                 {{ node.User?.firstname }} {{ node.User?.lastname }}
                             </span></a>
-                            <span style="font-size:12px;color:#888;">· {{ node.createdAt | date:'mediumDate' }}</span>
+                            <span style="font-size:12px;color:#888;">· {{ node.createdAt | date:'mediumDate':undefined:currentLocale }}</span>
                         </div>
-                        <div style="font-size:13px;">{{ node.content }}</div>
+                        <!-- Nếu đang edit comment node -->
+                        <div *ngIf="editingId === node.commentid; else viewNodeContent" class="mt-1">
+                            <textarea [(ngModel)]="editContent"
+                                        class="form-control"
+                                        rows="3"
+                                        placeholder="{{ 'RESP.EDIT_PLACEHOLDER' | translate }}"
+                                        style="resize:none;"></textarea>
+                            <div class="text-end mt-2">
+                                <button class="btn btn-white btn-sm rounded-pill px-3 me-2" (click)="cancelEdit()">
+                                {{ 'RESP.CANCEL' | translate }}
+                                </button>
+                                <button class="btn btn-dark btn-sm rounded-pill px-3" (click)="saveEdit(node)">
+                                {{ 'RESP.SAVE' | translate }}
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Chế độ xem bình thường -->
+                        <ng-template #viewNodeContent>
+                            <div style="font-size:13px;">{{ node.content }}</div>
+                        </ng-template>
                         <div class="interact d-flex align-items-center mt-1" style="font-size:12px;">
                             <button *ngIf="isLoggedIn"
                                     class="btn btn-link px-0 me-2 text-decoration-underline btn-reply"
+                                    [ngClass]="!userPermissions.can_write_comment ? 'not-allowed' : ''"
+                                    title="{{ !userPermissions.can_write_comment ? ('TOAST.NO_PERMISSION_TO_COMMENT' | translate) : '' }}"
                                     (click)="openReplyForm(node)">{{ 'RESP.REPLY' | translate }}</button>
+                            <!-- Nút Sửa chỉ cho chính chủ -->
+                             <button *ngIf="isOwner(node) && editingId !== node.commentid"
+                                    class="btn btn-link px-0 me-2 text-decoration-underline"
+                                    [ngClass]="!userPermissions.can_edit_comment ? 'not-allowed' : ''"
+                                    title="{{ !userPermissions.can_edit_comment ? ('TOAST.NO_PERMISSION_TO_FIX' | translate) : '' }}"
+                                    (click)="startEdit(node)">
+                            {{ 'RESP.EDIT' | translate }}
+                            </button>
                         </div>
 
                         <!-- Form reply cho node con -->
                         <div *ngIf="replyTo === node.commentid" class="mt-2" [style.marginLeft.px]="32">
                             <textarea [(ngModel)]="replyContent" class="form-control" rows="2"
-                                        placeholder="{{ 'RESP.WRITE_REP' | translate }}" style="resize:none;"></textarea>
+                                        placeholder="{{ 'RESP.WRITE_REP' | translate }}" style="resize:none;"
+                                        [disabled]="!userPermissions.can_write_comment" [ngClass]="!userPermissions.can_write_comment ? 'not-allowed' : ''"
+                                        title="{{ !userPermissions.can_write_comment ? ('TOAST.NO_PERMISSION_TO_COMMENT' | translate) : '' }}"></textarea>
                             <div class="text-end mt-2">
                                 <button class="btn btn-white btn-sm rounded-pill px-3 me-2" (click)="cancelReply()">{{ 'RESP.CANCEL' | translate }}</button>
-                                <button class="btn btn-dark btn-sm rounded-pill px-3" (click)="sendReply(node)">{{ 'RESP.REPLY' | translate }}</button>
+                                <button class="btn btn-dark btn-sm rounded-pill px-3" (click)="sendReply(node)"
+                                [disabled]="!userPermissions.can_write_comment" [ngClass]="!userPermissions.can_write_comment ? 'not-allowed' : ''">{{ 'RESP.REPLY' | translate }}</button>
                             </div>
                         </div>
                     </div>
@@ -372,7 +479,7 @@
                         </div>
                         <div class="text-secondary mb-2" style="font-size:0.97rem;">{{ post.content | excerpt: { limit: 80, by: 'chars' } }}</div>
                         <div class="d-flex align-items-center mt-2 justify-content-between" style="font-size:0.95rem;">
-                            <span class="text-secondary">{{ post.createdAt | date: 'MMM d' }}</span>
+                            <span class="text-secondary">{{ post.createdAt | date: 'mediumDate':undefined:currentLocale }}</span>
                             <div class="d-flex align-items-center gap-2">
                                 <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-thumb-up"></i> {{ post.like_cnt }}</button>
                                 <button class="btn btn-link text-secondary px-1 py-0"><i class="ti-comment"></i> {{ post.commentCount }}</button>

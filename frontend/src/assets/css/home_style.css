@@ -418,13 +418,9 @@ aside {
         margin-top: 2rem;
         min-width: 0;
     }
-    /* .sidebar-inner.is-sticky-top,
-    .sidebar-inner.is-sticky-bottom {
-        position: static;
-    } */
 }
 /* Khung bao để định kích thước & đo va chạm */
-aside .sidebar-outer {
+.sidebar-outer {
   position: relative;
   overflow: visible;
 }
@@ -433,27 +429,32 @@ aside .sidebar-outer {
 .sb-sentinel { height: 1px; width: 100%; }
 
 /* 3 trạng thái của sidebar-inner */
-aside .sidebar-inner {
-  position: relative; /* mặc định: free */
-  overflow: visible;
+.sidebar-inner {
+    position: relative;
 }
 
-/* Khi dính đỉnh (giống Medium khi qua ngưỡng trên) */
-aside .sidebar-inner.is-sticky-top {
-  position: sticky;
-  top: var(--sidebar-top, calc(var(--navbar-height) + 24px));
-  
-  /* Khi nội dung cao hơn viewport, vẫn cuộn trang – không cuộn trong sidebar */
-  max-height: none;
-  bottom: auto !important;
+.sidebar-inner.free {
+    position: relative;
+    top: var(--scroll-distance, 91px);
+    transition: top 0.2s, bottom 0.2s;
 }
 
-/* Khi dính đáy (khi chạm ngưỡng dưới) */
-aside .sidebar-inner.is-sticky-bottom {
-  position: sticky;
-  bottom: 24px;              /* khoảng cách đáy bạn muốn */
-  
-  top: auto !important;
+.sidebar-inner.is-sticky-top {
+    position: fixed;
+    top: var(--sidebar-top, calc(var(--navbar-height) + 24px));
+    left: auto;
+    right: auto;
+    width: var(--sidebar-width, 18.49%);
+    z-index: 100;
+}
+
+.sidebar-inner.is-sticky-bottom {
+    position: fixed;
+    bottom: 24px;
+    left: auto;
+    right: auto;
+    width: var(--sidebar-width, 18.49%);
+    z-index: 100;
 }
 .sidebar-section {
     margin-bottom: 2.3rem;
@@ -507,6 +508,7 @@ aside .sidebar-inner.is-sticky-bottom {
 }
 .btn-write {
     font-weight: 500;
+    border-width: 0;
     border-radius: 100px;
     padding: 6px 16px 6px 11px;
     color: var(--text-secondary);
@@ -521,6 +523,9 @@ aside .sidebar-inner.is-sticky-bottom {
     background: #fff;
     color: var(--text-primary);
     text-decoration: none;
+}
+.btn-write.is-disabled, .icon-btn.is-disabled {
+  cursor: not-allowed !important;
 }
 .full-list {
     font-size: 13px;
@@ -779,4 +784,50 @@ aside .sidebar-inner.is-sticky-bottom {
 }
 .danger-text {
     color : red;
+}
+/* ===== Auth toast (fixed, top-center) ===== */
+.write-toast {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 7px;
+  background: #ff474c;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.35);
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  animation: toastIn 140ms ease-out;
+  pointer-events: auto;
+}
+
+.write-toast .ti-alert { font-size: 14px; line-height: 1; }
+.write-toast .msg { font-weight: 400; white-space: nowrap; }
+
+.btn-toast-close {
+  background: transparent;
+  color: rgba(255,255,255,0.9);
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+}
+
+.toast-sticky-container {
+  position: sticky;
+  top: 7px;
+  z-index: 2000;
+  height: 0;
+  overflow: visible;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translate(-50%, -10px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
 }

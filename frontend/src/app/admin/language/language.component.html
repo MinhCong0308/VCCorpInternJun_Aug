@@ -202,10 +202,8 @@
       <div
         class="modal-header py-2"
         [ngClass]="{
-          'bg-info': confirmModal.action === 'status',
-          'bg-danger': confirmModal.action === 'delete',
-          'bg-secondary':
-            confirmModal.action === 'status' && !confirmModal.lang?.status
+          'bg-danger': confirmModal.op === 'disable',
+          'bg-success': confirmModal.op === 'enable'
         }"
       >
         <h5 class="modal-title">{{ confirmModal.title }}</h5>

@@ -22,6 +22,7 @@ declare const $: any;
 
 interface ConfirmModalState {
   action: 'delete-one' | 'status' | null;
+  op: 'delete' | 'activate' | 'deactivate' | null;
   ids: number[];
   title: string;
   message: string;
@@ -51,6 +52,7 @@ export class DictionaryComponent implements OnInit, AfterViewInit {
 
   confirmModal: ConfirmModalState = {
     action: null,
+    op: null,
     ids: [],
     title: '',
     message: '',
@@ -278,6 +280,7 @@ export class DictionaryComponent implements OnInit, AfterViewInit {
     if (action === 'status') {
       this.confirmModal = {
         action: 'status',
+        op: word.status ? 'deactivate' : 'activate',
         ids: [word.wordid],
         title: word.status ? 'Confirm Deactivate' : 'Confirm Activate',
         message: `${word.status ? 'Deactivate' : 'Activate'} word "${
@@ -288,6 +291,7 @@ export class DictionaryComponent implements OnInit, AfterViewInit {
     } else {
       this.confirmModal = {
         action: 'delete-one',
+        op: 'delete',
         ids: [word.wordid],
         title: 'Confirm Delete',
         message: `Delete word "${word.word}"?`,
@@ -318,6 +322,7 @@ export class DictionaryComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.confirmModal = {
         action: null,
+        op: null,
         ids: [],
         title: '',
         message: '',

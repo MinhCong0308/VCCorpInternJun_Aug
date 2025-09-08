@@ -76,15 +76,6 @@
       <div class="card-header">
         <h3 class="card-title">Bad Words</h3>
         <div class="card-tools d-flex">
-          <!-- <button
-            class="btn btn-danger mr-2"
-            (click)="openBulkDelete()"
-            [disabled]="!bulkSelection.size"
-          >
-            <i class="fas fa-trash-alt mr-1"></i> Delete Selected ({{
-              bulkSelection.size
-            }})
-          </button> -->
           <a
             href="#"
             class="btn btn-primary"
@@ -98,20 +89,15 @@
         <table class="table table-striped" id="dictionary-table">
           <thead>
             <tr>
-              <!-- <th style="width: 50px">
-                <input
-                  type="checkbox"
-                  (change)="toggleSelectAll($event)"
-                  [checked]="
-                    bulkSelection.size === words.length && words.length
-                  "
-                />
-              </th> -->
-              <th style="width: 70px">#</th>
+              <th style="width: 5%; text-align: center">#</th>
+
               <th>Word</th>
-              <th style="width: 140px">Locale</th>
-              <th style="width: 120px; text-align: center">Status</th>
-              <th style="width: 120px; text-align: center">Actions</th>
+
+              <th style="width: 15%">Locale</th>
+
+              <th style="width: 15%; text-align: center">Status</th>
+
+              <th style="width: 15%; text-align: center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -218,8 +204,9 @@
       <div
         class="modal-header py-2"
         [ngClass]="{
-          'bg-warning': confirmModal.action === 'status',
-          'bg-danger': confirmModal.action?.includes('delete')
+          'bg-success': confirmModal.op === 'activate',
+          'bg-warning': confirmModal.op === 'deactivate',
+          'bg-danger': confirmModal.op === 'delete'
         }"
       >
         <h5 class="modal-title">{{ confirmModal.title }}</h5>

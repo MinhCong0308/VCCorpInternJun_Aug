@@ -49,3 +49,9 @@
   display: inline-block;
   vertical-align: top;
 }
+@media (min-width: 992px) {
+  .col-lg-20p {
+    flex: 0 0 20%;
+    max-width: 20%;
+  }
+}

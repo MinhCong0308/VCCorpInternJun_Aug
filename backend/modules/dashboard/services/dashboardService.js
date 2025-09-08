@@ -7,6 +7,7 @@ const dashboardService = {
       totalPosts,
       totalCategories,
       totalLanguages,
+      totalBadwords,
       latestUsers,
       latestPosts,
     ] = await Promise.all([
@@ -14,6 +15,7 @@ const dashboardService = {
       db.Post.count(),
       db.Category.count(),
       db.Language.count(),
+      db.Dictionary.count(),
       db.User.findAll({
         limit: 12,
         order: [["createdAt", "DESC"]],
@@ -43,6 +45,7 @@ const dashboardService = {
         posts: totalPosts,
         categories: totalCategories,
         languages: totalLanguages,
+        badwords: totalBadwords,
       },
       latest_data: {
         users: latestUsers,

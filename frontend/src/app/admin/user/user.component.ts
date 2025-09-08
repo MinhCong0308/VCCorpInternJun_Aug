@@ -12,6 +12,7 @@ import {
   PaginatedUserResponse,
   UserService,
 } from '../../core/services/user.service';
+import { UserPermissionService, UserPermissions } from '../../core/services/user-permission.service';
 
 declare const $: any;
 
@@ -53,9 +54,23 @@ export class UserComponent implements OnInit, AfterViewInit {
     btnClass: 'btn-primary',
   };
 
+  // --- Adjust Permissions Logic ---
+  showAdjustPermissionsModal = false;
+  selectedUser: AdminUser | null = null;
+  adjustPermissions: any = {};
+  permissionList = [
+    { key: 'can_write_post', label: 'Write Post' },
+    { key: 'can_like_post', label: 'Like Post' },
+    { key: 'can_write_comment', label: 'Write Comment' },
+    { key: 'can_edit_comment', label: 'Edit Comment' },
+  ];
+  adjustPermissionsMsg: string = '';
+  adjustPermissionsMsgType: 'success' | 'error' | '' = '';
+
   constructor(
     private fb: FormBuilder,
     private service: UserService,
+    private permissionService: UserPermissionService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -372,5 +387,62 @@ export class UserComponent implements OnInit, AfterViewInit {
         btnClass: 'btn-primary',
       };
     }, 300);
+  }
+
+  openAdjustPermissions(user: AdminUser): void {
+    this.selectedUser = user;
+    this.showAdjustPermissionsModal = true;
+    // Fetch permissions from backend
+    this.permissionService.getUserPermissions(user.userid).subscribe({
+      next: (perms: UserPermissions) => {
+        this.adjustPermissions = { ...perms };
+      },
+      error: () => {
+        // Nếu chưa có thì mặc định bật hết
+        this.adjustPermissions = {
+          can_write_post: true,
+          can_like_post: true,
+          can_write_comment: true,
+          can_edit_comment: true,
+        };
+      },
+    });
+    if (typeof $ === 'function') {
+      setTimeout(() => $('#adjustPermissionsModal').modal('show'), 0);
+    }
+  }
+
+  closeAdjustPermissionsModal(): void {
+    this.showAdjustPermissionsModal = false;
+    this.selectedUser = null;
+    if (typeof $ === 'function') {
+      $('#adjustPermissionsModal').modal('hide');
+    }
+  }
+
+  togglePermission(key: string): void {
+    this.adjustPermissions[key] = !this.adjustPermissions[key];
+  }
+
+  applyAdjustPermissions(): void {
+    if (!this.selectedUser) return;
+    this.adjustPermissionsMsg = '';
+    this.adjustPermissionsMsgType = '';
+    this.permissionService.updateUserPermissions(this.selectedUser.userid, this.adjustPermissions).subscribe({
+      next: () => {
+        this.adjustPermissionsMsg = 'Permissions updated successfully!';
+        this.adjustPermissionsMsgType = 'success';
+        setTimeout(() => {
+          this.closeAdjustPermissionsModal();
+          this.loadUsers(this.currentPage);
+          this.adjustPermissionsMsg = '';
+          this.adjustPermissionsMsgType = '';
+        }, 1200);
+      },
+      error: () => {
+        this.adjustPermissionsMsg = 'Failed to update permissions.';
+        this.adjustPermissionsMsgType = 'error';
+      },
+    });
   }
 }

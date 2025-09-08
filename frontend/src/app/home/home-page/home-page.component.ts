@@ -11,6 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { AppSettingsService } from '../../core/config/app-settings.service';
 import { Subject, takeUntil } from 'rxjs';
 import { LocaleService } from '../../core/services/locale.service';
+import { UserPermissionService, UserPermissions } from '../../core/services/user-permission.service';
 
 @Component({
   selector: 'app-home-page',
@@ -58,17 +59,33 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
   scrollDir: 'down' | 'up' = 'down';
   scrollDistance = 0;
   scrollDistanceUp = 0;
-
   sbMode: 'top' | 'bottom' | 'free' = 'top';
   lastClass = '';
   hysteresis = 4;
   releaseFromTop = 0; // relTop - topOffset tại thời điểm rời 'top' khi cuộn xuống (<= 0)
   releaseFromBottom = 0; // viewportH - relBottom tại thời điểm rời 'bottom' khi cuộn lên (>= 0)
   freeOffset = 0;
+  // Toast noti
+  showWriteToast = false;
+  writeToastMsg = '';
+  writeToastTimeout: any;
+
+  private t(key: string, params?: Record<string, any>) {
+    // instant là đủ vì i18n đã load; nếu muốn chắc, có thể dùng .get(...).subscribe(...)
+    const out = this.translate.instant(key, params);
+    return out || key;
+  }
 
   private destroy$ = new Subject<void>();
   public localeService = inject(LocaleService);
   public currentLocale = 'en-US';
+
+  userPermissions: UserPermissions = {
+    can_write_post: false,
+    can_like_post: false,
+    can_write_comment: false,
+    can_edit_comment: false,
+  };
 
   constructor(
     private categoryService: CategoryService,
@@ -81,7 +98,8 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
     public searchService: SearchService,
     private translate: TranslateService,
     public appSettings: AppSettingsService,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private permissionService: UserPermissionService // Thêm service phân quyền
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
@@ -92,6 +110,25 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isLoggedIn = ok;
         if (ok) {
           this.loadProfile();
+          // Lấy quyền user
+          if (!this.isBrowser) return;
+          const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+          if (currentUser?.userid) {
+            this.permissionService.getUserPermissions(currentUser.userid).subscribe({
+              next: (perms: UserPermissions) => {
+                this.userPermissions = perms;
+              },
+              error: () => {
+                // Nếu chưa có thì mặc định bật hết
+                this.userPermissions = {
+                  can_write_post: true,
+                  can_like_post: true,
+                  can_write_comment: true,
+                  can_edit_comment: true,
+                };
+              },
+            });
+          }
         }
       },
     });
@@ -739,7 +776,37 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  onWriteClick(): void {
+    if (!this.userPermissions?.can_write_post) {
+      this.showAuthToast('banned');
+      return;
+    }
+    this.router.navigate(['/blog-owner/create']);
+  }
+
+  showAuthToast(kind: 'banned') {
+    const keyMap: Record<string, string> = {
+      banned: 'TOAST.NO_PERMISSION_TO_WRITE_POST'
+    };
+
+    // Nếu tham số là 1 key đã có dấu chấm (AUTH.XYZ), dùng thẳng; nếu là like/comment/bookmark → map sang key; nếu là text thường → để nguyên
+    const key = kind.includes?.('.') ? kind : (keyMap[kind] || keyMap['generic']);
+    const msg = key.includes('.') ? this.t(key) : kind; // nếu là text thuần thì dùng trực tiếp
+
+    this.writeToastMsg = msg;
+    this.showWriteToast = true;
+
+    clearTimeout(this.writeToastTimeout);
+    this.writeToastTimeout = setTimeout(() => (this.showWriteToast = false), 3000);
+  }
+
+  dismissAuthToast() {
+    clearTimeout(this.writeToastTimeout);
+    this.showWriteToast = false;
+  }
+
   ngOnDestroy(): void {
+    clearTimeout(this.writeToastTimeout);
     this.destroy$.next();
     this.destroy$.complete();
   }

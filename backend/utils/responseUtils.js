@@ -8,6 +8,14 @@ module.exports = {
     });
   },
 
+  forbidden: (res, message) => {
+    return res.status(403).send({
+      success: false,
+      status: 403,
+      message: message || "Access denied",
+    });
+  },
+
   notFound: (res) => {
     return res.status(404).send({
       success: false,

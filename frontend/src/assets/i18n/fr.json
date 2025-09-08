@@ -4,7 +4,8 @@
         "PLEASE_LOGIN": "Veuillez vous connecter pour continuer",
         "LOGIN_TO_LIKE": "Vous devez vous connecter pour aimer la publication",
         "LOGIN_TO_COMMENT": "Vous devez vous connecter pour commenter",
-        "NO_TRANSLATED_POST": "Aucune publication traduite pour cette langue"
+        "NO_TRANSLATED_POST": "Aucune publication traduite pour cette langue",
+        "NO_PERMISSION_TO_WRITE_POST": "Votre autorisation d'écrire un message a été retirée par ADMIN"
     },
     "NAV": {
         "SEARCH": "Rechercher",

@@ -4,7 +4,8 @@
         "PLEASE_LOGIN": "Please log in to continue",
         "LOGIN_TO_LIKE": "You need to log in to like the post",
         "LOGIN_TO_COMMENT": "You need to log in to comment",
-        "NO_TRANSLATED_POST": "No translated post for this language"
+        "NO_TRANSLATED_POST": "No translated post for this language",
+        "NO_PERMISSION_TO_WRITE_POST": "Your permission to write post had been taken away by ADMIN"
     },
     "NAV": {
         "SEARCH": "Search",

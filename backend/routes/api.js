@@ -32,6 +32,9 @@ const passport = require("modules/oauth/passport");
 const manageTokenController = require("modules/manage_token/controllers/manageTokenController");
 const { uploads } = require("kernels/middlewares/multer");
 const multer = require("multer");
+const userPermissonController = require("modules/user-permission/controllers/userPermissionController");
+const userPermissionValidation = require("modules/user-permission/validations/userPermissionValidation");
+const { checkUserPermission } = require("kernels/middlewares/userPermissionMiddleware");
 
 // ===== EXAMPLE Request, make this commented =====
 // router.group("/posts",middlewares([authenticated, role("owner")]),(router) => {
@@ -105,6 +108,7 @@ router.group(
   (router) => {
     router.post(
       "/create-post",
+      middlewares([checkUserPermission('can_write_post')]),
       validate([postValidation.createPost]),
       postController.createPost
     );
@@ -186,12 +190,14 @@ router.group("/comments", (router) => {
   router.post(
     "/",
     middlewares([authenticated, checkRole(["user"])]),
+    middlewares([checkUserPermission('can_write_comment')]),
     validate([commentValidation.create]),
     commentController.create
   );
   router.put(
     "/:commentId",
     middlewares([authenticated, checkRole(["user"])]),
+    middlewares([checkUserPermission('can_edit_comment')]),
     validate([commentValidation.update]),
     commentController.update
   );
@@ -216,11 +222,13 @@ router.group("/posts", (router) => {
   router.put(
     "/:postId/like",
     middlewares([authenticated, checkRole(["user"])]),
+    middlewares([checkUserPermission('can_like_post')]),
     postsController.likePost
   );
   router.put(
     "/:postId/unlike",
     middlewares([authenticated, checkRole(["user"])]),
+    middlewares([checkUserPermission('can_like_post')]),
     postsController.unlikePost
   );
 });
@@ -241,6 +249,11 @@ router.group(
     router.put("/:userid/enable", userController.enable);
   }
 );
+
+router.group("/user-permissions", middlewares([authenticated, checkRole(["admin"])]), (router) => {
+  router.get("/:userid", userPermissonController.getUserPermissions);
+  router.put("/:userid", validate([userPermissionValidation.update]), userPermissonController.updateUserPermissions);
+});
 
 router.group(
   "/dashboard",

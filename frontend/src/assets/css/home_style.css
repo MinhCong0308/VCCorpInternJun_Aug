@@ -508,6 +508,7 @@ aside {
 }
 .btn-write {
     font-weight: 500;
+    border-width: 0;
     border-radius: 100px;
     padding: 6px 16px 6px 11px;
     color: var(--text-secondary);
@@ -522,6 +523,9 @@ aside {
     background: #fff;
     color: var(--text-primary);
     text-decoration: none;
+}
+.btn-write.is-disabled {
+  cursor: not-allowed;
 }
 .full-list {
     font-size: 13px;
@@ -780,4 +784,50 @@ aside {
 }
 .danger-text {
     color : red;
+}
+/* ===== Auth toast (fixed, top-center) ===== */
+.write-toast {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 7px;
+  background: #ff474c;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.35);
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  animation: toastIn 140ms ease-out;
+  pointer-events: auto;
+}
+
+.write-toast .ti-alert { font-size: 14px; line-height: 1; }
+.write-toast .msg { font-weight: 400; white-space: nowrap; }
+
+.btn-toast-close {
+  background: transparent;
+  color: rgba(255,255,255,0.9);
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+}
+
+.toast-sticky-container {
+  position: sticky;
+  top: 7px;
+  z-index: 2000;
+  height: 0;
+  overflow: visible;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translate(-50%, -10px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
 }

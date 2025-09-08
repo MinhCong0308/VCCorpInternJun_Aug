@@ -67,6 +67,12 @@ class WithLocale
         return this;
     }
 
+    isBoolean() {
+        this.withLocale = this.withLocale.isBoolean().withMessage(stringUtils.capitalize(this.field) + " must be true or false").bail()
+        return this;
+    }
+
+
     isIn(check, against) {
         this.withLocale = this.withLocale.isIn(check, against).withMessage(this.field + " must be in allowable range").bail();
         return this

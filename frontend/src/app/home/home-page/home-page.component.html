@@ -1,3 +1,22 @@
+<!-- Auth toast -->
+<div class="toast-sticky-container">
+    <div
+    class="write-toast"
+    *ngIf="showWriteToast"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+    >
+        <i class="ti-alert" aria-hidden="true"></i>
+        <span class="msg">{{ writeToastMsg }}</span>
+
+        <!-- nút đóng (nếu muốn) -->
+        <button type="button" class="btn-toast-close" (click)="dismissAuthToast()" [attr.aria-label]="'TOAST.CLOSE' | translate">
+            ×
+        </button>
+    </div>
+</div>
+
 <!-- Navbar -->
 <nav #navbar
      class="navbar sticky-top smart-hide navbar-expand-lg navbar-light bg-white border-bottom py-2">
@@ -76,9 +95,15 @@
             </div>
             <!-- Nếu đã login -->
             <div *ngIf="isLoggedIn" class="d-flex align-items-center gap-3 ms-auto">
-                <a routerLink="/blog-owner/create" class="btn btn-write">
+                <button
+                    class="btn btn-write"
+                    (click)="onWriteClick()"
+                    [attr.aria-disabled]="!userPermissions?.can_write_post ? true : null"
+                    [class.is-disabled]="!userPermissions?.can_write_post"
+                    title="{{ !userPermissions.can_write_post ? ('TOAST.NO_PERMISSION_TO_WRITE_POST' | translate) : '' }}"
+                >
                     <i class="ti-pencil-alt"></i> {{ 'NAV.WRITE' | translate }}
-                </a>
+                </button>
                 <!-- Language Dropdown -->
                 <div class="dropdown">
                     <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
@@ -329,7 +354,18 @@
                             <li>{{ 'SIDEBAR.WRITING_ON_BLOG.EXPERT_ADVICE' | translate }}</li>
                             <li>{{ 'SIDEBAR.WRITING_ON_BLOG.GROW_READERS' | translate }}</li>
                         </ul>
-                        <a routerLink="/blog-owner/create"><button class="btn btn-dark btn-sm rounded-pill">{{ 'SIDEBAR.WRITING_ON_BLOG.START_WRITING' | translate }}</button></a>
+                        <a *ngIf="userPermissions?.can_write_post; else noWriteBtn" [routerLink]="'/blog-owner/create'">
+                            <button class="btn btn-dark btn-sm rounded-pill">{{ 'SIDEBAR.WRITING_ON_BLOG.START_WRITING' | translate }}</button>
+                        </a>
+                        <ng-template #noWriteBtn>
+                            <button
+                            class="btn btn-dark btn-sm rounded-pill"
+                            disabled
+                            title="You do not have permission to write posts"
+                            style="cursor: not-allowed;">
+                            {{ 'SIDEBAR.WRITING_ON_BLOG.START_WRITING' | translate }}
+                        </button>
+                        </ng-template>
                     </div>
                     <div class="sidebar-section">
                         <h6>{{ 'SIDEBAR.RECOMMENDED_CATEGORIES' | translate }}</h6>

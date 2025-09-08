@@ -154,8 +154,14 @@
                           class="dropdown-item"
                           (click)="openConfirm(u, 'role')"
                         >
-                          <i class="fas fa-user mr-2 text-primary"></i>Change
-                          Role
+                          <i class="fas fa-user mr-2 text-primary"></i>Change Role
+                        </button>
+                        <button
+                          *ngIf="u.roleid !== 2"
+                          class="dropdown-item"
+                          (click)="openAdjustPermissions(u)"
+                        >
+                          <i class="fas fa-sliders-h mr-2 text-warning"></i>Adjust Permissions
                         </button>
                         <button
                           class="dropdown-item"
@@ -216,6 +222,72 @@
     </div>
   </div>
 </section>
+
+<!-- Adjust Permissions Modal -->
+<div
+  class="modal fade"
+  id="adjustPermissionsModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="adjustPermissionsModalLabel"
+  aria-hidden="true"
+  [ngClass]="{ show: showAdjustPermissionsModal }"
+  [style.display]="showAdjustPermissionsModal ? 'block' : 'none'"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content adjust-permissions-modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title" id="adjustPermissionsModalLabel">
+          Adjusting Permissions of user: <b>{{ selectedUser?.username }}</b>
+        </h5>
+        <button
+          type="button"
+          class="close"
+          (click)="closeAdjustPermissionsModal()"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="adjustPermissionsMsg" class="alert" [ngClass]="adjustPermissionsMsgType === 'success' ? 'alert-success' : 'alert-danger'">
+          {{ adjustPermissionsMsg }}
+        </div>
+        <table class="table table-bordered mb-0">
+          <thead>
+            <tr>
+              <th>Permission</th>
+              <th style="width: 120px; text-align: center">Enabled</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let perm of permissionList">
+              <td>{{ perm.label }}</td>
+              <td style="text-align: center">
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  [ngClass]="adjustPermissions[perm.key] ? 'btn-success' : 'btn-danger'"
+                  (click)="togglePermission(perm.key)"
+                >
+                  {{ adjustPermissions[perm.key] ? 'On' : 'Off' }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeAdjustPermissionsModal()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="applyAdjustPermissions()">
+          Apply
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Confirmation Modal -->
 <div

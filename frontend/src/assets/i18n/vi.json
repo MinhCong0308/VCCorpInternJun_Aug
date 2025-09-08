@@ -4,7 +4,8 @@
         "PLEASE_LOGIN": "Vui lòng đăng nhập để tiếp tục",
         "LOGIN_TO_LIKE": "Bạn cần đăng nhập để like bài viết",
         "LOGIN_TO_COMMENT": "Bạn cần đăng nhập để bình luận bài viết",
-        "NO_TRANSLATED_POST": "Không có bản dịch cho ngôn ngữ này"
+        "NO_TRANSLATED_POST": "Không có bản dịch cho ngôn ngữ này",
+        "NO_PERMISSION_TO_WRITE_POST": "Quyền viết bài của bạn đã bị ADMIN thu hồi"
     },
     "NAV": {
         "SEARCH": "Tìm kiếm",

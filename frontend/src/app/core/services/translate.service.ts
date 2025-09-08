@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class TranslateService {
+export class TranslatePostService {
   private baseUrl = "http://localhost:3000/post-owner/translate";
   constructor(private http: HttpClient) { }
   translate(text: string, sourceLanguage: string, targetLanguage: string): Observable<any> {

@@ -116,5 +116,25 @@ const authController = {
       return responseUtils.unauthorized(res, "Logout failed");
     }
   },
+  changePassword: async (req, res) => {
+    try {
+      const user = req.user;
+      console.log("User from token:", user);
+      if(!user) {
+        return responseUtils.unauthorized(res, "Invalid session");
+      }
+      const { currentPassword, newPassword } = req.body;
+      console.log("Current Password:", currentPassword);
+      console.log("New Password:", newPassword);
+      if(!currentPassword || !newPassword) {
+        return responseUtils.error(res, { message: "Current password and new password are required" });
+      }
+      await authService.changePassword(user.userid, currentPassword, newPassword);
+      return responseUtils.ok(res, { message: "Password changed successfully" });
+    } catch (error) {
+      console.error("Change Password error:", error);
+      return responseUtils.unauthorized(res, "Change Password failed");
+    }
+  }
 };
 module.exports = authController;

@@ -10,12 +10,13 @@ import { QuillEditorComponent } from 'ngx-quill';
 import { ProfileService, UserProfile } from '../../core/services/profile.service';
 import { CategoryService, Category } from '../../core/services/category.service';
 import { LanguageService, Language } from '../../core/services/language.service';
-import { TranslateService } from '../../core/services/translate.service';
+import { TranslatePostService } from '../../core/services/translate.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { Subscription } from 'rxjs';
 import { DraftService } from '../../core/services/draft.service';
 import { fromEvent, Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 interface PostLanguageTab {
   title: string;
   content: string;
@@ -56,10 +57,13 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
   userProfile: UserProfile | null = null;
   currentLanguage: Language | null = null;
   defaultLanguage: Language | null = null;
+  initialLang = 'en';
   languages: Language[] = [];
   languageTabs: PostLanguageTab[] = [];
   activeTabIndex: number = 0;
   translations: Post[] = [];
+  isBrowser: boolean;
+  loadingLang: boolean = false;
 
   // Subscription management
   private subscriptions: Subscription[] = [];
@@ -97,10 +101,13 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     private profileService: ProfileService,
     private categoryService: CategoryService,
     private languageService: LanguageService,
-    private translateService: TranslateService,
+    private translateService: TranslatePostService,
     private notificationService: NotificationService,
-    private draftService: DraftService
-  ) {}
+    private draftService: DraftService,
+    private translate: TranslateService
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 
   async ngOnInit(): Promise<void> {
     try {
@@ -137,9 +144,18 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       clearTimeout(this.scrollTimeout);
     }
     this.subscriptions.forEach(sub => sub.unsubscribe());
-    this.resetQuillEditor();
-    this.destroy$.next();
-    this.destroy$.complete();       
+    this.stopAutosave();
+    // check for removing trash draft, it means that user does not enter any thing (both title and content and choosen categoryare empty)
+    if(this.blogForm) {
+      const title = this.blogForm.get('title')?.value || '';
+      const content = this.blogForm.get('content')?.value || '';
+      const tags = this.blogForm.get('tags')?.value || [];
+      if(!title.trim() && !content.trim() && (!tags || tags.length === 0)) {
+        console.log('Removing empty draft on destroy');
+        this.clearDraft();
+      } 
+    }
+    this.resetQuillEditor();      
   }
 
   setUpAutoScroll(): void {
@@ -242,7 +258,11 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       await this.loadUserProfile();      
       await this.loadLanguages();      
       await this.handleRouteParams();
-      await this.restoreDraft();   
+      const draftRestored = await this.restoreDraft();
+      // restoreDraft() returns void, so check if a draft exists instead
+      if (!this.languageTabs.length && !this.isEditMode) {
+        this.initializeDefaultTab();
+      }
       this.setUpAutosave();        
       console.log('Initialization completed successfully');
     } catch (error) {
@@ -299,12 +319,34 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
   }
 
   loadLanguages(): Promise<void> {
+    if(!isPlatformBrowser(this.platformId)) {
+      return Promise.resolve();
+    }
+    // check if list of languages is stored in localStorage
+    if(localStorage.getItem('languages')) {
+      try {
+        const storedLanguages = JSON.parse(localStorage.getItem('languages') || '[]');
+        if(Array.isArray(storedLanguages) && storedLanguages.length > 0) {
+          this.languages = storedLanguages;
+          this.normalizeLanguages();
+          const code = this.translate.getCurrentLang?.() || this.initialLang;
+          this.syncCurrentLanguageByCode(code);
+          this.defaultLanguage = this.currentLanguage;
+          console.log('Default language from localStorage:', this.defaultLanguage);
+          console.log('Languages loaded from localStorage:', this.languages.length);
+          return Promise.resolve();
+        }
+      } catch (error) {
+        console.error('Error parsing stored languages:', error);
+        // proceed to load from server
+      }
+    }
     return new Promise((resolve, reject) => {
       const sub = this.languageService.getLanguages().subscribe({
         next: (response) => {
           this.languages = response.data.languages || [];
-          this.defaultLanguage = this.languages.find(lang => lang.is_default) || null;
-          this.currentLanguage = this.defaultLanguage;
+          this.currentLanguage = this.languages.find(lang => lang.is_default) || null;
+          this.defaultLanguage = this.currentLanguage;
           console.log('Languages loaded:', this.languages.length);
           resolve();
         },
@@ -332,7 +374,34 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       this.subscriptions.push(sub);
     });
   }
-
+  normalizeLanguages(): void {
+    this.languages = this.languages
+      .filter(l => l.status === 1 || l.status === undefined)
+      .map(l => ({
+        ...l,
+        locale_code: (l.locale_code || '').trim() || (l.languagename === 'Vietnamese' ? 'vi' : 'en')
+      }));
+  }
+  syncCurrentLanguageByCode(code?: string): void {
+    const cc = (code || 'en').toLowerCase();
+    this.currentLanguage =
+      this.languages.find(l => (l.locale_code || '').toLowerCase() === cc)
+      || this.languages.find(l => !!l.is_default)
+      || this.languages[0];
+  }
+  
+  applyUiLanguage(lang: Language): void {
+    if (!lang?.locale_code) return;
+    const id = lang?.languageid;
+    this.translate.use(lang.locale_code);
+    if (this.isBrowser) {
+      try { 
+        localStorage.setItem('lang', lang.locale_code);
+        localStorage.setItem('languageId', String(id));
+      } catch {}
+      document.documentElement.lang = lang.locale_code;
+    }
+  }
   handleRouteParams(): Promise<void> {
     return new Promise((resolve) => {
       const sub = this.route.queryParams.subscribe({
@@ -360,7 +429,9 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
 
 
   initializeDefaultTab(): void {
+    console.log("Initializing default tab");
     if (this.defaultLanguage && !this.isEditMode) {
+      console.log('Default language found:', this.defaultLanguage);
       const defaultTab: PostLanguageTab = {
         title: '',
         content: '',
@@ -939,10 +1010,15 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     this.subscriptions.push(sub);
   }
   selectLanguage(language: Language): void {
-    this.currentLanguage = language;
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('locale_code', language.locale_code);
+    if(!language || this.loadingLang) return;
+    if(this.currentLanguage?.languageid === language.languageid) {
+      this.applyUiLanguage(language);
+      return;
     }
+    this.loadingLang = true;
+    this.applyUiLanguage(language);
+    this.currentLanguage = language;
+    this.loadingLang = false;
   }
 
   clearMessages(): void {
@@ -991,7 +1067,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
   private setUpAutosave() {
     this.blogForm.valueChanges.pipe(debounceTime(400), takeUntil(this.destroy$)).subscribe(() => this.saveDraft());
     setTimeout(() => {
-      if(!this.quillEditor.quillEditor) return;
+      if(!this.quillEditor?.quillEditor) return;
       this.quillEditor.quillEditor.on('text-change', () => {
         console.log("Run this auto update");
         this.saveCurrentTabData();

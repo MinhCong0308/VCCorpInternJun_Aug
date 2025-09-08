@@ -22,7 +22,11 @@
         "WRITE": "Write",
         "PROFILE": "Profile",
         "SIGNOUT": "Sign out",
-        "NOTIFICATIONS": "Notifications"
+        "NOTIFICATIONS": "Notifications",
+        "CHANGE_PASSWORD": "Change Password",
+        "UPDATE": "Update",
+        "PUBLISH": "Publish",
+        "DRAFTS": "Draft in"
     },
     "SEARCH": {
         "RECENT_TITLE": "RECENT SEARCHES",
@@ -171,5 +175,44 @@
         "RESEND_COOLDOWN": "Resend available in",
         "WRONG_EMAIL": "Wrong email?",
         "GO_BACK_TO_SIGNUP": "Go back to signup"
+    },
+    "PASSWORD": {
+        "TITLE": "Change Password",
+        "CURRENT": "Current Password",
+        "CURRENT_PLACEHOLDER": "Enter your current password",
+        "NEW": "New Password",
+        "NEW_PLACEHOLDER": "Enter your new password",
+        "CONFIRM": "Confirm Password",
+        "CONFIRM_PLACEHOLDER": "Confirm your new password",
+        "UPDATE": "Update Password",
+        "UPDATING": "Updating...",
+        "SUCCESS_TITLE": "Success",
+        "SUCCESS_MESSAGE": "Your password has been changed successfully.",
+        "ERROR_TITLE": "Password Change Failed",
+        "ERROR_DEFAULT": "Failed to change password. Please try again.",
+        "ERROR_CURRENT_INCORRECT": "Current password is incorrect.",
+        "ERROR_REQUIRED": "This field is required.",
+        "ERROR_MIN_LENGTH": "Password must be at least 8 characters.",
+        "ERROR_STRENGTH": "Password must include uppercase, lowercase, number and special character.",
+        "ERROR_MISMATCH": "Passwords do not match.",
+        "ERROR_INVALID": "Invalid input.",
+        "STRENGTH": "Password strength",
+        "STRENGTH_WEAK": "Weak",
+        "STRENGTH_FAIR": "Fair",
+        "STRENGTH_GOOD": "Good",
+        "STRENGTH_STRONG": "Strong",
+        "REQUIREMENTS": "Password must be at least 8 characters and include uppercase, lowercase, number and special character."
+    },
+    "POST_EDITOR": {
+        "SELECT_CATEGORY": "Select category",
+        "TRANSLATING": "Translating...",
+        "ORIGINAL": "Original",
+        "TRANSLATE": "Translate",
+        "TRANSLATE_TO": "Translate to:",
+        "TRANSLATION": "Translation",
+        "TRANSLATING_CONTENT": "Translating content...",
+        "TRANSLATION_READ_ONLY": "Translation (read-only)",
+        "ENTER_TITLE": "Enter title",
+        "TELL_STORY": "Tell your story..."
     }
 }

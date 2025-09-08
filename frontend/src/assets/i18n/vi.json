@@ -22,7 +22,11 @@
         "WRITE": "Viết bài",
         "PROFILE": "Tài khoản cá nhân",
         "SIGNOUT": "Đăng xuất",
-        "NOTIFICATIONS": "Thông báo"
+        "NOTIFICATIONS": "Thông báo",
+        "CHANGE_PASSWORD": "Đổi mật khẩu",
+        "UPDATE": "Cập nhật",
+        "PUBLISH": "Xuất bản",
+        "DRAFTS": "Bản nháp của"
     },
     "SEARCH": {
         "RECENT_TITLE": "TÌM KIẾM GẦN ĐÂY",
@@ -171,5 +175,44 @@
         "RESEND_COOLDOWN": "Gửi lại trong",
         "WRONG_EMAIL": "Email sai?",
         "GO_BACK_TO_SIGNUP": "Quay lại đăng ký"
+    },
+    "PASSWORD": {
+        "TITLE": "Đổi mật khẩu",
+        "CURRENT": "Mật khẩu hiện tại",
+        "CURRENT_PLACEHOLDER": "Nhập mật khẩu hiện tại",
+        "NEW": "Mật khẩu mới",
+        "NEW_PLACEHOLDER": "Nhập mật khẩu mới",
+        "CONFIRM": "Xác nhận mật khẩu",
+        "CONFIRM_PLACEHOLDER": "Xác nhận mật khẩu mới",
+        "UPDATE": "Cập nhật mật khẩu",
+        "UPDATING": "Đang cập nhật...",
+        "SUCCESS_TITLE": "Thành công",
+        "SUCCESS_MESSAGE": "Mật khẩu của bạn đã được thay đổi thành công.",
+        "ERROR_TITLE": "Thay đổi mật khẩu thất bại",
+        "ERROR_DEFAULT": "Không thể thay đổi mật khẩu. Vui lòng thử lại.",
+        "ERROR_CURRENT_INCORRECT": "Mật khẩu hiện tại không chính xác.",
+        "ERROR_REQUIRED": "Trường này là bắt buộc.",
+        "ERROR_MIN_LENGTH": "Mật khẩu phải có ít nhất 8 ký tự.",
+        "ERROR_STRENGTH": "Mật khẩu phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.",
+        "ERROR_MISMATCH": "Mật khẩu không khớp.",
+        "ERROR_INVALID": "Nhập liệu không hợp lệ.",
+        "STRENGTH": "Độ mạnh mật khẩu",
+        "STRENGTH_WEAK": "Yếu",
+        "STRENGTH_FAIR": "Trung bình",
+        "STRENGTH_GOOD": "Khá",
+        "STRENGTH_STRONG": "Mạnh",
+        "REQUIREMENTS": "Mật khẩu phải có ít nhất 8 ký tự và bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt."
+    },
+    "POST_EDITOR": {
+        "SELECT_CATEGORY": "Chọn danh mục",
+        "TRANSLATING": "Đang dịch...",
+        "ORIGINAL": "Bản gốc",
+        "TRANSLATE": "Dịch",
+        "TRANSLATE_TO": "Dịch sang:",
+        "TRANSLATION": "Bản dịch",
+        "TRANSLATING_CONTENT": "Đang dịch nội dung...",
+        "TRANSLATION_READ_ONLY": "Bản dịch (chỉ đọc)",
+        "ENTER_TITLE": "Nhập tiêu đề",
+        "TELL_STORY": "Kể câu chuyện của bạn..."
     }
 }

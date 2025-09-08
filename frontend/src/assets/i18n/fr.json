@@ -5,7 +5,14 @@
         "LOGIN_TO_LIKE": "Vous devez vous connecter pour aimer la publication",
         "LOGIN_TO_COMMENT": "Vous devez vous connecter pour commenter",
         "NO_TRANSLATED_POST": "Aucune publication traduite pour cette langue",
-        "NO_PERMISSION_TO_WRITE_POST": "Votre autorisation d'écrire un message a été retirée par ADMIN"
+        "NO_PERMISSION_TO_WRITE_POST": "Votre autorisation d'écrire un message a été retirée par ADMIN",
+        "NO_PERMISSION_TO_LIKE": "Votre autorisation d'aimer la publication a été retirée par ADMIN",
+        "NO_PERMISSION_TO_COMMENT": "Votre autorisation de commenter a été retirée par ADMIN",
+        "NO_PERMISSION_TO_FIX": "Votre autorisation de corriger le commentaire a été retirée par ADMIN",
+        "COMMENT_SUCCESS": "Commentaire posté",
+        "COMMENT_FAIL": "Erreur lors de la publication du commentaire",
+        "EDIT_SUCCESS": "Commentaire mis à jour",
+        "EDIT_FAIL": "Erreur lors de la mise à jour du commentaire"
     },
     "NAV": {
         "SEARCH": "Rechercher",
@@ -44,7 +51,8 @@
         "SEE_LESS": "Voir moins",
         "READING_LIST": {
         "TITLE": "Liste de lecture",
-        "DESCRIPTION": "Cliquez sur le signet d'un article pour l'ajouter facilement à votre liste de lecture ou à une liste personnalisée que vous pouvez partager." },
+        "DESCRIPTION": "Cliquez sur le signet d'un article pour l'ajouter facilement à votre liste de lecture ou à une liste personnalisée que vous pouvez partager." 
+        },
         "FOOTER": {
         "HELP": "Aide",
         "STATUS": "Statut",
@@ -80,6 +88,8 @@
         "CANCEL": "Annuler",
         "SEND": "Envoyer",
         "REPLY": "Répondre",
+        "EDIT": "Modifier",
+        "SAVE": "Enregistrez",
         "NUM_REP": "réponses",
         "HIDE_REP": "Masquer les réponses",
         "WRITE_REP": "Écrire une réponse...",

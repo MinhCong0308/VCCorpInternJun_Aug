@@ -250,9 +250,9 @@ router.group(
   }
 );
 
-router.group("/user-permissions", middlewares([authenticated, checkRole(["admin"])]), (router) => {
+router.group("/user-permissions", (router) => {
   router.get("/:userid", userPermissonController.getUserPermissions);
-  router.put("/:userid", validate([userPermissionValidation.update]), userPermissonController.updateUserPermissions);
+  router.put("/:userid", middlewares([authenticated, checkRole(["admin"])]), validate([userPermissionValidation.update]), userPermissonController.updateUserPermissions);
 });
 
 router.group(

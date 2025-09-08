@@ -98,8 +98,8 @@
                 <button
                     class="btn btn-write"
                     (click)="onWriteClick()"
-                    [attr.aria-disabled]="!userPermissions?.can_write_post ? true : null"
-                    [class.is-disabled]="!userPermissions?.can_write_post"
+                    [attr.aria-disabled]="!userPermissions.can_write_post ? true : null"
+                    [class.is-disabled]="!userPermissions.can_write_post"
                     title="{{ !userPermissions.can_write_post ? ('TOAST.NO_PERMISSION_TO_WRITE_POST' | translate) : '' }}"
                 >
                     <i class="ti-pencil-alt"></i> {{ 'NAV.WRITE' | translate }}

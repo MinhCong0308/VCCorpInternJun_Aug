@@ -65,6 +65,7 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
   releaseFromTop = 0; // relTop - topOffset tại thời điểm rời 'top' khi cuộn xuống (<= 0)
   releaseFromBottom = 0; // viewportH - relBottom tại thời điểm rời 'bottom' khi cuộn lên (>= 0)
   freeOffset = 0;
+  currentUserId = 0;
   // Toast noti
   showWriteToast = false;
   writeToastMsg = '';
@@ -81,10 +82,10 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
   public currentLocale = 'en-US';
 
   userPermissions: UserPermissions = {
-    can_write_post: false,
-    can_like_post: false,
-    can_write_comment: false,
-    can_edit_comment: false,
+    can_write_post: true,
+    can_like_post: true,
+    can_write_comment: true,
+    can_edit_comment: true,
   };
 
   constructor(
@@ -99,7 +100,7 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
     private translate: TranslateService,
     public appSettings: AppSettingsService,
     @Inject(PLATFORM_ID) private platformId: Object,
-    private permissionService: UserPermissionService // Thêm service phân quyền
+    private permissionService: UserPermissionService
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
@@ -110,25 +111,6 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isLoggedIn = ok;
         if (ok) {
           this.loadProfile();
-          // Lấy quyền user
-          if (!this.isBrowser) return;
-          const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-          if (currentUser?.userid) {
-            this.permissionService.getUserPermissions(currentUser.userid).subscribe({
-              next: (perms: UserPermissions) => {
-                this.userPermissions = perms;
-              },
-              error: () => {
-                // Nếu chưa có thì mặc định bật hết
-                this.userPermissions = {
-                  can_write_post: true,
-                  can_like_post: true,
-                  can_write_comment: true,
-                  can_edit_comment: true,
-                };
-              },
-            });
-          }
         }
       },
     });
@@ -278,6 +260,24 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.accountService.getProfile().subscribe({
       next: (res: any) => {
         this.avatarUrl = res?.data?.avatarUrl || this.defaultAvatar;
+        this.currentUserId = res?.data?.userid;
+        // Lấy quyền user
+        if (this.currentUserId) {
+          this.permissionService.getUserPermissions(this.currentUserId).subscribe({
+            next: (perms: UserPermissions) => {
+              this.userPermissions = perms;
+            },
+            error: () => {
+              // Nếu chưa có thì mặc định bật hết
+              this.userPermissions = {
+                can_write_post: true,
+                can_like_post: true,
+                can_write_comment: true,
+                can_edit_comment: true,
+              };
+            },
+          });
+        }
       },
       error: (err) => {
         console.error('Failed to load profile', err);

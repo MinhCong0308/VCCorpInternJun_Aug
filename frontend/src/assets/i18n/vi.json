@@ -5,7 +5,14 @@
         "LOGIN_TO_LIKE": "Bạn cần đăng nhập để like bài viết",
         "LOGIN_TO_COMMENT": "Bạn cần đăng nhập để bình luận bài viết",
         "NO_TRANSLATED_POST": "Không có bản dịch cho ngôn ngữ này",
-        "NO_PERMISSION_TO_WRITE_POST": "Quyền viết bài của bạn đã bị ADMIN thu hồi"
+        "NO_PERMISSION_TO_WRITE_POST": "Quyền viết bài của bạn đã bị ADMIN thu hồi",
+        "NO_PERMISSION_TO_LIKE": "Quyền Like bài đăng của bạn đã bị ADMIN thu hồi",
+        "NO_PERMISSION_TO_COMMENT": "Quyền bình luận của bạn đã bị ADMIN thu hồi",
+        "NO_PERMISSION_TO_FIX": "Quyền sửa bình luận của bạn đã bị ADMIN thu hồi",
+        "COMMENT_SUCCESS": "Bình luận đã được đăng",
+        "COMMENT_FAIL": "Lỗi đăng bình luận",
+        "EDIT_SUCCESS": "Đã cập nhật bình luận",
+        "EDIT_FAIL": "Lỗi khi cập nhật bình luận"
     },
     "NAV": {
         "SEARCH": "Tìm kiếm",
@@ -81,6 +88,8 @@
         "CANCEL": "Hủy",
         "SEND": "Gửi",
         "REPLY": "Trả lời",
+        "EDIT": "Sửa",
+        "SAVE": "Lưu",
         "NUM_REP": "trả lời",
         "HIDE_REP": "Thu gọn các câu trả lời",
         "WRITE_REP": "Viết câu trả lời...",

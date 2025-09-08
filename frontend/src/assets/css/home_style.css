@@ -524,8 +524,8 @@ aside {
     color: var(--text-primary);
     text-decoration: none;
 }
-.btn-write.is-disabled {
-  cursor: not-allowed;
+.btn-write.is-disabled, .icon-btn.is-disabled {
+  cursor: not-allowed !important;
 }
 .full-list {
     font-size: 13px;

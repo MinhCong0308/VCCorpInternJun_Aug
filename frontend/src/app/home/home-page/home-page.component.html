@@ -1,3 +1,22 @@
+<!-- Auth toast -->
+<div class="toast-sticky-container">
+    <div
+    class="write-toast"
+    *ngIf="showWriteToast"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+    >
+        <i class="ti-alert" aria-hidden="true"></i>
+        <span class="msg">{{ writeToastMsg }}</span>
+
+        <!-- nút đóng (nếu muốn) -->
+        <button type="button" class="btn-toast-close" (click)="dismissAuthToast()" [attr.aria-label]="'TOAST.CLOSE' | translate">
+            ×
+        </button>
+    </div>
+</div>
+
 <!-- Navbar -->
 <nav #navbar
      class="navbar sticky-top smart-hide navbar-expand-lg navbar-light bg-white border-bottom py-2">
@@ -76,9 +95,15 @@
             </div>
             <!-- Nếu đã login -->
             <div *ngIf="isLoggedIn" class="d-flex align-items-center gap-3 ms-auto">
-                <a routerLink="/blog-owner/create" class="btn btn-write">
+                <button
+                    class="btn btn-write"
+                    (click)="onWriteClick()"
+                    [attr.aria-disabled]="!userPermissions.can_write_post ? true : null"
+                    [class.is-disabled]="!userPermissions.can_write_post"
+                    title="{{ !userPermissions.can_write_post ? ('TOAST.NO_PERMISSION_TO_WRITE_POST' | translate) : '' }}"
+                >
                     <i class="ti-pencil-alt"></i> {{ 'NAV.WRITE' | translate }}
-                </a>
+                </button>
                 <!-- Language Dropdown -->
                 <div class="dropdown">
                     <button class="btn btn-light px-2 py-1 border-0 d-flex align-items-center gap-1"
@@ -194,7 +219,7 @@
                         </div>
                         <div class="post-sneak">{{ post.content | excerpt: { limit: 130, by: 'chars' } }}</div>
                         <div class="post-meta">
-                            <span>{{ post.createdAt | date: 'MMM d' }}</span>
+                            <span>{{ post.createdAt | date: 'mediumDate':undefined:currentLocale }}</span>
                             <span><i class="ti-thumb-up"></i> {{ post.like_cnt }}</span>
                             <span><i class="ti-comment"></i> {{ post.commentCount }}</span>
                         </div>
@@ -204,7 +229,7 @@
                     </a>
                 </div>
 
-                <div class="post-item">
+                <!-- <div class="post-item">
                     <div class="post-info">
                         <div class="d-flex align-items-center mb-1">
                             <img src="https://randomuser.me/api/portraits/men/11.jpg" class="author-avatar" alt="Author">
@@ -283,7 +308,7 @@
                         </div>
                     </div>
                     <a href="#"><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*7RLhPlkS-a6-l8iFCWA3Rw@2x.jpeg" class="post-img-thumb" alt="Preview"></a>
-                </div>
+                </div> -->
             </div>
         </main>
         <!-- Sidebar -->
@@ -315,7 +340,7 @@
                             </div>
 
                             <span class="text-secondary" style="font-size: 11px;">
-                            {{ post.createdAt | date: 'MMM d' }}
+                            {{ post.createdAt | date: 'mediumDate':undefined:currentLocale }}
                             </span>
                         </div>
 
@@ -330,7 +355,18 @@
                             <li>{{ 'SIDEBAR.WRITING_ON_BLOG.EXPERT_ADVICE' | translate }}</li>
                             <li>{{ 'SIDEBAR.WRITING_ON_BLOG.GROW_READERS' | translate }}</li>
                         </ul>
-                        <a routerLink="/blog-owner/create"><button class="btn btn-dark btn-sm rounded-pill">{{ 'SIDEBAR.WRITING_ON_BLOG.START_WRITING' | translate }}</button></a>
+                        <a *ngIf="userPermissions?.can_write_post; else noWriteBtn" [routerLink]="'/blog-owner/create'">
+                            <button class="btn btn-dark btn-sm rounded-pill">{{ 'SIDEBAR.WRITING_ON_BLOG.START_WRITING' | translate }}</button>
+                        </a>
+                        <ng-template #noWriteBtn>
+                            <button
+                            class="btn btn-dark btn-sm rounded-pill"
+                            disabled
+                            title="You do not have permission to write posts"
+                            style="cursor: not-allowed;">
+                            {{ 'SIDEBAR.WRITING_ON_BLOG.START_WRITING' | translate }}
+                        </button>
+                        </ng-template>
                     </div>
                     <div class="sidebar-section">
                         <h6>{{ 'SIDEBAR.RECOMMENDED_CATEGORIES' | translate }}</h6>

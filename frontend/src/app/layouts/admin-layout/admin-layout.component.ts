@@ -14,7 +14,12 @@ import {
   DOCUMENT,
   NgIf,
 } from '@angular/common';
-import { RouterLink, RouterOutlet, RouterLinkActive, Router } from '@angular/router';
+import {
+  RouterLink,
+  RouterOutlet,
+  RouterLinkActive,
+  Router,
+} from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { finalize } from 'rxjs/operators';
 
@@ -91,11 +96,21 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   logout(): void {
-    this.authService.logout()
+    this.authService
+      .logout()
       .pipe(finalize(() => this.router.navigate(['/admin/login'])))
       .subscribe({
         next: () => {},
-        error: () => {}
+        error: () => {},
+      });
+  }
+  backToBlog(): void {
+    this.authService
+      .logout()
+      .pipe(finalize(() => this.router.navigate(['/'])))
+      .subscribe({
+        next: () => {},
+        error: () => {},
       });
   }
 }

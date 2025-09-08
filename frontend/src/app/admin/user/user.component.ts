@@ -12,6 +12,7 @@ import {
   PaginatedUserResponse,
   UserService,
 } from '../../core/services/user.service';
+import { UserPermissionService, UserPermissions } from '../../core/services/user-permission.service';
 
 declare const $: any;
 
@@ -39,21 +40,37 @@ export class UserComponent implements OnInit, AfterViewInit {
 
   confirmModal: {
     action: 'role' | 'status' | null;
+    op: 'enable' | 'disable' | null;
     user: AdminUser | null;
     title: string;
     message: string;
     btnClass: string;
   } = {
     action: null,
+    op: null,
     user: null,
     title: '',
     message: '',
     btnClass: 'btn-primary',
   };
 
+  // --- Adjust Permissions Logic ---
+  showAdjustPermissionsModal = false;
+  selectedUser: AdminUser | null = null;
+  adjustPermissions: any = {};
+  permissionList = [
+    { key: 'can_write_post', label: 'Write Post' },
+    { key: 'can_like_post', label: 'Like Post' },
+    { key: 'can_write_comment', label: 'Write Comment' },
+    { key: 'can_edit_comment', label: 'Edit Comment' },
+  ];
+  adjustPermissionsMsg: string = '';
+  adjustPermissionsMsgType: 'success' | 'error' | '' = '';
+
   constructor(
     private fb: FormBuilder,
     private service: UserService,
+    private permissionService: UserPermissionService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -320,22 +337,29 @@ export class UserComponent implements OnInit, AfterViewInit {
   }
 
   openConfirm(user: AdminUser, action: 'role' | 'status'): void {
-    this.confirmModal.user = user;
-    this.confirmModal.action = action;
     if (action === 'role') {
-      const targetRole = user.roleid === 2 ? 'User' : 'Admin';
-      this.confirmModal.title = 'Confirm Role Change';
-      this.confirmModal.message = `Change role of "${user.username}" to ${targetRole}?`;
-      this.confirmModal.btnClass = 'btn-info';
+      this.confirmModal = {
+        action: 'role',
+        op: null,
+        user,
+        title: 'Confirm Role Change',
+        message: `Change role of "${user.username}" to ${
+          user.roleid === 2 ? 'User' : 'Admin'
+        }?`,
+        btnClass: 'btn-info',
+      };
     } else {
       const willDisable = user.status === 1;
-      this.confirmModal.title = willDisable
-        ? 'Confirm Disable'
-        : 'Confirm Enable';
-      this.confirmModal.message = `${
-        willDisable ? 'Disable' : 'Enable'
-      } user "${user.username}"?`;
-      this.confirmModal.btnClass = willDisable ? 'btn-warning' : 'btn-success';
+      this.confirmModal = {
+        action: 'status',
+        op: willDisable ? 'disable' : 'enable',
+        user,
+        title: willDisable ? 'Confirm Disable' : 'Confirm Enable',
+        message: `${willDisable ? 'Disable' : 'Enable'} user "${
+          user.username
+        }"?`,
+        btnClass: willDisable ? 'btn-danger' : 'btn-success',
+      };
     }
     if (typeof $ === 'function') {
       $('#userActionModal').modal('show');
@@ -356,11 +380,69 @@ export class UserComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.confirmModal = {
         action: null,
+        op: null,
         user: null,
         title: '',
         message: '',
         btnClass: 'btn-primary',
       };
     }, 300);
+  }
+
+  openAdjustPermissions(user: AdminUser): void {
+    this.selectedUser = user;
+    this.showAdjustPermissionsModal = true;
+    // Fetch permissions from backend
+    this.permissionService.getUserPermissions(user.userid).subscribe({
+      next: (perms: UserPermissions) => {
+        this.adjustPermissions = { ...perms };
+      },
+      error: () => {
+        // Nếu chưa có thì mặc định bật hết
+        this.adjustPermissions = {
+          can_write_post: true,
+          can_like_post: true,
+          can_write_comment: true,
+          can_edit_comment: true,
+        };
+      },
+    });
+    if (typeof $ === 'function') {
+      setTimeout(() => $('#adjustPermissionsModal').modal('show'), 0);
+    }
+  }
+
+  closeAdjustPermissionsModal(): void {
+    this.showAdjustPermissionsModal = false;
+    this.selectedUser = null;
+    if (typeof $ === 'function') {
+      $('#adjustPermissionsModal').modal('hide');
+    }
+  }
+
+  togglePermission(key: string): void {
+    this.adjustPermissions[key] = !this.adjustPermissions[key];
+  }
+
+  applyAdjustPermissions(): void {
+    if (!this.selectedUser) return;
+    this.adjustPermissionsMsg = '';
+    this.adjustPermissionsMsgType = '';
+    this.permissionService.updateUserPermissions(this.selectedUser.userid, this.adjustPermissions).subscribe({
+      next: () => {
+        this.adjustPermissionsMsg = 'Permissions updated successfully!';
+        this.adjustPermissionsMsgType = 'success';
+        setTimeout(() => {
+          this.closeAdjustPermissionsModal();
+          this.loadUsers(this.currentPage);
+          this.adjustPermissionsMsg = '';
+          this.adjustPermissionsMsgType = '';
+        }, 1200);
+      },
+      error: () => {
+        this.adjustPermissionsMsg = 'Failed to update permissions.';
+        this.adjustPermissionsMsgType = 'error';
+      },
+    });
   }
 }

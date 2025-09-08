@@ -9,6 +9,7 @@ import { PostModule } from './post/post.module';
 import { BlogLayoutComponent } from './layouts/blog-layout/blog-layout.component';
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import { LoginComponent as AdminLoginComponent } from './admin/login/login.component';
+import { permissionGuard } from './core/guards/permission.guard';
 
 export const routes: Routes = [
   // Admin login should NOT use AdminLayout; define it before the AdminLayout route
@@ -28,7 +29,7 @@ export const routes: Routes = [
       {
         path: 'blog-owner',
         loadChildren: () => BlogOwnerModule,
-        canActivate: [authGuard],
+        canActivate: [authGuard, permissionGuard],
       },
     ],
   },

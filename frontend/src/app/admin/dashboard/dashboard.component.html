@@ -20,7 +20,7 @@
   <div class="container-fluid">
     <!-- Admin widgets demo: Tổng số bài, user, bình luận... -->
     <div class="row">
-      <div class="col-lg-3 col-6">
+      <div class="col-6 col-md-4 col-lg-20p">
         <a routerLink="/admin/posts">
           <div class="small-box bg-info">
             <div class="inner">
@@ -34,7 +34,7 @@
           </div>
         </a>
       </div>
-      <div class="col-lg-3 col-6">
+      <div class="col-6 col-md-4 col-lg-20p">
         <a routerLink="/admin/categories">
           <div class="small-box bg-success">
             <div class="inner">
@@ -48,7 +48,7 @@
           </div>
         </a>
       </div>
-      <div class="col-lg-3 col-6">
+      <div class="col-6 col-md-4 col-lg-20p">
         <a routerLink="/admin/users">
           <div class="small-box bg-warning">
             <div class="inner">
@@ -61,7 +61,7 @@
           </div>
         </a>
       </div>
-      <div class="col-lg-3 col-6">
+      <div class="col-6 col-md-4 col-lg-20p">
         <a routerLink="/admin/languages">
           <div class="small-box bg-danger">
             <div class="inner">
@@ -70,6 +70,19 @@
             </div>
             <div class="icon">
               <i class="fas fa-language"></i>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-6 col-md-4 col-lg-20p">
+        <a routerLink="/admin/dictionary">
+          <div class="small-box bg-secondary">
+            <div class="inner">
+              <h3>{{ totals.badwords }}</h3>
+              <p>Bad Words</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-ban"></i>
             </div>
           </div>
         </a>

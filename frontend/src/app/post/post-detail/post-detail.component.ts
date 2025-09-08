@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, AfterViewInit, PLATFORM_ID, ViewChild, ElementRef, HostListener, OnDestroy } from '@angular/core';
+import { Component, Inject, OnInit, AfterViewInit, PLATFORM_ID, ViewChild, ElementRef, HostListener, OnDestroy, inject } from '@angular/core';
 import { PostService } from '../../core/services/post.service';
 import { CommentService, Comment } from '../../core/services/comment.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,6 +9,9 @@ import { ProfileService, UserProfile } from '../../core/services/profile.service
 import { SearchService } from '../../core/services/search.service';
 import { AppSettingsService } from '../../core/config/app-settings.service';
 import { TranslateService } from '@ngx-translate/core';
+import { firstValueFrom, Subject, takeUntil } from 'rxjs';
+import { LocaleService } from '../../core/services/locale.service';
+import { UserPermissionService, UserPermissions } from '../../core/services/user-permission.service';
 
 type CommentView = Comment & { depth: number };
 type UiComment = Comment & { children: UiComment[]; depth: number };
@@ -28,7 +31,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   replyTo?: number;
   replyContent = '';
   isSubmitting = false;
-  editingId?: number;
+  editingId?: number | null = null;
   editContent = '';
   isLoggedIn: boolean = false; // Biến để kiểm tra trạng thái đăng nhập
   isBrowser: boolean; // Biến để kiểm tra môi trường trình duyệt
@@ -72,12 +75,29 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   showErrorWarn = false;
   errorWarnText = '';
   errorToastTimer: any;
+  showWriteToast = false;
+  writeToastMsg = '';
+  writeToastTimeout: any;
+  showSuccess = false;
+  successToastMsg = '';
+  successToastTimeout: any;
+
+  userPermissions: UserPermissions = {
+    can_write_post: true,
+    can_like_post: true,
+    can_write_comment: true,
+    can_edit_comment: true,
+  };
 
   private t(key: string, params?: Record<string, any>) {
     // instant là đủ vì i18n đã load; nếu muốn chắc, có thể dùng .get(...).subscribe(...)
     const out = this.translate.instant(key, params);
     return out || key;
   }
+
+  private destroy$ = new Subject<void>();
+  public localeService = inject(LocaleService);
+  public currentLocale = 'en-US';
 
   constructor(
     private route: ActivatedRoute,
@@ -90,6 +110,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     public search: SearchService,
     public appSettings: AppSettingsService,
     private translate: TranslateService,
+    private permissionService: UserPermissionService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -128,6 +149,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       this.loadPost(this.postId);
       this.loadComments(this.postId);
     });
+    this.localeService.locale$.pipe(takeUntil(this.destroy$)).subscribe((loc: string) => { this.currentLocale = loc || 'en-US' });
   }
 
   ngAfterViewInit(): void {
@@ -182,7 +204,26 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (profile) => {
         this.userProfile = profile;
         this.userid = profile.userid;
-        this.avatarUrl = profile.avatarUrl;
+        if (profile.avatarUrl) {
+          this.avatarUrl = profile.avatarUrl;
+        }
+        // Lấy quyền user
+        if (this.userid) {
+          this.permissionService.getUserPermissions(this.userid).subscribe({
+            next: (perms: UserPermissions) => {
+              this.userPermissions = perms;
+            },
+            error: () => {
+              // Nếu chưa có thì mặc định bật hết
+              this.userPermissions = {
+                can_write_post: true,
+                can_like_post: true,
+                can_write_comment: true,
+                can_edit_comment: true,
+              };
+            },
+          });
+        }
       },
       error: (err) => {
         console.error('Failed to load profile', err);
@@ -287,13 +328,21 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       next: () => {
         this.newComment = '';
         this.isSubmitting = false;
+        this.showSuccessToast('commentSuccess');
         this.loadComments(postId);
       },
-      error: (e) => console.error(e)
+      error: (e) => {
+        console.error(e);
+        this.showErrorToast('commentFail');
+      }
     });
   }
 
   openReplyForm(c: CommentView) {
+    if(!this.userPermissions?.can_write_comment) {
+      this.showPermissionToast('noCommentPermission');
+      return;
+    }
     this.replyTo = c.commentid;
     this.replyContent = '';
   }
@@ -313,9 +362,13 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       next: () => {
         this.replyContent = '';
         this.replyTo = undefined;
+        this.showSuccessToast('commentSuccess');
         this.loadComments(postId);
       },
-      error: (e) => console.error(e)
+      error: (e) => {
+        console.error(e);
+        this.showErrorToast('commentFail');
+      }
     });
   }
 
@@ -418,6 +471,8 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
           // Đổi UI language ngay để có phản hồi thị giác
           this.applyUiLanguage(lang);
           this.currentLanguage = lang;
+          
+          this.localeService.setLocaleFromLangCode(lang.locale_code);
 
           // Điều hướng sang postid mới (URL “đúng bản dịch”)
           this.router.navigate(['/post-detail', target.postid], { replaceUrl: true })
@@ -560,6 +615,10 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       this.showAuthToast('like');
       return; 
     }
+    if (!this.userPermissions?.can_like_post) {
+      this.showPermissionToast('noLikePermission');
+      return;
+    }
     if (ev.type === 'touchstart') { ev.preventDefault(); } // tránh click ảo trên mobile
 
     this.holding = true;
@@ -693,9 +752,11 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showAuthWarn = false;
   }
 
-  showErrorToast(kind: 'translate' | string = 'generic') {
+  showErrorToast(kind: 'translate' | 'editFail' | 'commentFail' | string = 'generic') {
     const keyMap: Record<string, string> = {
       translate: 'TOAST.NO_TRANSLATED_POST',
+      editFail: "TOAST.EDIT_FAIL",
+      commentFail: "TOAST.COMMENT_FAIL",
       generic: ''
     };
     const key = kind.includes?.('.') ? kind : (keyMap[kind] || keyMap['generic']);
@@ -713,8 +774,65 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showErrorWarn = false;
   }
 
+  onWriteClick(): void {
+    if (!this.userPermissions?.can_write_post) {
+      this.showPermissionToast('noWritePostPermission');
+      return;
+    }
+    this.router.navigate(['/blog-owner/create']);
+  }
+
+  showPermissionToast(kind: 'noWritePostPermission' | 'noLikePermission' | 'noFixPermission' | 'noCommentPermission') {
+    const keyMap: Record<string, string> = {
+      noWritePostPermission: 'TOAST.NO_PERMISSION_TO_WRITE_POST',
+      noLikePermission: 'TOAST.NO_PERMISSION_TO_LIKE',
+      noFixPermission: 'TOAST.NO_PERMISSION_TO_FIX',
+      noCommentPermission: 'TOAST.NO_PERMISSION_TO_COMMENT'
+    };
+
+    // Nếu tham số là 1 key đã có dấu chấm (AUTH.XYZ), dùng thẳng; nếu là like/comment/bookmark → map sang key; nếu là text thường → để nguyên
+    const key = kind.includes?.('.') ? kind : (keyMap[kind] || keyMap['generic']);
+    const msg = key.includes('.') ? this.t(key) : kind; // nếu là text thuần thì dùng trực tiếp
+
+    this.writeToastMsg = msg;
+    this.showWriteToast = true;
+
+    clearTimeout(this.writeToastTimeout);
+    this.writeToastTimeout = setTimeout(() => (this.showWriteToast = false), 3000);
+  }
+
+  dismissPermissionToast() {
+    clearTimeout(this.writeToastTimeout);
+    this.showWriteToast = false;
+  }
+
+  showSuccessToast(kind: 'editSuccess' | 'commentSuccess') {
+    const keyMap: Record<string, string> = {
+      editSuccess: 'TOAST.EDIT_SUCCESS',
+      commentSuccess: 'TOAST.COMMENT_SUCCESS'
+    };
+
+    // Nếu tham số là 1 key đã có dấu chấm (AUTH.XYZ), dùng thẳng; nếu là like/comment/bookmark → map sang key; nếu là text thường → để nguyên
+    const key = kind.includes?.('.') ? kind : (keyMap[kind] || keyMap['generic']);
+    const msg = key.includes('.') ? this.t(key) : kind; // nếu là text thuần thì dùng trực tiếp
+
+    this.successToastMsg = msg;
+    this.showSuccess = true;
+
+    clearTimeout(this.successToastTimeout);
+    this.successToastTimeout = setTimeout(() => (this.showSuccess = false), 3000);
+  }
+
+  dismissSuccessToast() {
+    clearTimeout(this.successToastTimeout);
+    this.showSuccess = false;
+  }
+
   goLogin() {
     this.dismissAuthToast();
+    this.dismissErrorToast();
+    this.dismissPermissionToast();
+    this.dismissSuccessToast();
     this.router.navigate(['/auth/login']);
   }
 
@@ -733,10 +851,53 @@ export class PostDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  isOwner(c: { userid?: number; User?: { userid?: number } }): boolean {
+    const ownerId = c.userid ?? c.User?.userid ?? null;
+    return !!this.isLoggedIn && !!this.userid && ownerId === this.userid;
+  }
+
+  startEdit(c: any) {
+    if(!this.userPermissions?.can_edit_comment) {
+      this.showPermissionToast('noFixPermission');
+      return;
+    }
+    if (!this.isOwner(c)) return;
+    this.editingId = c.commentid;
+    this.editContent = c.content || '';
+  }
+
+  cancelEdit() {
+    this.editingId = null;
+    this.editContent = '';
+  }
+
+  async saveEdit(c: any) {
+    const content = (this.editContent || '').trim();
+    if (!content) return;
+
+    try {
+      const updated = await firstValueFrom(this.commentService.updateComment(c.commentid, content));
+      console.log("updated: ", updated);
+      // cập nhật object đang bound
+      c.content = updated.content;
+      c.updatedAt = updated.updatedAt;
+      this.editingId = null;
+      this.editContent = '';
+      this.showSuccessToast('editSuccess');
+    } catch (err) {
+      this.showErrorToast('editFail');
+    }
+  }
+
   ngOnDestroy(): void {
     clearTimeout(this.authToastTimer);
+    clearTimeout(this.errorToastTimer);
+    clearTimeout(this.writeToastTimeout);
+    clearTimeout(this.successToastTimeout);
     clearTimeout(this.holdTimeout);
     clearInterval(this.repeatInterval);
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // Hàm để đăng xuất

@@ -45,10 +45,6 @@ export class CommentService {
   }
 
   createComment(postId: number, userId: number, content: string, parentId?: number) {
-    if (!isPlatformBrowser(this.platformId)) {
-      console.error("This feature is only available in the browser.");
-      return EMPTY;
-    }
     return this.http.post<ApiResponse<Comment>>(`${this.baseUrl}/comments`, {postId, userId, content, parentId}, {
       withCredentials: true,
     }).pipe(map(res => res.data));

@@ -12,7 +12,10 @@ import {
   PaginatedUserResponse,
   UserService,
 } from '../../core/services/user.service';
-import { UserPermissionService, UserPermissions } from '../../core/services/user-permission.service';
+import {
+  UserPermissionService,
+  UserPermissions,
+} from '../../core/services/user-permission.service';
 
 declare const $: any;
 
@@ -109,10 +112,36 @@ export class UserComponent implements OnInit, AfterViewInit {
       roleid: [1, Validators.required],
       status: [1, Validators.required],
       avatar: [null, Validators.required],
+      // Initial permissions for new user
+      permissions: this.fb.group({
+        can_write_post: [true],
+        can_like_post: [true],
+        can_write_comment: [true],
+        can_edit_comment: [true],
+      }),
     });
   }
 
+  // Helper to get permissions form group with proper typing for template
+  get permGroup(): FormGroup {
+    return this.userForm.get('permissions') as FormGroup;
+  }
+
   ngOnInit(): void {
+    // Toggle permissions form group based on role selection (1=User, 2=Admin)
+    const roleCtrl = this.userForm.get('roleid');
+    roleCtrl?.valueChanges.subscribe((val) => {
+      const isUser = Number(val) === 1;
+      if (isUser) {
+        this.permGroup.enable({ emitEvent: false });
+      } else {
+        this.permGroup.disable({ emitEvent: false });
+      }
+    });
+    // Initialize state based on initial role value
+    const initialIsUser = Number(roleCtrl?.value) === 1;
+    if (!initialIsUser) this.permGroup.disable({ emitEvent: false });
+
     this.route.queryParamMap.subscribe((q) => {
       const limitParam = Number(q.get('limit'));
       const pageParam = Number(q.get('page'));
@@ -146,7 +175,17 @@ export class UserComponent implements OnInit, AfterViewInit {
       $('[data-toggle="tooltip"]').tooltip();
       // Reset form when modal is hidden
       $('#addUserModal').on('hidden.bs.modal', () => {
-        this.userForm.reset({ roleid: 1, status: 1, avatar: null });
+        this.userForm.reset({
+          roleid: 1,
+          status: 1,
+          avatar: null,
+          permissions: {
+            can_write_post: true,
+            can_like_post: true,
+            can_write_comment: true,
+            can_edit_comment: true,
+          },
+        });
         this.errorMsg = '';
       });
     }
@@ -290,11 +329,37 @@ export class UserComponent implements OnInit, AfterViewInit {
     const payload = this.userForm.value;
 
     this.service.createUser(payload).subscribe({
-      next: () => {
+      next: (created) => {
         if (typeof $ === 'function') $('#addUserModal').modal('hide');
-        // Reset is handled by modal hidden event
-        this.loadUsers(this.currentPage);
-        this.avatarPreview = null;
+        const roleid = Number(payload.roleid);
+        const newUserId = created?.userid;
+        // Only upsert permissions for normal users (roleid = 1)
+        if (roleid === 1 && newUserId) {
+          const perms = (this.permGroup.getRawValue() || {
+            can_write_post: true,
+            can_like_post: true,
+            can_write_comment: true,
+            can_edit_comment: true,
+          }) as UserPermissions;
+          this.permissionService
+            .updateUserPermissions(newUserId, perms)
+            .subscribe({
+              next: () => {
+                this.loadUsers(this.currentPage);
+                this.avatarPreview = null;
+              },
+              error: () => {
+                this.errorMsg =
+                  'User created, but failed to set initial permissions.';
+                this.loadUsers(this.currentPage);
+                this.avatarPreview = null;
+              },
+            });
+        } else {
+          // Admins or missing id: just refresh
+          this.loadUsers(this.currentPage);
+          this.avatarPreview = null;
+        }
       },
       error: (err) => {
         const server = err?.error || {};
@@ -428,21 +493,23 @@ export class UserComponent implements OnInit, AfterViewInit {
     if (!this.selectedUser) return;
     this.adjustPermissionsMsg = '';
     this.adjustPermissionsMsgType = '';
-    this.permissionService.updateUserPermissions(this.selectedUser.userid, this.adjustPermissions).subscribe({
-      next: () => {
-        this.adjustPermissionsMsg = 'Permissions updated successfully!';
-        this.adjustPermissionsMsgType = 'success';
-        setTimeout(() => {
-          this.closeAdjustPermissionsModal();
-          this.loadUsers(this.currentPage);
-          this.adjustPermissionsMsg = '';
-          this.adjustPermissionsMsgType = '';
-        }, 1200);
-      },
-      error: () => {
-        this.adjustPermissionsMsg = 'Failed to update permissions.';
-        this.adjustPermissionsMsgType = 'error';
-      },
-    });
+    this.permissionService
+      .updateUserPermissions(this.selectedUser.userid, this.adjustPermissions)
+      .subscribe({
+        next: () => {
+          this.adjustPermissionsMsg = 'Permissions updated successfully!';
+          this.adjustPermissionsMsgType = 'success';
+          setTimeout(() => {
+            this.closeAdjustPermissionsModal();
+            this.loadUsers(this.currentPage);
+            this.adjustPermissionsMsg = '';
+            this.adjustPermissionsMsgType = '';
+          }, 1200);
+        },
+        error: () => {
+          this.adjustPermissionsMsg = 'Failed to update permissions.';
+          this.adjustPermissionsMsgType = 'error';
+        },
+      });
   }
 }

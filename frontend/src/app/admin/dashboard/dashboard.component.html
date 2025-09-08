@@ -112,6 +112,7 @@
                   <a
                     class="product-title clamp-2-lines"
                     [routerLink]="['/admin/posts', p.postid]"
+                    [queryParams]="{ from: 'dashboard' }"
                     (click)="$event.stopPropagation()"
                     data-toggle="tooltip"
                     [attr.title]="p.title"

@@ -154,14 +154,16 @@
                           class="dropdown-item"
                           (click)="openConfirm(u, 'role')"
                         >
-                          <i class="fas fa-user mr-2 text-primary"></i>Change Role
+                          <i class="fas fa-user mr-2 text-primary"></i>Change
+                          Role
                         </button>
                         <button
                           *ngIf="u.roleid !== 2"
                           class="dropdown-item"
                           (click)="openAdjustPermissions(u)"
                         >
-                          <i class="fas fa-sliders-h mr-2 text-warning"></i>Adjust Permissions
+                          <i class="fas fa-sliders-h mr-2 text-warning"></i
+                          >Adjust Permissions
                         </button>
                         <button
                           class="dropdown-item"
@@ -250,7 +252,15 @@
         </button>
       </div>
       <div class="modal-body">
-        <div *ngIf="adjustPermissionsMsg" class="alert" [ngClass]="adjustPermissionsMsgType === 'success' ? 'alert-success' : 'alert-danger'">
+        <div
+          *ngIf="adjustPermissionsMsg"
+          class="alert"
+          [ngClass]="
+            adjustPermissionsMsgType === 'success'
+              ? 'alert-success'
+              : 'alert-danger'
+          "
+        >
           {{ adjustPermissionsMsg }}
         </div>
         <table class="table table-bordered mb-0">
@@ -267,10 +277,12 @@
                 <button
                   type="button"
                   class="btn btn-sm"
-                  [ngClass]="adjustPermissions[perm.key] ? 'btn-success' : 'btn-danger'"
+                  [ngClass]="
+                    adjustPermissions[perm.key] ? 'btn-success' : 'btn-danger'
+                  "
                   (click)="togglePermission(perm.key)"
                 >
-                  {{ adjustPermissions[perm.key] ? 'On' : 'Off' }}
+                  {{ adjustPermissions[perm.key] ? "On" : "Off" }}
                 </button>
               </td>
             </tr>
@@ -278,10 +290,18 @@
         </table>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeAdjustPermissionsModal()">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeAdjustPermissionsModal()"
+        >
           Cancel
         </button>
-        <button type="button" class="btn btn-primary" (click)="applyAdjustPermissions()">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="applyAdjustPermissions()"
+        >
           Apply
         </button>
       </div>
@@ -563,6 +583,75 @@
               <option value="1">Active</option>
               <option value="2">Disabled</option>
             </select>
+          </div>
+
+          <!-- Initial Permissions: visible only when role is User -->
+          <div
+            class="card border mb-2"
+            *ngIf="userForm.get('roleid')?.value == 1"
+            [formGroup]="permGroup"
+          >
+            <div class="card-header py-2">
+              <strong>Initial Permissions</strong>
+            </div>
+            <div class="card-body py-2">
+              <div class="form-row">
+                <div class="col-6 mb-2">
+                  <div class="custom-control custom-switch">
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="newPermWritePost"
+                      formControlName="can_write_post"
+                    />
+                    <label class="custom-control-label" for="newPermWritePost"
+                      >Can write post</label
+                    >
+                  </div>
+                </div>
+                <div class="col-6 mb-2">
+                  <div class="custom-control custom-switch">
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="newPermLikePost"
+                      formControlName="can_like_post"
+                    />
+                    <label class="custom-control-label" for="newPermLikePost"
+                      >Can like post</label
+                    >
+                  </div>
+                </div>
+                <div class="col-6 mb-2">
+                  <div class="custom-control custom-switch">
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="newPermWriteComment"
+                      formControlName="can_write_comment"
+                    />
+                    <label
+                      class="custom-control-label"
+                      for="newPermWriteComment"
+                      >Can write comment</label
+                    >
+                  </div>
+                </div>
+                <div class="col-6 mb-2">
+                  <div class="custom-control custom-switch">
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="newPermEditComment"
+                      formControlName="can_edit_comment"
+                    />
+                    <label class="custom-control-label" for="newPermEditComment"
+                      >Can edit comment</label
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="modal-footer">

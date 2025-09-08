@@ -1,8 +1,14 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import {
+  CommonModule,
+  DatePipe,
+  isPlatformBrowser,
+  Location as NgLocation,
+} from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { PostAdminService } from '../../core/services/post-admin.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Inject, PLATFORM_ID } from '@angular/core';
 
 declare const $: any; // jQuery for AdminLTE modal & tooltip
 
@@ -34,7 +40,9 @@ export class ViewPostComponent implements OnInit, AfterViewInit {
     private route: ActivatedRoute,
     private router: Router,
     private service: PostAdminService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private location: NgLocation,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
@@ -98,7 +106,18 @@ export class ViewPostComponent implements OnInit, AfterViewInit {
   }
 
   backToList() {
-    this.router.navigate(['/admin/posts']);
+    // Prefer real browser history when available
+    if (isPlatformBrowser(this.platformId) && window.history.length > 1) {
+      this.location.back();
+      return;
+    }
+    // Fallback based on query param "from"
+    const from = this.route.snapshot.queryParamMap.get('from');
+    if (from === 'dashboard') {
+      this.router.navigate(['/admin/dashboard']);
+    } else {
+      this.router.navigate(['/admin/posts']);
+    }
   }
 
   openConfirm(action: 'approve' | 'reject') {

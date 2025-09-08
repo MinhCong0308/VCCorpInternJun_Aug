@@ -14,7 +14,11 @@
         "WRITE": "Écrire",
         "PROFILE": "Profil",
         "SIGNOUT": "Se déconnecter",
-        "NOTIFICATIONS": "Notifications"
+        "NOTIFICATIONS": "Notifications",
+        "CHANGE_PASSWORD": "Changer le mot de passe",
+        "UPDATE": "Mettre à jour",
+        "PUBLISH": "Publier",
+        "DRAFTS": "Brouillons de"
     },
     "SEARCH": {
         "RECENT_TITLE": "RECHERCHES RÉCENTES",
@@ -160,5 +164,44 @@
         "RESEND_COOLDOWN": "Renvoyer disponible dans",
         "WRONG_EMAIL": "Mauvaise adresse e-mail?",
         "GO_BACK_TO_SIGNUP": "Revenir à l'inscription"
+    }, 
+    "PASSWORD": {
+        "TITLE": "Changer le mot de passe",
+        "CURRENT": "Mot de passe actuel",
+        "CURRENT_PLACEHOLDER": "Entrez votre mot de passe actuel",
+        "NEW": "Nouveau mot de passe",
+        "NEW_PLACEHOLDER": "Entrez votre nouveau mot de passe",
+        "CONFIRM": "Confirmer le mot de passe",
+        "CONFIRM_PLACEHOLDER": "Confirmez votre nouveau mot de passe",
+        "UPDATE": "Mettre à jour",
+        "UPDATING": "Mise à jour...",
+        "SUCCESS_TITLE": "Succès",
+        "SUCCESS_MESSAGE": "Votre mot de passe a été changé avec succès.",
+        "ERROR_TITLE": "Échec du changement de mot de passe",
+        "ERROR_DEFAULT": "Échec du changement de mot de passe. Veuillez réessayer.",
+        "ERROR_CURRENT_INCORRECT": "Le mot de passe actuel est incorrect.",
+        "ERROR_REQUIRED": "Ce champ est obligatoire.",
+        "ERROR_MIN_LENGTH": "Le mot de passe doit contenir au moins 8 caractères.",
+        "ERROR_STRENGTH": "Le mot de passe doit inclure des majuscules, des minuscules, des chiffres et des caractères spéciaux.",
+        "ERROR_MISMATCH": "Les mots de passe ne correspondent pas.",
+        "ERROR_INVALID": "Entrée invalide.",
+        "STRENGTH": "Force du mot de passe",
+        "STRENGTH_WEAK": "Faible",
+        "STRENGTH_FAIR": "Moyen",
+        "STRENGTH_GOOD": "Bon",
+        "STRENGTH_STRONG": "Fort",
+        "REQUIREMENTS": "Le mot de passe doit contenir au moins 8 caractères et inclure des majuscules, des minuscules, des chiffres et des caractères spéciaux."
+    },
+    "POST_EDITOR": {
+        "SELECT_CATEGORY": "Sélectionner une catégorie",
+        "TRANSLATING": "Traduction en cours...",
+        "ORIGINAL": "Original",
+        "TRANSLATE": "Traduire",
+        "TRANSLATE_TO": "Traduire vers :",
+        "TRANSLATION": "Traduction",
+        "TRANSLATING_CONTENT": "Traduction du contenu en cours...",
+        "TRANSLATION_READ_ONLY": "Traduction (lecture seule)",
+        "ENTER_TITLE": "Saisir le titre",
+        "TELL_STORY": "Racontez votre histoire..."
     }
 }

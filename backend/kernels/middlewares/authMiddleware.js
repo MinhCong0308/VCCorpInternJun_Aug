@@ -5,6 +5,7 @@ const db = require('models/index');
 const manageTokenServices = require('modules/manage_token/services/manageTokenService');
 const authenticated = async (req, res, next) => {
     try {
+        console.log("Check for cookie: ", req.cookies);
         const accessToken = req.cookies?.accessToken;
         if (!accessToken) {
             return responseUtils.unauthorized(res, 'No token provided');

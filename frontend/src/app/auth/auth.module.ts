@@ -6,10 +6,11 @@ import { LoginComponent } from './login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SignupComponent } from './signup/signup.component';
 import { VerifyOtpComponent } from './verify-otp/verify-otp.component';
+import { ChangePasswordComponent } from './change-password/change-password.component';
 import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
-  declarations: [LoginComponent, SignupComponent, VerifyOtpComponent],
+  declarations: [LoginComponent, SignupComponent, VerifyOtpComponent, ChangePasswordComponent],
   imports: [
     CommonModule,
     AuthRoutingModule,

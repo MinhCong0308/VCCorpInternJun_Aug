@@ -120,5 +120,19 @@ const authService = {
     await redis.del(email);
     return { message: "Email verified successfully." };
   },
+  async changePassword(userId, currentPassword, newPassword) {
+    const user = await db.User.findOne({ where: { userid: userId } });
+    if (!user) {
+      throw new Error("User not found.");
+    }
+    const isMatch = await bcrypt.compare(currentPassword, user.hashed_password);
+    if (!isMatch) {
+      throw new Error("Current password is incorrect.");
+    }
+    const hashed_password = await bcrypt.hash(newPassword, 10);
+    user.hashed_password = hashed_password;
+    await user.save();
+    return { message: "Password changed successfully." };
+  }
 };
 module.exports = authService;

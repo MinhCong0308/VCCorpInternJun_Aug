@@ -2,7 +2,7 @@
   <!-- Loading Container -->
   <div *ngIf="isInitializing || isLoading" class="loading-container">
     <div class="loading-spinner">
-      <p>Loading your profile...</p>
+      <p>Loading page...</p>
     </div>
   </div>
   <form [formGroup]="blogForm" (ngSubmit)="submitBlog()" class="d-flex flex-column min-vh-100 overflow-hidden">
@@ -13,11 +13,11 @@
           <img src="assets/img/logo.png" class="logo-img" alt="logo-image">
           MSTBlog
         </a>
-        <span class="text-muted">Draft in {{ userProfile?.fullname }}</span>
+        <span class="text-muted">{{ ('NAV.DRAFTS' | translate) }} {{ userProfile?.fullname }}</span>
         <div class="collapse navbar-collapse">
           <div class="d-flex align-items-center gap-3 ms-auto">
             <button class="btn btn-success btn-sm rounded-pill px-3" type="submit">
-              {{ isEditMode ? 'Update' : 'Publish' }}
+              {{ isEditMode ? ('NAV.UPDATE' | translate) : ('NAV.PUBLISH' | translate) }}
             </button>
             <!-- UI Language Dropdown -->
             <div class="dropdown">
@@ -27,7 +27,7 @@
                       <img [src]="lang.flag_image" class="flag-icon me-1" alt="{{ lang.locale_code }}" />
                   </ng-container>
                   <ng-template #noLang>
-                      <span class="d-none d-lg-inline">Language</span>
+                      <span class="d-none d-lg-inline">{{ 'NAV.LANGUAGE' | translate }}</span>
                   </ng-template>
                   <i class="ti-angle-down ms-1" style="font-size: 0.8em;"></i>
               </button>
@@ -50,9 +50,10 @@
                      width="32" height="32" alt="Profile" />
               </a>
               <ul class="dropdown-menu dropdown-menu-end mt-2">
-                <li><a class="dropdown-item" routerLink="/useraccount/profile">Profile</a></li>
+                <li><a class="dropdown-item" routerLink="/useraccount/profile">{{ 'NAV.PROFILE' | translate }}</a></li>
+                <li><a class="dropdown-item" routerLink="/useraccount/change-password">{{ 'NAV.CHANGE_PASSWORD' | translate }}</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" routerLink="/auth/login">Sign out</a></li>
+                <li><a class="dropdown-item" routerLink="/auth/login">{{ 'NAV.SIGNOUT' | translate }}</a></li>
               </ul>
             </div>
           </div>
@@ -71,7 +72,7 @@
               <div class="d-flex align-items-start gap-3">
                 <div class="dropdown">
                   <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    Select Categories
+                    {{ 'POST_EDITOR.SELECT_CATEGORY' | translate }}
                   </button>
                   <div class="dropdown-menu p-3 checkbox-dropdown" (click)="$event.stopPropagation()">
                     <label class="checkbox-item d-block mb-2" *ngFor="let tag of availableTags" (click)="toggleTag(tag, $event)">
@@ -108,15 +109,15 @@
                     
                     <!-- Loading spinner for translating tabs -->
                     <div *ngIf="tab.isTranslating" class="spinner-border spinner-border-sm me-1" role="status">
-                      <span class="visually-hidden">Translating...</span>
+                      <span class="visually-hidden">{{ 'POST_EDITOR.TRANSLATING' | translate}}</span>
                     </div>
                     
                     <img [src]="tab.language.flag_image" class="flag-icon" [alt]="tab.language.locale_code" width="20" height="15" />
                     <span>{{ tab.language.languagename }}</span>
                     
                     <!-- Original badge -->
-                    <span *ngIf="tab.isOriginal" class="badge bg-success ms-1" style="font-size: 0.6em;">Original</span>
-                    
+                    <span *ngIf="tab.isOriginal" class="badge bg-success ms-1" style="font-size: 0.6em;">{{ 'POST_EDITOR.ORIGINAL' | translate}}</span>
+
                     <!-- Remove button (only for translations) -->
                     <button 
                       *ngIf="!tab.isOriginal" 
@@ -131,10 +132,10 @@
                 <!-- Add Translation Button -->
                 <div class="dropdown" *ngIf="getAvailableTranslationLanguages().length > 0">
                   <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    <i class="ti-world"></i> Translate
+                    <i class="ti-world"></i> {{ 'POST_EDITOR.TRANSLATE' | translate }}
                   </button>
                   <ul class="dropdown-menu">
-                    <li class="dropdown-header">Translate to:</li>
+                    <li class="dropdown-header">{{ 'POST_EDITOR.TRANSLATE_TO' | translate }}</li>
                     <li *ngFor="let lang of getAvailableTranslationLanguages()">
                       <a class="dropdown-item d-flex align-items-center gap-2" href="#" (click)="addTranslationTab(lang); $event.preventDefault()">
                         <img [src]="lang.flag_image" class="flag-icon" [alt]="lang.locale_code" width="20" height="15" />
@@ -157,19 +158,19 @@
                       width="24" 
                       height="18" />
                     <span class="fw-bold">{{ languageTabs[activeTabIndex].language.languagename }}</span>
-                    <span *ngIf="languageTabs[activeTabIndex]?.isOriginal" class="badge bg-success">Original</span>
-                    <span *ngIf="!languageTabs[activeTabIndex]?.isOriginal" class="badge bg-info">Translation</span>
+                    <span *ngIf="languageTabs[activeTabIndex]?.isOriginal" class="badge bg-success">{{ 'POST_EDITOR.ORIGINAL' | translate }}</span>
+                    <span *ngIf="!languageTabs[activeTabIndex]?.isOriginal" class="badge bg-info">{{ 'POST_EDITOR.TRANSLATION' | translate }}</span>
                   </div>
                   
                   <div *ngIf="languageTabs[activeTabIndex]?.isTranslating" class="d-flex align-items-center gap-2 text-primary">
                     <div class="spinner-border spinner-border-sm" role="status">
-                      <span class="visually-hidden">Translating...</span>
+                      <span class="visually-hidden">{{ 'POST_EDITOR.TRANSLATING' | translate }}</span>
                     </div>
-                    <small>Translating content...</small>
+                    <small>{{ 'POST_EDITOR.TRANSLATING_CONTENT' | translate }}</small>
                   </div>
                   
                   <small *ngIf="!languageTabs[activeTabIndex]?.isOriginal && !languageTabs[activeTabIndex]?.isTranslating" class="text-muted">
-                    Translation (read-only)
+                    {{ 'POST_EDITOR.TRANSLATION_READ_ONLY' | translate }}
                   </small>
                 </div>
 
@@ -178,7 +179,7 @@
                   id="blogTitle"
                   formControlName="title"
                   class="form-control editor-title mb-4"
-                  [placeholder]="languageTabs[activeTabIndex].isOriginal ? 'Enter Title' : 'Translated Title (read-only)'"
+                  [placeholder]="languageTabs[activeTabIndex].isOriginal ? ('POST_EDITOR.ENTER_TITLE' | translate) : ('POST_EDITOR.TRANSLATION_READ_ONLY' | translate)"
                   [readonly]="!languageTabs[activeTabIndex].isOriginal"
                   rows="1"
                 ></textarea>
@@ -188,7 +189,7 @@
                   formControlName="content" 
                   [modules]="quillModules" 
                   class="bg-white border rounded" 
-                  [placeholder]="languageTabs[activeTabIndex].isOriginal ? 'Tell your story...' : 'Translated content (read-only)'"
+                  [placeholder]="languageTabs[activeTabIndex].isOriginal ? ('POST_EDITOR.TELL_STORY' | translate) : ('POST_EDITOR.TRANSLATION_READ_ONLY' | translate)"
                   [readOnly]="!languageTabs[activeTabIndex].isOriginal">
                 </quill-editor>
               </div>

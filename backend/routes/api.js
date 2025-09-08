@@ -68,6 +68,7 @@ router.group("/auth", (router) => {
   );
   router.post("/logout", middlewares([authenticated]), authController.logout);
   router.post("/refresh", manageTokenController.refreshToken);
+  router.post("/change-password", middlewares([authenticated]), authController.changePassword);
   router.group("/oauth", (router) => {
     router.get("/google", oauthController.loginWithGoogle);
     router.get(

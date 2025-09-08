@@ -42,12 +42,14 @@ export class LanguageComponent implements OnInit, AfterViewInit {
 
   confirmModal: {
     action: 'status' | 'delete' | null;
+    op: 'enable' | 'disable' | null;
     lang: Language | null;
     title: string;
     message: string;
     btnClass: string;
   } = {
     action: null,
+    op: null,
     lang: null,
     title: '',
     message: '',
@@ -396,19 +398,18 @@ export class LanguageComponent implements OnInit, AfterViewInit {
     if (!lang) return;
     this.confirmModal.lang = lang;
     this.confirmModal.action = action;
-    if (action === 'status') {
-      const willDisable = !!lang.status;
-      this.confirmModal.title = willDisable
-        ? 'Confirm Disable'
-        : 'Confirm Enable';
-      this.confirmModal.message = `${
-        willDisable ? 'Disable' : 'Enable'
-      } language "${lang.languagename}"?`;
-      this.confirmModal.btnClass = willDisable ? 'btn-warning' : 'btn-success';
-    } else {
-      // delete path removed
-      return;
-    }
+    if (action !== 'status') return; // delete not supported
+    const willDisable = !!lang.status;
+    this.confirmModal = {
+      action: 'status',
+      op: willDisable ? 'disable' : 'enable',
+      lang,
+      title: willDisable ? 'Confirm Disable' : 'Confirm Enable',
+      message: `${willDisable ? 'Disable' : 'Enable'} language "${
+        lang.languagename
+      }"?`,
+      btnClass: willDisable ? 'btn-danger' : 'btn-success',
+    };
     if (typeof $ === 'function') {
       $('#languageActionModal').modal('show');
     }
@@ -426,6 +427,7 @@ export class LanguageComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.confirmModal = {
         action: null,
+        op: null,
         lang: null,
         title: '',
         message: '',

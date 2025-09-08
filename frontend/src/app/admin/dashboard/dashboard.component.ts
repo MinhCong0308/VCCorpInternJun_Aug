@@ -18,7 +18,7 @@ import { Router, RouterModule } from '@angular/router';
 export class DashboardComponent implements OnInit {
   loading = false;
   error = '';
-  totals = { users: 0, posts: 0, categories: 0, languages: 0 };
+  totals = { users: 0, posts: 0, categories: 0, languages: 0, badwords: 0 };
   latestUsers: DashboardUser[] = [];
   latestPosts: DashboardPost[] = [];
   private apiBase = 'http://localhost:3000';

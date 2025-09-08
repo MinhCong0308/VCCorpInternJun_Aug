@@ -7,6 +7,7 @@ export interface DashboardTotals {
   posts: number;
   categories: number;
   languages: number;
+  badwords: number;
 }
 
 export interface DashboardUser {

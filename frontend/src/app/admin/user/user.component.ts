@@ -39,12 +39,14 @@ export class UserComponent implements OnInit, AfterViewInit {
 
   confirmModal: {
     action: 'role' | 'status' | null;
+    op: 'enable' | 'disable' | null;
     user: AdminUser | null;
     title: string;
     message: string;
     btnClass: string;
   } = {
     action: null,
+    op: null,
     user: null,
     title: '',
     message: '',
@@ -320,22 +322,29 @@ export class UserComponent implements OnInit, AfterViewInit {
   }
 
   openConfirm(user: AdminUser, action: 'role' | 'status'): void {
-    this.confirmModal.user = user;
-    this.confirmModal.action = action;
     if (action === 'role') {
-      const targetRole = user.roleid === 2 ? 'User' : 'Admin';
-      this.confirmModal.title = 'Confirm Role Change';
-      this.confirmModal.message = `Change role of "${user.username}" to ${targetRole}?`;
-      this.confirmModal.btnClass = 'btn-info';
+      this.confirmModal = {
+        action: 'role',
+        op: null,
+        user,
+        title: 'Confirm Role Change',
+        message: `Change role of "${user.username}" to ${
+          user.roleid === 2 ? 'User' : 'Admin'
+        }?`,
+        btnClass: 'btn-info',
+      };
     } else {
       const willDisable = user.status === 1;
-      this.confirmModal.title = willDisable
-        ? 'Confirm Disable'
-        : 'Confirm Enable';
-      this.confirmModal.message = `${
-        willDisable ? 'Disable' : 'Enable'
-      } user "${user.username}"?`;
-      this.confirmModal.btnClass = willDisable ? 'btn-warning' : 'btn-success';
+      this.confirmModal = {
+        action: 'status',
+        op: willDisable ? 'disable' : 'enable',
+        user,
+        title: willDisable ? 'Confirm Disable' : 'Confirm Enable',
+        message: `${willDisable ? 'Disable' : 'Enable'} user "${
+          user.username
+        }"?`,
+        btnClass: willDisable ? 'btn-danger' : 'btn-success',
+      };
     }
     if (typeof $ === 'function') {
       $('#userActionModal').modal('show');
@@ -356,6 +365,7 @@ export class UserComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.confirmModal = {
         action: null,
+        op: null,
         user: null,
         title: '',
         message: '',

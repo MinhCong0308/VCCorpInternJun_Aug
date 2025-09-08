@@ -117,6 +117,15 @@ const authService = {
     const user = await db.User.findOne({ where: { email } });
     user.status = config.config.statusenum.AUTHENTICATED; // update status of user to authenticated
     await user.save();
+    // create user permission record
+    const userPermission = await db.UserPermission.create({
+      userid: user.userid,
+      can_write_post: true,
+      can_like_post: true,
+      can_write_comment: true,
+      can_edit_comment: true
+    });
+    
     await redis.del(email);
     return { message: "Email verified successfully." };
   },

@@ -17,5 +17,8 @@ const authValidation = {
     new BodyWithLocale("inputOTP").notEmpty().isLength({ min: 6, max: 6 }),
     new BodyWithLocale("email").notEmpty().isEmail(),
   ],
+  resendOTP: [
+    new BodyWithLocale("email").notEmpty().isEmail(),
+  ],
 };
 module.exports = authValidation;

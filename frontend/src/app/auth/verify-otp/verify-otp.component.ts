@@ -75,6 +75,7 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
   }
 
   private getUserEmail(): void {
+    if (!this.isBrowser) return;
     this.userEmail = localStorage.getItem('verifyEmail') || '';
     if (!this.userEmail) {
       this.errorMessage = 'Email not found. Please go back to signup.';
@@ -182,6 +183,13 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
     this.errorMessage = '';
     this.successMessage = '';
 
+    // Bắt đầu cooldown khi gửi OTP lần đầu nếu chưa cooldown
+    if (!this.isResendCooldown) {
+      this.startResendCooldown();
+    }
+
+    if (!this.isBrowser) return;
+
     try {
       const response = await this.verifyOtp(this.userEmail, otp);
 
@@ -214,21 +222,27 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
 
     this.isResending = true;
     this.errorMessage = '';
+    this.successMessage = '';
 
     try {
       const response = await this.requestResendOtp(this.userEmail);
 
       if (response.ok) {
+        const data = await response.json();
+        console.log("Resend response: ", data.message);
         this.successMessage = 'New code sent to your email!';
         this.startResendCooldown();
         this.clearOtp();
         this.focusFirstInput();
       } else {
         const errorData = await response.json();
-        this.errorMessage = errorData.message || 'Failed to resend code.';
+        console.log("Resend response: ", errorData.message);
+        this.errorMessage = 'Failed to resend code.';
+        this.successMessage = '';
       }
     } catch (error: any) {
       this.errorMessage = 'Network error. Please try again.';
+      this.successMessage = '';
       console.error('Resend OTP error:', error);
     } finally {
       this.isResending = false;

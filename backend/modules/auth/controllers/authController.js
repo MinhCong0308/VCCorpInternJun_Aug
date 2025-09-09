@@ -69,6 +69,19 @@ const authController = {
       return responseUtils.unauthorized(res, error.message);
     }
   },
+  resendOTP: async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return responseUtils.error(res, { message: "Email is required" });
+      }
+      await authService.requestOTP(email);
+      return responseUtils.ok(res, { message: "OTP resent successfully" });
+    } catch (error) {
+      console.error("Resend OTP error:", error.message);
+      return responseUtils.error(res, { message: error.message });
+    }
+  },
   verifyOTP: async (req, res) => {
     try {
       const { email, inputOTP } = req.body;

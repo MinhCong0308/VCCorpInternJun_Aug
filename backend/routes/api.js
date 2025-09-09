@@ -60,6 +60,11 @@ router.group("/auth", (router) => {
     authController.signUp
   );
   router.post(
+    "/resend-otp",
+    validate([authValidation.resendOTP]),
+    authController.resendOTP
+  );
+  router.post(
     "/validate-otp",
     validate([authValidation.verifyOTP]),
     authController.verifyOTP

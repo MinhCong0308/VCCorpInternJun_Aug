@@ -1,9 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { finalize } from 'rxjs/operators';
 import { NotificationService } from '../../core/services/notification.service';
 import { TranslateService } from '@ngx-translate/core';
+import { LanguageService, Language } from '../../core/services/language.service';
+import { isPlatformBrowser } from '@angular/common';
+import { AuthService } from '../../core/services/auth.service';
+import { AccountService } from '../../core/services/account.service';
+import { AppSettingsService } from '../../core/config/app-settings.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-change-password',
@@ -18,16 +24,42 @@ export class ChangePasswordComponent implements OnInit {
   showNewPassword = false;
   showConfirmPassword = false;
   baseUrl = 'http://localhost:3000/auth';
+  isBrowser: boolean;
+  loadingLang = false;
+  initialLang = 'en';
+  dropdownOpen = false;
+  languages : Language[] = [];
+  currentLanguage: Language | null = null;
+  isLoggedIn: boolean = false;
+  avatarUrl: string = '';
+  currentUserId = 0;
 
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
     private notificationService: NotificationService,
-    private translate: TranslateService
-  ) { }
+    private translate: TranslateService,
+    private languageService: LanguageService,
+    private authService: AuthService,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private accountService: AccountService,
+    public appSettings: AppSettingsService,
+    private router: Router,
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 
   ngOnInit(): void {
     this.initializeForm();
+    this.authService.checkSession().subscribe({
+      next: (ok) => {
+        this.isLoggedIn = ok;
+        if (ok) {
+          this.loadProfile();
+        }
+      },
+    });
+    this.loadLanguages();
   }
 
   private initializeForm(): void {
@@ -202,6 +234,100 @@ export class ChangePasswordComponent implements OnInit {
       control.markAsTouched();
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);
+      }
+    });
+  }
+
+  loadLanguages(): void {
+    if (!this.isBrowser) return;
+    try {
+      const cached = localStorage.getItem('languages');
+      if (cached) {
+        this.languages = JSON.parse(cached) as Language[];
+        this.normalizeLanguages();
+        const code = this.translate.getCurrentLang?.() || this.initialLang;
+        this.syncCurrentLanguageByCode(code);
+      }
+    } catch {}
+    this.languageService.getLanguages().subscribe({
+      next: (response) => {
+        const list: Language[] = (response?.data?.languages || response?.languages || response || []) as Language[];
+        this.languages = list;
+        this.normalizeLanguages();
+        if (this.isBrowser) {
+          try { localStorage.setItem('languages', JSON.stringify(this.languages)); } catch {}
+        }
+        this.syncCurrentLanguageByCode(this.translate.getCurrentLang?.());
+      },
+      error: (error) => {
+        // console.error('Error loading languages:', error);
+        this.notificationService.error('Error', 'Failed to load languages. Please try again later.');
+      }
+    });
+  }
+  normalizeLanguages(): void {
+    this.languages = this.languages
+      .filter(l => l.status === 1 || l.status === undefined)
+      .map(l => ({
+        ...l,
+        locale_code: (l.locale_code || '').trim() || (l.languagename === 'Vietnamese' ? 'vi' : 'en')
+      }));
+  }
+  syncCurrentLanguageByCode(code?: string): void {
+    const cc = (code || 'en').toLowerCase();
+    this.currentLanguage =
+      this.languages.find(l => (l.locale_code || '').toLowerCase() === cc)
+      || this.languages.find(l => !!l.is_default)
+      || this.languages[0];
+  }
+  selectLanguage(lang: Language): void {
+    if (!lang || this.loadingLang) return;
+    // nếu chọn lại chính ngôn ngữ đang dùng → thôi
+    if (this.currentLanguage?.languageid === lang.languageid) {
+      this.applyUiLanguage(lang); // vẫn gọi để đồng bộ document.lang/localStorage
+      return;
+    }
+
+    this.loadingLang = true;
+    this.applyUiLanguage(lang);
+    this.currentLanguage = lang;
+    this.loadingLang = false;
+  }
+  applyUiLanguage(lang: Language): void {
+    if (!lang?.locale_code) return;
+    const id = lang?.languageid;
+    this.translate.use(lang.locale_code);
+    if (this.isBrowser) {
+      try { 
+        localStorage.setItem('lang', lang.locale_code);
+        localStorage.setItem('languageId', String(id));
+      } catch {}
+      document.documentElement.lang = lang.locale_code;
+    }
+  }
+
+  // Hàm để lấy profile người dùng đã đăng nhập
+  loadProfile(): void {
+    this.accountService.getProfile().subscribe({
+      next: (res: any) => {
+        this.avatarUrl = res?.data?.avatarUrl || this.appSettings.defaults.userAvatar;
+        this.currentUserId = res?.data?.userid;
+      },
+      error: (err) => {
+        console.error('Failed to load profile', err);
+        this.avatarUrl = this.appSettings.defaults.userAvatar;
+      },
+    });
+  }
+
+  // Hàm để đăng xuất
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/auth/login']);
+      },
+      error: (error) => {
+        console.error('Logout error:', error);
       }
     });
   }

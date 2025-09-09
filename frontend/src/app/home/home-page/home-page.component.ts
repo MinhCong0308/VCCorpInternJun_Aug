@@ -259,7 +259,7 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
   loadProfile(): void {
     this.accountService.getProfile().subscribe({
       next: (res: any) => {
-        this.avatarUrl = res?.data?.avatarUrl || this.defaultAvatar;
+        this.avatarUrl = res?.data?.avatarUrl || this.appSettings.defaults.userAvatar;
         this.currentUserId = res?.data?.userid;
         // Lấy quyền user
         if (this.currentUserId) {
@@ -281,7 +281,7 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (err) => {
         console.error('Failed to load profile', err);
-        this.avatarUrl = this.defaultAvatar;
+        this.avatarUrl = this.appSettings.defaults.userAvatar;
       },
     });
   }

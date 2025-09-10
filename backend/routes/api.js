@@ -79,6 +79,7 @@ router.group("/auth", (router) => {
   router.post("/change-password", middlewares([authenticated]), authController.changePassword);
   router.post("/verify-reset-password", authController.verifyResetPassword);
   router.post("/reset-password", authController.resetPassword);
+  router.post("/verify-forget-password-token", authController.verifyForgetPasswordToken);
   router.group("/oauth", (router) => {
     router.get("/google", oauthController.loginWithGoogle);
     router.get(

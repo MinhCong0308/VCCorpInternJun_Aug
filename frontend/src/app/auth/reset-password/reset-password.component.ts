@@ -126,7 +126,7 @@ export class ResetPasswordComponent implements OnInit {
         console.log('Here');
         localStorage.setItem('verifyEmail', this.resetForm.value.email);
         this.resetForm.reset();
-        this.router.navigate(['/auth/verify-otp'], { queryParams: { purpose: 'reset-password' } });
+        // this.router.navigate(['/auth/verify-otp'], { queryParams: { purpose: 'reset-password' } });
       },
       error: (error) => {
         console.log("What's the error:", error);

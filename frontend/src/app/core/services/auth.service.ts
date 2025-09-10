@@ -275,27 +275,22 @@ export class AuthService {
     console.log('Verifying reset password for email:', email);
     const url = `${this.baseUrl}/verify-reset-password`;
      return this.http
-      .post<{success: boolean; message: string}>(url, {email: email}, { withCredentials: true })
-      .pipe(
-        tap(() => {
-          this.clearSessionCache(); 
-          console.log('Sent OTP for reset password - cleared session cache');
-        }),
-        catchError((error) => {
-          console.error('Verify reset password error:', error);
-          return of({
-            success: false,
-            message: error.message,
-          });
-        })
-      );
+      .post<{success: boolean; message: string}>(url, {email: email}, { withCredentials: true });
   }
-  resetPassword(email: string, newPassword: string, newPasswordConfirm: string): Observable<{success: boolean; message: string}> {
+  resetPassword(email: string, newPassword: string, newPasswordConfirm: string, token: string): Observable<{success: boolean; message: string}> {
     const url = `${this.baseUrl}/reset-password`;
       return this.http.post<{success: boolean; message: string}>(url, {
         email: email,
         newPassword: newPassword,
-        newPasswordConfirm: newPasswordConfirm
+        newPasswordConfirm: newPasswordConfirm,
+        token: token
+      }, { withCredentials: true });
+  }
+  verifyForResetPassword(email: string, otp: string): Observable<{success: boolean; message: string}> {
+    const url = `${this.baseUrl}/verify-forget-password-token`;
+      return this.http.post<{success: boolean; message: string}>(url, {
+        email: email,
+        token: otp
       }, { withCredentials: true });
   }
   // Fetch current session user via cookie-based auth

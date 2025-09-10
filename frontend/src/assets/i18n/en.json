@@ -122,7 +122,9 @@
         "DEACTIVATE": "Deactivate account",
         "DEACTIVATE_DESC": "Deactivating will suspend your account until you sign back in.",
         "GO_TO_LOGIN": "Go to Login",
-        "LOADING": "Loading your profile..."
+        "LOADING": "Loading your profile...",
+        "NEW_PASSWORD": "New Password",
+        "CONFIRM_PASSWORD": "Confirm Password"
     },
     "YOUR_BLOG": {
         "TITLE": "Your Blogs",
@@ -174,7 +176,18 @@
         "RESEND_CODE": "Resend Code",
         "RESEND_COOLDOWN": "Resend available in",
         "WRONG_EMAIL": "Wrong email?",
-        "GO_BACK_TO_SIGNUP": "Go back to signup"
+        "GO_BACK_TO_SIGNUP": "Go back to signup",
+        "RESET_PASSWORD": "Reset Password",
+        "CREATE_NEW_PASSWORD": "Please create a new password for your account.",
+        "PROCESSING": "Processing...",
+        "INVALID_RESET_LINK": "Invalid or expired password reset link",
+        "PASSWORD_RESET_SUCCESS": "Password Reset Successful",
+        "PASSWORD_RESET_SUCCESS_DETAIL": "Your password has been successfully reset. You can now log in with your new password.",
+        "PASSWORD_RESET_FAILED": "Failed to reset password. Please try again later.",
+        "INVALID_OR_EXPIRED_TOKEN": "This password reset link is invalid or has expired",
+        "REMEMBER_PASSWORD": "Remember your password?",
+        "RESET_INSTRUCTIONS": "Enter your email address below and we'll send you a link to reset your password.",
+        "SEND_RESET_LINK": "Send OTP to verify reset"
     },
     "PASSWORD": {
         "TITLE": "Change Password",

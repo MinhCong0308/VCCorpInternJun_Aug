@@ -1,4 +1,5 @@
 const { BodyWithLocale } = require("kernels/rules");
+const { reset } = require("leo-profanity"); 
 
 const authValidation = {
   logIn: [
@@ -19,6 +20,12 @@ const authValidation = {
   ],
   resendOTP: [
     new BodyWithLocale("email").notEmpty().isEmail(),
+  ],
+  // verifyResetPassword: [new BodyWithLocale("email").notEmpty().isEmail()],
+  resetPassword: [
+    new BodyWithLocale("email").notEmpty().isEmail(),
+    new BodyWithLocale("newPassword").notEmpty().isLength({ min: 5 }),
+    new BodyWithLocale("newPasswordConfirm").notEmpty().confirmed("newPassword"),
   ],
 };
 module.exports = authValidation;

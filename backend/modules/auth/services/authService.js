@@ -94,13 +94,19 @@ const authService = {
     };
     return transporter.sendMail(mailOptions);
   },
-  async requestOTP(email) {
+  async requestOTP(email, isResetPassword = false) {
     const user = await db.User.findOne({ where: { email } });
-    if (!user || user.status !== config.config.statusenum.NON_AUTHENTICATED) {
-      throw new Error("User not found or already verified.");
+    if(!isResetPassword) {
+      if (!user || user.status !== config.config.statusenum.NON_AUTHENTICATED) {
+        throw new Error("User not found or already verified.");
+      }
+    } else {
+      if (!user || user.status !== config.config.statusenum.AUTHENTICATED) {
+        throw new Error("User not found or not authenticated.");
+      }
     }
     const otp = await this.genOTP();
-    await redis.set(email, otp, { EX: 300 }); // 300s = 5 minitues
+    await redis.set(email, otp, { EX: 300 }); // 300s = 5 minutes
     await this.sendOTP(email, otp);
     console.log("OTP sent successfully");
   },
@@ -118,14 +124,17 @@ const authService = {
     user.status = config.config.statusenum.AUTHENTICATED; // update status of user to authenticated
     await user.save();
     // create user permission record
-    const userPermission = await db.UserPermission.create({
-      userid: user.userid,
-      can_write_post: true,
-      can_like_post: true,
-      can_write_comment: true,
-      can_edit_comment: true
-    });
-    
+    // find user-permission first, if not exist, create one
+    const userPermission = await db.UserPermission.findOne({ where: { userid: user.userid } });
+    if (!userPermission) {
+      await db.UserPermission.create({
+        userid: user.userid,
+        can_write_post: true,
+        can_like_post: true,
+        can_write_comment: true,
+        can_edit_comment: true
+      });
+    }
     await redis.del(email);
     return { message: "Email verified successfully." };
   },
@@ -142,6 +151,16 @@ const authService = {
     user.hashed_password = hashed_password;
     await user.save();
     return { message: "Password changed successfully." };
+  },
+  async resetPassword(email, newPassword) {
+    const user = await db.User.findOne({ where: { email } });
+    if (!user) {
+      throw new Error("User not found.");
+    }
+    const hashed_password = await bcrypt.hash(newPassword, 10);
+    user.hashed_password = hashed_password;
+    await user.save();
+    return { message: "Password reset successfully." };
   }
 };
 module.exports = authService;

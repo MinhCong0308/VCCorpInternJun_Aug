@@ -7,10 +7,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SignupComponent } from './signup/signup.component';
 import { VerifyOtpComponent } from './verify-otp/verify-otp.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
+import { ResetPasswordComponent} from './reset-password/reset-password.component';
+import { ResetNewPasswordComponent } from './reset-new-password/reset-new-password.component';
 import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
-  declarations: [LoginComponent, SignupComponent, VerifyOtpComponent, ChangePasswordComponent],
+  declarations: [LoginComponent, SignupComponent, VerifyOtpComponent, ChangePasswordComponent, ResetPasswordComponent, ResetNewPasswordComponent],
   imports: [
     CommonModule,
     AuthRoutingModule,

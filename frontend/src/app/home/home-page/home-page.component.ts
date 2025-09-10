@@ -685,7 +685,7 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
       // chỉ dính đáy khi đáy khung đã lọt vào đáy viewport
       if (relBottom <= viewportH) {
         this.scrollDistance = viewportH - relBottom;
-        console.log('scrollDistance when going DOWN: ', this.scrollDistance); // chỉ sau khi chạm đáy
+        // console.log('scrollDistance when going DOWN: ', this.scrollDistance); // chỉ sau khi chạm đáy
         inner.classList.add('is-sticky-bottom');
       } else inner.classList.add('free');
     } else {
@@ -697,7 +697,7 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
         inner.classList.add('is-sticky-top');
       } else {
         this.scrollDistanceUp = viewportH - relBottom;
-        console.log('scrollDistanceUp: ', this.scrollDistanceUp); // check scrollDistanceUp
+        // console.log('scrollDistanceUp: ', this.scrollDistanceUp); // check scrollDistanceUp
         inner.classList.add('free');
       }
     }
@@ -709,7 +709,7 @@ export class HomePageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // DEBUG nếu cần
-    console.log('[SB] mode', this.scrollDir, { relTop, relBottom, topOffset, viewportH, class: inner.className });
+    // console.log('[SB] mode', this.scrollDir, { relTop, relBottom, topOffset, viewportH, class: inner.className });
   }
 
   getScrollParent(el: HTMLElement): Window | HTMLElement {

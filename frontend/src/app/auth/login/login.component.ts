@@ -25,7 +25,7 @@ export class LoginComponent implements OnInit {
   dropdownOpen = false;
   languages : Language[] = [];
   currentLanguage: Language | null = null;
-
+  showCurrentPassword = false;
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -92,8 +92,8 @@ export class LoginComponent implements OnInit {
             this.router.navigate(['/home']);
           }, 1000);
         } else {
-          console.log("Jump here");
-          console.log('Response:', response);
+          // console.log("Jump here");
+          // console.log('Response:', response);
           this.errorMessage = response.message || 'Login failed!';
         }
       },
@@ -107,7 +107,13 @@ export class LoginComponent implements OnInit {
       }
     });
   }
-
+  togglePasswordVisibility(field: string): void {
+    switch (field) {
+      case 'password':
+        this.showCurrentPassword = !this.showCurrentPassword;
+        break;
+    }
+  }
   handleGoogleLogin(): void {
     if (!this.isBrowser) return
     this.isLoading = false;

@@ -1,12 +1,12 @@
 /* Use same CSS variables as home_style.css */
-:root {
+/* :root {
     --heading-font: 'Playfair Display', serif;
     --body-font: 'Inter', sans-serif;
     --text-primary: #000;
     --text-secondary: #6c757d;
     --border-color: #e0e0e0;
     --background-color: #ffffff;
-}
+} */
 
 /* Body and layout */
 .min-vh-100 {
@@ -15,26 +15,9 @@
     color: var(--text-primary);
 }
 
-/* Logo styles - same as home */
-.logo {
-    font-family: var(--heading-font);
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #242424 !important;
-    text-decoration: none !important;
-}
+/* Logo styles - already in home_style.css, REMOVE here */
 
-.logo-img {
-    height: 35px;
-    width: 35px;
-    padding-bottom: 5px;
-}
-
-/* Navbar styles */
-.navbar {
-    box-shadow: none;
-    border-bottom: 1px solid var(--border-color);
-}
+/* Navbar styles - already in home_style.css, REMOVE here */
 
 /* Main content */
 main {
@@ -54,41 +37,7 @@ h2 {
     font-size: 2rem;
 }
 
-/* Google button - enhanced from home_style.css */
-.google-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    background-color: white;
-    border: 1px solid #dadce0;
-    color: #3c4043;
-    font-weight: 500;
-    padding: 12px 16px;
-    border-radius: 8px;
-    width: 100%;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    font-family: var(--body-font);
-    font-size: 14px;
-}
-
-.google-btn:hover:not(:disabled) {
-    background-color: #f8f9fa;
-    border-color: #c1c7cd;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.google-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    background-color: #f8f9fa;
-}
-
-.google-icon {
-    width: 20px;
-    height: 20px;
-}
+/* Google button - already in home_style.css, REMOVE here */
 
 /* Form controls */
 .form-label {
@@ -133,22 +82,7 @@ h2 {
     font-family: var(--body-font);
 }
 
-/* Links */
-a {
-    color: #1a8917;
-    text-decoration: none;
-    font-family: var(--body-font);
-}
-
-a:hover {
-    color: #1a8917;
-    text-decoration: underline;
-}
-
-.small {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-}
+/* Links - already in home_style.css, REMOVE here */
 
 /* Primary button */
 .btn-dark {
@@ -219,47 +153,7 @@ a:hover {
     font-size: 0.9rem;
 }
 
-/* Footer - same as home */
-.main-footer {
-    width: auto;
-    background: #ffffff;
-    padding: 27px 0;
-    font-size: 16px;
-    color: #ffffff;
-    margin-top: auto;
-}
-
-.footer-divider {
-    border: none;
-    border-top: 1px solid var(--text-secondary);
-    margin: 0 auto 1.5rem auto;
-    width: 99.5vw;
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-}
-
-.footer-links {
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-}
-
-.footer-links a {
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-    text-decoration: none;
-    display: inline-block;
-    transition: color 0.2s ease;
-}
-
-.footer-links a:hover {
-    color: var(--text-primary);
-}
+/* Footer - already in home_style.css, REMOVE here */
 
 /* Responsive design */
 @media (max-width: 576px) {
@@ -270,19 +164,6 @@ a:hover {
     
     h2 {
         font-size: 1.75rem;
-    }
-    
-    .footer-links {
-        gap: 1rem;
-    }
-    
-    .footer-links a {
-        font-size: 0.7rem;
-    }
-    
-    .google-btn {
-        padding: 10px 14px;
-        font-size: 13px;
     }
     
     .form-control {
@@ -374,4 +255,16 @@ a:hover {
 
 .flex-grow-1 {
     flex-grow: 1;
+}
+.input-group .form-control,
+.input-group .btn-outline-secondary {
+  border-width: 1px; /* Default is usually 2px, so set to 1px */
+  border-color: #ced4da; /* Optional: keep a soft gray */
+  box-shadow: none;      /* Remove any default shadow */
+}
+
+/* Optional: make border color lighter on focus for better UX */
+.input-group .form-control:focus {
+  border-color: #b3b3b3;
+  box-shadow: none;
 }

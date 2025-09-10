@@ -82,13 +82,21 @@
               {{ 'AUTH.PASSWORD' | translate }}
               <a routerLink="/auth/forgot-password" class="small text-decoration-none">{{ 'AUTH.FORGOT_PASSWORD' | translate }}</a>
             </label>
-            <input 
-              type="password" 
-              class="form-control"
-              [class.is-invalid]="isFieldInvalid('password')"
-              id="password" 
-              formControlName="password"
-              placeholder="••••••••" />
+            <div class="input-group">
+              <input 
+                [type]="showCurrentPassword ? 'text' : 'password'" 
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('password')"
+                id="password" 
+                formControlName="password"
+                placeholder="••••••••" />
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary" 
+                (click)="togglePasswordVisibility('password')">
+                <i [ngClass]="showCurrentPassword ? 'ti-key' : 'ti-eye'"></i>
+              </button>  
+            </div>
             <div *ngIf="isFieldInvalid('password')" class="invalid-feedback">
               <span *ngIf="loginForm.get('password')?.errors?.['required']">{{ 'AUTH.PASSWORD_REQ' | translate }}</span>
               <span *ngIf="loginForm.get('password')?.errors?.['minlength']">{{ 'AUTH.PASSWORD_WARN' | translate }}</span>

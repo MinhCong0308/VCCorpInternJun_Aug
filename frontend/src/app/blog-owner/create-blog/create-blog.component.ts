@@ -18,6 +18,7 @@ import { fromEvent, Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
+import { AppSettingsService } from '../../core/config/app-settings.service';
 interface PostLanguageTab {
   title: string;
   content: string;
@@ -107,7 +108,8 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     private draftService: DraftService,
     private translate: TranslateService,
     private authService: AuthService,
-  ) {
+    public appSettings: AppSettingsService,
+    ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
@@ -308,6 +310,9 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       const sub = this.profileService.getUserProfile().subscribe({
         next: (profile) => {
           this.userProfile = profile;
+          if (!profile.avatarUrl) {
+            profile.avatarUrl = this.appSettings.defaults.userAvatar;
+          }
           console.log('User profile loaded successfully');
           resolve();
         },

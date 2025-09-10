@@ -7,6 +7,7 @@ import { Language, LanguageService} from '../../core/services/language.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SearchService } from '../../core/services/search.service';
+import { AppSettingsService } from '../../core/config/app-settings.service';
 
 @Component({
   selector: 'app-account',
@@ -38,7 +39,7 @@ export class AccountComponent implements OnInit {
   initialLang = 'en';
   query = '';
   dropdownOpen = false;
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private authService: AuthService, private profileService: ProfileService, private languageService: LanguageService, private notificationService: NotificationService, private translate: TranslateService, public search: SearchService) { this.isBrowser = isPlatformBrowser(this.platformId); }
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private authService: AuthService, private profileService: ProfileService, private languageService: LanguageService, private notificationService: NotificationService, private translate: TranslateService, public search: SearchService, public appSettings: AppSettingsService) { this.isBrowser = isPlatformBrowser(this.platformId); }
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) {
@@ -56,6 +57,9 @@ export class AccountComponent implements OnInit {
       next: (profile) => {
         // console.log('Account component: User profile loaded successfully');
         this.userProfile = profile;
+        if (!profile.avatarUrl) {
+          profile.avatarUrl = this.appSettings.defaults.userAvatar;
+        }
         this.loadLanguage();
         // console.log('Languages loaded:', this.languages);
         // this.defaultLanguage = this.languages.find(lang => lang.is_default) || null;

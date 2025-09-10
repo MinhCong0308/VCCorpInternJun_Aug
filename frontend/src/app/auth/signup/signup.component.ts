@@ -26,6 +26,8 @@ export class SignupComponent implements OnInit {
   dropdownOpen = false;
   languages : Language[] = [];
   currentLanguage: Language | null = null;
+  showPassword = false; // Add this
+  showConfirmPassword = false; // Add this
 
   constructor(
     private fb: FormBuilder,

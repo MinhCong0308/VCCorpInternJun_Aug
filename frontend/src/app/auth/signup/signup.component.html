@@ -32,7 +32,7 @@
               </li>
           </ul>
         </div>
-        <a routerLink="/auth/login" class="btn btn-outline-dark">{{ 'NAV.LOGIN' | translate }}</a>
+        <a routerLink="/auth/login" class="btn btn-primary">{{ 'NAV.LOGIN' | translate }}</a>
       </div>
     </div>
   </nav>
@@ -123,13 +123,21 @@
           <!-- Password Field -->
           <div class="mb-3">
             <label for="password" class="form-label">{{ 'AUTH.PASSWORD' | translate }}</label>
-            <input 
-              type="password" 
-              class="form-control"
-              [class.is-invalid]="isFieldInvalid('password')"
-              id="password" 
-              formControlName="password"
-              placeholder="••••••••" />
+            <div class="input-group">
+              <input 
+                [type]="showPassword ? 'text' : 'password'" 
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('password')"
+                id="password" 
+                formControlName="password"
+                placeholder="••••••••" />
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary" 
+                (click)="showPassword = !showPassword">
+                <i [ngClass]="showPassword ? 'ti-key' : 'ti-eye'"></i>
+              </button>
+            </div>
             <div *ngIf="isFieldInvalid('password')" class="invalid-feedback">
               <span *ngIf="signupForm.get('password')?.errors?.['required']">{{ 'AUTH.PASSWORD_REQ' | translate }}</span>
               <span *ngIf="signupForm.get('password')?.errors?.['minlength']">{{ 'AUTH.PASSWORD_WARN' | translate }}</span>
@@ -139,13 +147,21 @@
           <!-- Confirm Password Field -->
           <div class="mb-3">
             <label for="confirmPassword" class="form-label">{{ 'AUTH.CONFIRM_PASSWORD' | translate }}</label>
-            <input 
-              type="password" 
-              class="form-control"
-              [class.is-invalid]="isFieldInvalid('confirmPassword') || hasPasswordMismatch()"
-              id="confirmPassword" 
-              formControlName="confirmPassword"
-              placeholder="••••••••" />
+            <div class="input-group">
+              <input 
+                [type]="showConfirmPassword ? 'text' : 'password'" 
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('confirmPassword') || hasPasswordMismatch()"
+                id="confirmPassword" 
+                formControlName="confirmPassword"
+                placeholder="••••••••" />
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary" 
+                (click)="showConfirmPassword = !showConfirmPassword">
+                <i [ngClass]="showConfirmPassword ? 'ti-key' : 'ti-eye'"></i>
+              </button>
+            </div>
             <div *ngIf="isFieldInvalid('confirmPassword') || hasPasswordMismatch()" class="invalid-feedback">
               <span *ngIf="signupForm.get('confirmPassword')?.errors?.['required']">{{ 'AUTH.CONFIRM_PASSWORD_REQ' | translate }}</span>
               <span *ngIf="hasPasswordMismatch()">{{ 'AUTH.CONFIRM_PASSWORD_ERR' | translate }}</span>

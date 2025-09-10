@@ -17,6 +17,7 @@ import { DraftService } from '../../core/services/draft.service';
 import { fromEvent, Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { AuthService } from '../../core/services/auth.service';
 interface PostLanguageTab {
   title: string;
   content: string;
@@ -104,7 +105,8 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     private translateService: TranslatePostService,
     private notificationService: NotificationService,
     private draftService: DraftService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private authService: AuthService,
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
@@ -698,13 +700,11 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     }
     
     this.saveCurrentTabData();
-    
+    const { hasErrors } = this.validateOriginalTab();
+    if (hasErrors) return;
     const originalTab = this.languageTabs.find(tab => tab.isOriginal);
-    if (!originalTab || !originalTab.content.trim() || !originalTab.title.trim()) {
-      this.notificationService.warning(
-        'Missing Content',
-        'Please fill in the original content before adding a translation.'
-      );
+    if (!originalTab) {
+      this.notificationService.error('Error', 'Original language tab not found.');
       return;
     }
     const translationTab: PostLanguageTab = {
@@ -880,34 +880,23 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     this.selectedTags.delete(tag);
     this.blogForm.patchValue({ tags: Array.from(this.selectedTags) });
   }
-
-  async submitBlog(): Promise<void> {
-    if (!isPlatformBrowser(this.platformId)) {
-      // this.errorMessage = 'This feature is only available in the browser.';
-      return;
-    }
-    
-    this.saveCurrentTabData();
-    this.fieldErrors.title = false;
-    this.fieldErrors.content = false;
-
+  validateOriginalTab(): { hasErrors: boolean; errorMessages: string[] } {
     let hasErrors = false;
     let errorMessages: string[] = [];
     const originalTab = this.languageTabs.find(tab => tab.isOriginal);
+
     if (!originalTab || !originalTab.title.trim() || !originalTab.content.trim()) {
-      if(!originalTab) {
+      if (!originalTab) {
         console.log("Run here for error");
-    
       }
-      if(!originalTab?.title.trim()) {
+      if (!originalTab?.title.trim()) {
         console.log("Original tab: ", originalTab);
         this.blogForm.get('title')?.markAsTouched();
         errorMessages.push('Missing title field');
         hasErrors = true;
       }
-      if(!this.quillEditor.quillEditor.getText().trim()) {
+      if (!this.quillEditor.quillEditor.getText().trim()) {
         this.blogForm.get('content')?.markAsTouched();
-        // console.log("It runs here?");
         console.log("here...");
         errorMessages.push('Missing content field');
         hasErrors = true;
@@ -917,9 +906,30 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
         'Missing Required Fields',
         errorMessages.join(',')
       );
+    }
+    return { hasErrors, errorMessages };
+  }
+  async submitBlog(): Promise<void> {
+    if (!isPlatformBrowser(this.platformId)) {
+      // this.errorMessage = 'This feature is only available in the browser.';
       return;
     }
-
+    
+    this.saveCurrentTabData();
+    this.fieldErrors.title = false;
+    this.fieldErrors.content = false;
+    const { hasErrors } = this.validateOriginalTab();
+    if (hasErrors) {
+      return;
+    }
+    const originalTab = this.languageTabs.find(tab => tab.isOriginal);
+    if (!originalTab) {
+      this.notificationService.error(
+        'Submission Error',
+        'Original language tab not found. Please refresh and try again.'
+      );
+      return;
+    }
     const hasTranslatingTabs = this.languageTabs.some(tab => tab.isTranslating);
     if (hasTranslatingTabs) {
       this.notificationService.info(
@@ -1116,5 +1126,15 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
       this.quillEditor.quillEditor.off('text-change');
     }
     console.log('Auto-save stopped completely');
+  }
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/auth/login']);
+      },
+      error: (error) => {
+        console.error('Logout error:', error);
+      }
+    });
   }
 }

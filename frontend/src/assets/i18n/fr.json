@@ -83,7 +83,8 @@
         "BY": "par",
         "SAVE": "Enregistrer",
         "SAVING": "Enregistrement...",
-        "CANCEL": "Annuler"
+        "CANCEL": "Annuler",
+        "EDIT": "Modifier"
     },
     "RESP": {
         "TITLE": "Réponses",

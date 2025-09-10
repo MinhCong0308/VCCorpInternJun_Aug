@@ -83,7 +83,8 @@
         "BY": "by",
         "SAVE": "Save",
         "SAVING": "Saving...",
-        "CANCEL": "Cancel"
+        "CANCEL": "Cancel",
+        "EDIT": "Edit"
     },
     "RESP": {
         "TITLE": "Responses",

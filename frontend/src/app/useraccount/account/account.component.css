@@ -1,0 +1,70 @@
+/* Editable field styling */
+.editable-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.editable-field .settings-value {
+  flex-grow: 1;
+  padding-right: 60px; /* Make space for the edit button */
+}
+
+.editable-field .btn-edit {
+  position: absolute;
+  right: 0;
+  background: transparent;
+  border: none;
+  color: #007bff;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
+.editable-field .btn-edit:hover {
+  background-color: #e1e1e1;
+}
+
+/* Settings section spacing */
+.settings-section {
+  padding: 1.25rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.settings-section:last-child {
+  border-bottom: none;
+}
+
+.settings-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.settings-value {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.settings-description {
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Danger text for deactivation */
+.danger-text {
+  color: #dc3545;
+}
+
+/* Button styles */
+.btn-outline-primary {
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.btn-outline-primary:hover {
+  background-color: #007bff;
+  color: white;
+}

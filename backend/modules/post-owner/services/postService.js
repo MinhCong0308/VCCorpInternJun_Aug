@@ -330,6 +330,8 @@ const postService = {
         if (!text || text.trim() === '') {
             throw new Error("Text to translate cannot be empty");
         }
+        console.log("Source Language:", sourceLanguage);
+        console.log("Target Language:", targetLanguage);
         if (!targetLanguage || !(targetLanguage.toUpperCase() in config.config.languageEnum)) {
             throw new Error("Invalid target language");
         }

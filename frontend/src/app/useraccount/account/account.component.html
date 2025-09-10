@@ -90,7 +90,7 @@
                      width="32" height="32" alt="Profile" />
               </a>
               <ul class="dropdown-menu dropdown-menu-end mt-2">
-                <li><a class="dropdown-item" routerLink="/useraccount/profile">{{ 'NAV.PROFILE | translate }}</a></li>
+                <li><a class="dropdown-item" routerLink="/useraccount/profile">{{ 'NAV.PROFILE' | translate }}</a></li>
                 <li><a class="dropdown-item" routerLink="/auth/change-password">{{ 'NAV.CHANGE_PASSWORD' | translate }}</a></li>
                 <li><hr class="dropdown-divider" /></li>
                 <li><a class="dropdown-item" (click)="logout()">{{ 'NAV.SIGNOUT' | translate }}</a></li>
@@ -135,8 +135,13 @@
               <div class="settings-section">
                 <div>
                   <div class="settings-label">{{ 'ACCOUNT.USERNAME' | translate }}</div>
-                  <div id="username-display" class="settings-value" style="cursor: pointer;" (click)="toggleEdit('username')">
-                    {{ '@' + userProfile.username }}
+                  <div class="editable-field">
+                    <div id="username-display" class="settings-value" style="cursor: pointer;" (click)="toggleEdit('username')">
+                      {{ '@' + userProfile.username }}
+                    </div>
+                    <button class="btn-edit" (click)="toggleEdit('username')">
+                      <i class="ti-pencil"></i> {{ 'COMMON.EDIT' | translate }}
+                    </button>
                   </div>
                   <form id="username-form" [class.d-none]="!editMode.username" class="mt-2" 
                         (ngSubmit)="saveEdit('username', $event)">
@@ -184,8 +189,13 @@
                 <div>
                   <div class="settings-label">{{ 'ACCOUNT.FULLNAME' | translate }}</div>
                   <div class="settings-description">{{ 'ACCOUNT.FULLNAME_DESC' | translate }}</div>
-                  <div id="fullname-display" class="settings-value mt-1" style="cursor: pointer;" (click)="toggleEdit('fullname')">
-                      {{ userProfile.fullname }}
+                  <div class="editable-field">
+                    <div id="fullname-display" class="settings-value mt-1" style="cursor: pointer;" (click)="toggleEdit('fullname')">
+                        {{ userProfile.fullname }}
+                    </div>
+                    <button class="btn-edit" (click)="toggleEdit('fullname')">
+                      <i class="ti-pencil"></i> {{ 'COMMON.EDIT' | translate }}
+                    </button>
                   </div>
                   <form id="fullname-form" [class.d-none]="!editMode.fullname" class="mt-2" 
                         (ngSubmit)="saveEdit('fullname', $event)">

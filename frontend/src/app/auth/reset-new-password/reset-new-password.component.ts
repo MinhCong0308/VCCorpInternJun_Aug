@@ -20,6 +20,7 @@ export class ResetNewPasswordComponent {
   errorMessage: string | null = null;
   successMessage: string | null = null;
   showPassword = false;
+  showNewPassword = false;
   languages: Language[] = [];
   currentLanguage: Language | null = null;
   email = localStorage.getItem('verifyEmail') || '';

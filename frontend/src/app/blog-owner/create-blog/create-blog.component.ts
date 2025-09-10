@@ -724,11 +724,14 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     return /^\s*$/.test(str) || str === '\n' || str.trim() === '';
   }
 
-  async translateDeltaOps(originalDelta: any, targetLanguage: Language): Promise<any> {
-    if (!originalDelta || !originalDelta.ops) {
+  async translateDeltaOps(originalTab: PostLanguageTab, targetLanguage: Language): Promise<any> {
+    if (!originalTab || !originalTab.delta || !originalTab.delta.ops) {
       return Promise.resolve(this.createEmptyDelta());
     }
-    const translatedOps = [...originalDelta.ops];
+    if(!originalTab) {
+      return Promise.resolve(this.createEmptyDelta());
+    }
+    const translatedOps = [...originalTab.delta.ops];
     const translationPromises: Promise<void>[] = [];
     for (let i = 0; i < translatedOps.length; i++) {
       const op = { ...translatedOps[i] };
@@ -738,8 +741,8 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
         } else {
           const translationPromise = new Promise<void>((resolve) => {
             const sub = this.translateService.translate(
-              op.insert, 
-              this.defaultLanguage?.languagename ?? 'auto', 
+              op.insert,
+              originalTab.language.languagename,  
               targetLanguage.languagename
             ).subscribe({
               next: (response: any) => {
@@ -780,7 +783,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
     const targetLanguage = targetTab.language;
     const titleSub = this.translateService.translate(
       originalTab.title,
-      this.defaultLanguage?.languagename ?? 'auto',
+      originalTab.language.languagename,
       targetLanguage.languagename
     ).subscribe({
       next: (response: any) => {
@@ -790,7 +793,7 @@ export class CreateBlogComponent implements OnInit, OnDestroy {
           console.error('Error translating title:', error);
           targetTab.title = `[${targetLanguage?.languagename}] ${originalTab.title}`;
         }
-        this.translateDeltaOps(originalTab.delta, targetLanguage).then((translatedDelta) => {
+        this.translateDeltaOps(originalTab, targetLanguage).then((translatedDelta) => {
           targetTab.delta = translatedDelta;   
           if (this.quillEditor && this.quillEditor.quillEditor) {
             const currentContents = this.quillEditor.quillEditor.getContents();

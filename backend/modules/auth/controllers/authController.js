@@ -116,15 +116,15 @@ const authController = {
     }
   },
   verifyResetPassword: async (req, res) => {
-    console.log("It is called");
+    // console.log("It is called");
     try {
       const { email } = req.body;
       if (!email) {
         return responseUtils.error(res, { message: "Email is required" });
       }
-      console.log("It is called");
-      await authService.requestOTP(email, true);
-      return responseUtils.ok(res, {  message: "OTP sent to email" });
+      // console.log("It is called");
+      const data = await authService.verifyForgetPassword(email);
+      return responseUtils.ok(res, {  message: data.message });
     } catch (error) {
       console.error("Verify Reset Password error:", error);
       return responseUtils.unauthorized(res, error.message);
@@ -132,14 +132,14 @@ const authController = {
   },
   async resetPassword(req, res) {
     try {
-      const {email, newPassword, newPasswordConfirm} = req.body;
-      if(!email || !newPassword || !newPasswordConfirm) {
-        return responseUtils.error(res, { message: "Email, new password and confirm new password are required" });
+      const {email, newPassword, newPasswordConfirm, token} = req.body;
+      if(!email || !newPassword || !newPasswordConfirm || !token) {
+        return responseUtils.error(res, { message: "Email, new password, confirm new password and token are required" });
       }
       if(newPassword !== newPasswordConfirm) {
         return responseUtils.error(res, { message: "New password and confirm new password do not match" });
       }
-      await authService.resetPassword(email, newPassword);
+      await authService.resetPassword(email, newPassword, token);
       return responseUtils.ok(res, { message: "Password reset successfully" });
     } catch (error) {
       console.error("Reset Password error:", error);
@@ -179,6 +179,22 @@ const authController = {
       console.error("Change Password error:", error);
       return responseUtils.unauthorized(res, "Change Password failed");
     }
-  }
+  },
+  verifyForgetPasswordToken: async (req, res) => {
+    try {
+      const { email, token } = req.body;
+      console.log("Email:", email);
+      console.log("Token:", token);
+      if (!email || !token) {
+        return responseUtils.error(res, { message: "Email and token are required" });
+      }
+      const data = await authService.verifyResetPasswordToken(email, token);
+      console.log("Token verified:", data);
+      return responseUtils.ok(res, { message: data.message });
+    } catch (error) {
+      console.error("Verify Forget Password Token error:", error);
+      return responseUtils.unauthorized(res, error.message);
+    }
+  },
 };
 module.exports = authController;

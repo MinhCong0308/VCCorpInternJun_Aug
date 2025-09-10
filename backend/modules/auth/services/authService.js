@@ -152,15 +152,49 @@ const authService = {
     await user.save();
     return { message: "Password changed successfully." };
   },
-  async resetPassword(email, newPassword) {
+  async resetPassword(email, newPassword, token) {
     const user = await db.User.findOne({ where: { email } });
     if (!user) {
       throw new Error("User not found.");
     }
+    const storedToken = await redis.get(email);
+    if (!storedToken) {
+      throw new Error("Invalid or expired token.");
+    }
+    if (storedToken !== token) {
+      throw new Error("Token mismatch.");
+    }
     const hashed_password = await bcrypt.hash(newPassword, 10);
     user.hashed_password = hashed_password;
+    await redis.del(email);
     await user.save();
     return { message: "Password reset successfully." };
+  },
+  async verifyForgetPassword(email) {
+    const user = await db.User.findOne({ where: { email } });
+    if (!user || user.status !== config.config.statusenum.AUTHENTICATED) {
+      throw new Error("User not found or not authenticated.");
+    }
+    await redis.del(email);
+    const base_url = 'http://localhost:4200/auth/reset-password?token=';
+    const otp = await this.genOTP();
+    await redis.set(email, otp, { EX: 300 }); // 300s = 5 minutes
+    const resetLink = `${base_url}${otp}`;
+    await this.sendOTP(email, resetLink);
+    console.log("Password reset link sent successfully");
+    return { message: "Password reset link sent to email, please use this link to access the reset page." };
+  },
+  async verifyResetPasswordToken(email, token) {
+    const storedToken = await redis.get(email);
+    if (!storedToken) {
+      throw new Error("Invalid or expired token.");
+    }
+    if (storedToken !== token) {
+      throw new Error("Token mismatch.");
+    }
+    // await redis.del(email);
+    console.log("Token verified successfully");
+    return { message: "Token verified successfully." };
   }
 };
 module.exports = authService;

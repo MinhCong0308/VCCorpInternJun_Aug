@@ -7,7 +7,6 @@ import { NotificationService } from '../../core/services/notification.service';
 import { LanguageService, Language } from '../../core/services/language.service';
 import { isPlatformBrowser } from '@angular/common';
 
-
 @Component({
   selector: 'app-reset-new-password',
   templateUrl: './reset-new-password.component.html',
@@ -15,7 +14,7 @@ import { isPlatformBrowser } from '@angular/common';
   standalone: false,
 })
 export class ResetNewPasswordComponent {
-  resetForm: FormGroup;
+  resetForm!: FormGroup;
   isLoading = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
@@ -31,6 +30,7 @@ export class ResetNewPasswordComponent {
   initialLang = 'en';
   isBrowser: boolean;
   loadingLang = false;
+  token = '';
    constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -39,7 +39,7 @@ export class ResetNewPasswordComponent {
     private notificationService: NotificationService,
     private translate: TranslateService,
     private languageService: LanguageService,
-    @Inject(PLATFORM_ID) private platformId: Object // <-- Missing proper injection
+    @Inject(PLATFORM_ID) private platformId: Object 
 
   ) {
     this.resetForm = this.fb.group({
@@ -52,10 +52,26 @@ export class ResetNewPasswordComponent {
     }, {
       validators: [this.mustMatch('newPassword', 'confirmPassword')]
     });
+    this.token = this.route.snapshot.queryParams['token'] || '';
     this.isBrowser = isPlatformBrowser(this.platformId);
     if(this.isBrowser) {
       this.email = localStorage.getItem('verifyEmail') || '';
     }
+    console.log('ResetNewPasswordComponent initialized with email:', this.email, 'and token:', this.token);
+    // check validate of token first
+    this.authService.verifyForResetPassword(this.email, this.token).subscribe({
+      next: (response) => {
+        if (response.success) {
+          console.log('Token verified successfully for email:', this.email);
+        }
+      },
+      error: (error) => {
+        this.errorMessage = this.translate.instant('AUTH.INVALID_RESET_LINK');
+        this.notificationService.error('Error', this.errorMessage || 'Invalid or expired reset link.');
+        this.router.navigate(['/auth/forgot-password']);
+        console.error('Token verification error:', error);
+      }
+    });
   }
   isFieldInvalid(fieldName: string): boolean {
     const field = this.resetForm.get(fieldName);
@@ -116,7 +132,6 @@ export class ResetNewPasswordComponent {
       this.applyUiLanguage(lang); // vẫn gọi để đồng bộ document.lang/localStorage
       return;
     }
-
     this.loadingLang = true;
     this.applyUiLanguage(lang);
     this.currentLanguage = lang;
@@ -141,7 +156,7 @@ export class ResetNewPasswordComponent {
     const newPassword = this.resetForm?.value?.newPassword;
     const newPasswordConfirm = this.resetForm?.value?.confirmPassword;
 
-    this.authService.resetPassword(email, newPassword, newPasswordConfirm).subscribe({
+    this.authService.resetPassword(email, newPassword, newPasswordConfirm, this.token).subscribe({
       next: (response) => {
         this.isLoading = false;
         this.successMessage = this.translate.instant('AUTH.PASSWORD_RESET_SUCCESS');

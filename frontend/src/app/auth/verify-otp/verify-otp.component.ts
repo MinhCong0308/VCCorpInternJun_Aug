@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Subscription, interval } from 'rxjs';
+import { Router, ActivatedRoute } from '@angular/router';
+import { Subject, Subscription, interval } from 'rxjs';
 import { Language, LanguageService } from '../../core/services/language.service';
 import { AuthService } from '../../core/services/auth.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -30,6 +30,8 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
   dropdownOpen = false;
   languages : Language[] = [];
   currentLanguage: Language | null = null;
+  purpose = 'signup'; // or 'reset-password'
+  private destroy$ = new Subject<void>();
 
   // Resend cooldown
   isResendCooldown = false;
@@ -39,6 +41,7 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private authService: AuthService,
     private translate: TranslateService,
     private languageService: LanguageService,
@@ -53,10 +56,13 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
     const code = saved || this.translate.getCurrentLang?.() || 'en';
     this.initialLang = code;
     this.translate.use(code);
-    if (this.isBrowser) document.documentElement.lang = code;
     this.loadLanguages();
     this.initializeForm();
+    this.route.queryParams.subscribe(params => {
+      this.purpose = params['purpose'] === 'reset-password' ? 'reset-password' : 'signup';
+    });
     this.getUserEmail();
+    this.focusFirstInput();
     this.focusFirstInput();
   }
 
@@ -192,11 +198,21 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
 
     try {
       const response = await this.verifyOtp(this.userEmail, otp);
-
       if (response.ok) {
-        this.successMessage = 'Verification successful! Redirecting to login...';
-        localStorage.removeItem('verifyEmail');
-        
+        console.log('Current purpose:', this.purpose);
+        if(this.purpose === 'reset-password') {
+          this.successMessage = 'Verification successful! Redirecting to reset password...';
+        } else {
+          this.successMessage = 'Verification successful! Redirecting to login...';
+          localStorage.removeItem('verifyEmail');
+        }
+        if(this.purpose === 'reset-password') {
+          console.log("Jump here");
+          setTimeout(() => {
+            this.router.navigate(['/auth/reset-password']);
+          }, 2000);
+          return;
+        }
         setTimeout(() => {
           this.router.navigate(['/auth/login']);
         }, 2000);

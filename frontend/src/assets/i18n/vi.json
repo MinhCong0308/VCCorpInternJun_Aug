@@ -122,7 +122,9 @@
         "DEACTIVATE": "Vô hiệu hoá tài khoản",
         "DEACTIVATE_DESC": "Vô hiệu hoá sẽ tạm dừng tài khoản cho đến khi bạn đăng nhập lại.",
         "GO_TO_LOGIN": "Đi tới Đăng nhập",
-        "LOADING": "Đang tải tài khoản của bạn..."
+        "LOADING": "Đang tải tài khoản của bạn...",
+        "NEW_PASSWORD": "Mật khẩu mới",
+        "CONFIRM_PASSWORD": "Xác nhận mật khẩu"
     },
     "YOUR_BLOG": {
         "TITLE": "Blog của bạn",
@@ -174,7 +176,18 @@
         "RESEND_CODE": "Gửi lại mã",
         "RESEND_COOLDOWN": "Gửi lại trong",
         "WRONG_EMAIL": "Email sai?",
-        "GO_BACK_TO_SIGNUP": "Quay lại đăng ký"
+        "GO_BACK_TO_SIGNUP": "Quay lại đăng ký",
+        "RESET_PASSWORD": "Đặt lại mật khẩu",
+        "CREATE_NEW_PASSWORD": "Vui lòng tạo mật khẩu mới cho tài khoản của bạn.",
+        "PROCESSING": "Đang xử lý...",
+        "INVALID_RESET_LINK": "Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn",
+        "PASSWORD_RESET_SUCCESS": "Đặt lại mật khẩu thành công",
+        "PASSWORD_RESET_SUCCESS_DETAIL": "Mật khẩu của bạn đã được đặt lại thành công. Bạn có thể đăng nhập bằng mật khẩu mới.",
+        "PASSWORD_RESET_FAILED": "Đặt lại mật khẩu thất bại. Vui lòng thử lại sau.",
+        "INVALID_OR_EXPIRED_TOKEN": "Liên kết đặt lại mật khẩu này không hợp lệ hoặc đã hết hạn",
+        "REMEMBER_PASSWORD": "Bạn đã nhớ mật khẩu?",
+        "RESET_INSTRUCTIONS": "Nhập địa chỉ email của bạn bên dưới và chúng tôi sẽ gửi cho bạn một liên kết để đặt lại mật khẩu.",
+        "SEND_RESET_LINK": "Gửi OTP để xác thực đặt lại"
     },
     "PASSWORD": {
         "TITLE": "Đổi mật khẩu",

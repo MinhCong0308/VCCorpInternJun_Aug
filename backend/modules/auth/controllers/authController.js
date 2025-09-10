@@ -115,6 +115,37 @@ const authController = {
       return responseUtils.unauthorized(res, "Invalid session");
     }
   },
+  verifyResetPassword: async (req, res) => {
+    console.log("It is called");
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return responseUtils.error(res, { message: "Email is required" });
+      }
+      console.log("It is called");
+      await authService.requestOTP(email, true);
+      return responseUtils.ok(res, {  message: "OTP sent to email" });
+    } catch (error) {
+      console.error("Verify Reset Password error:", error);
+      return responseUtils.unauthorized(res, error.message);
+    }
+  },
+  async resetPassword(req, res) {
+    try {
+      const {email, newPassword, newPasswordConfirm} = req.body;
+      if(!email || !newPassword || !newPasswordConfirm) {
+        return responseUtils.error(res, { message: "Email, new password and confirm new password are required" });
+      }
+      if(newPassword !== newPasswordConfirm) {
+        return responseUtils.error(res, { message: "New password and confirm new password do not match" });
+      }
+      await authService.resetPassword(email, newPassword);
+      return responseUtils.ok(res, { message: "Password reset successfully" });
+    } catch (error) {
+      console.error("Reset Password error:", error);
+      return responseUtils.unauthorized(res, error.message);
+    }
+  },
   logout: async (req, res) => {
     try {
       const accessToken = req.cookies.accessToken;

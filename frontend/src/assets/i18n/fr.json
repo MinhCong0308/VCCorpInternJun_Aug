@@ -122,7 +122,9 @@
         "DEACTIVATE": "Désactiver le compte",
         "DEACTIVATE_DESC": "La désactivation suspendra votre compte jusqu'à votre reconnexion.",
         "GO_TO_LOGIN": "Accéder à la connexion",
-        "LOADING": "Chargement en cours votre profil..."
+        "LOADING": "Chargement en cours votre profil...",
+        "NEW_PASSWORD": "Nouveau mot de passe",
+        "CONFIRM_PASSWORD": "Confirmer le mot de passe"
     },
     "YOUR_BLOG": {
         "TITLE": "Vos blogs",
@@ -174,7 +176,18 @@
         "RESEND_CODE": "Renvoyer le code",
         "RESEND_COOLDOWN": "Renvoyer disponible dans",
         "WRONG_EMAIL": "Mauvaise adresse e-mail?",
-        "GO_BACK_TO_SIGNUP": "Revenir à l'inscription"
+        "GO_BACK_TO_SIGNUP": "Revenir à l'inscription",
+        "RESET_PASSWORD": "Réinitialiser le mot de passe",
+        "CREATE_NEW_PASSWORD": "Veuillez créer un nouveau mot de passe pour votre compte.",
+        "PROCESSING": "Traitement...",
+        "INVALID_RESET_LINK": "Lien de réinitialisation du mot de passe invalide ou expiré",
+        "PASSWORD_RESET_SUCCESS": "Réinitialisation du mot de passe réussie",
+        "PASSWORD_RESET_SUCCESS_DETAIL": "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
+        "PASSWORD_RESET_FAILED": "Échec de la réinitialisation du mot de passe. Veuillez réessayer plus tard.",
+        "INVALID_OR_EXPIRED_TOKEN": "Ce lien de réinitialisation du mot de passe est invalide ou a expiré",
+        "REMEMBER_PASSWORD": "Vous vous souvenez de votre mot de passe?",
+        "RESET_INSTRUCTIONS": "Entrez votre adresse e-mail ci-dessous et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+        "SEND_RESET_LINK": "Envoyer le lien de réinitialisation"
     }, 
     "PASSWORD": {
         "TITLE": "Changer le mot de passe",

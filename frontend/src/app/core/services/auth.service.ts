@@ -13,6 +13,7 @@ import {
   timeout,
 } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
+import { Sign } from 'crypto';
 
 export interface User {
   userid: number;
@@ -270,7 +271,33 @@ export class AuthService {
       })
     );
   }
-
+  verifyResetPassword(email: string): Observable<{success: boolean; message: string}> {
+    console.log('Verifying reset password for email:', email);
+    const url = `${this.baseUrl}/verify-reset-password`;
+     return this.http
+      .post<{success: boolean; message: string}>(url, {email: email}, { withCredentials: true })
+      .pipe(
+        tap(() => {
+          this.clearSessionCache(); 
+          console.log('Sent OTP for reset password - cleared session cache');
+        }),
+        catchError((error) => {
+          console.error('Verify reset password error:', error);
+          return of({
+            success: false,
+            message: error.message,
+          });
+        })
+      );
+  }
+  resetPassword(email: string, newPassword: string, newPasswordConfirm: string): Observable<{success: boolean; message: string}> {
+    const url = `${this.baseUrl}/reset-password`;
+      return this.http.post<{success: boolean; message: string}>(url, {
+        email: email,
+        newPassword: newPassword,
+        newPasswordConfirm: newPasswordConfirm
+      }, { withCredentials: true });
+  }
   // Fetch current session user via cookie-based auth
   me() {
     return this.http.get<{ success: boolean; data?: any }>(

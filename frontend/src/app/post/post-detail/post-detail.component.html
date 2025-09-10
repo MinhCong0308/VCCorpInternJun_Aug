@@ -295,7 +295,7 @@
                 <div *ngIf="!isLoggedIn" class="mb-4" (click)="goLogin()" style="cursor: pointer;"> 
                     <div class="reply-form d-flex align-items-start">
                         <a><img [src]="appSettings.defaults.userAvatar" class="rounded-circle" style="width:32px;height:32px;margin-right:12px;"></a>
-                        <textarea class="form-control" rows="3" placeholder="{{ 'RESP.REMINDER' | translate }}" style="resize:none; cursor: pointer;"></textarea>
+                        <textarea disabled class="form-control" rows="3" placeholder="{{ 'RESP.REMINDER' | translate }}" style="resize:none;"></textarea>
                     </div>
                 </div>
                 <!-- Nếu đã login -->

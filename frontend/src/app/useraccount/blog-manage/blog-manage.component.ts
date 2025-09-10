@@ -9,6 +9,7 @@ import { LanguageService, Language } from '../../core/services/language.service'
 import { NotificationService } from '../../core/services/notification.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SearchService } from '../../core/services/search.service';
+import { AppSettingsService } from '../../core/config/app-settings.service';
 @Component({
   selector: 'app-blog-manage',
   templateUrl: './blog-manage.component.html',
@@ -38,7 +39,7 @@ export class BlogManageComponent implements OnInit {
     return Math.max(1, Math.ceil(this.total / this.limit));
   }
 
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService, private postOnlyService: PostService, private languageService: LanguageService, private notificationService: NotificationService, private translate: TranslateService, public search: SearchService) {
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private postService: PostBlogOwnerService, private authService: AuthService, private profileService: ProfileService, private postOnlyService: PostService, private languageService: LanguageService, private notificationService: NotificationService, private translate: TranslateService, public search: SearchService, public appSettings: AppSettingsService) {
     this.posts = []; // Ensure posts is always initialized as an empty array
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
@@ -56,6 +57,9 @@ export class BlogManageComponent implements OnInit {
     this.profileService.getUserProfile().subscribe({
       next: (profile) => {
         this.userProfile = profile;
+        if (!profile.avatarUrl) {
+          profile.avatarUrl = this.appSettings.defaults.userAvatar;
+        }
         this.isInitializing = false;
         this.loadPosts();
         this.loadLanguages();

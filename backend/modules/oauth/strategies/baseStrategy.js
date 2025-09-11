@@ -14,14 +14,12 @@ class OAuthStrategy {
 
     async verify(accessToken, refreshToken, profile, done) {
         try {
-            const user = await oauthService.handleOAuthSuccess(profile);
-            if (!user) {
-                return done(new Error("OAuth authentication failed"), null);
-            }
-            return done(null, user);
+            // Pass this.provider to the service
+            const result = await oauthService.handleOAuthSuccess(profile, this.provider);
+            return done(null, result);
         } catch (error) {
             console.error(`[${this.provider} OAuth] Error:`, error);
-            return done(error, null);
+            return done(error);
         }
     } 
     

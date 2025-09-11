@@ -1,108 +1,43 @@
-const { sign, signRefreshToken } = require("utils/jwtUtils");
-const db = require("models/index");
-const { Op } = require("sequelize");
-const config = require("configs/index");
-const crypto = globalThis.crypto || require("node:crypto").webcrypto;
-const nodemailer = require("nodemailer");
-const bcrypt = require("bcryptjs");
-require("dotenv").config();
+const OAuthProviderFactory = require('modules/oauth/factories/OAuthProviderFactory');
+
 const oauthService = {
-    async handleOAuthSuccess(profile) {
-        // Extract user information from profile
-        const userInfo = this.extractUserInfo(profile);
-        const {firstName, lastName, email, username} = userInfo;
-        let user;
-        user = await db.User.findOne({
-            where: {
-                email: email,
-            }
-        });
-        if (!user) {
-            const password = this.generateRandomPassword(16);
-            const hashedPassword = await bcrypt.hash(password, 10);
-            // create user
-            const newUser = await db.User.create({
-                firstname: firstName,
-                lastname: lastName,
-                username: username,
-                email: email,
-                hashed_password: hashedPassword, // Store the random password
-                status: config.config.statusenum.AUTHENTICATED,
-                roleid: config.config.roleenum.USER,
-                last_login_at: new Date(),
-            });
-            await this.sendWelcomeEmail(newUser.email, password);
+  /**
+   * Handle successful OAuth authentication
+   * @param {Object} profile - User profile from OAuth provider
+   * @param {string} provider - OAuth provider name (google, facebook, etc)
+   * @returns {Object} User data and tokens
+   */
+  async handleOAuthSuccess(profile, provider) {
+    try {
+      // Validate inputs
+        if (!profile) {
+            throw new Error("OAuth profile data is required");
         }
-        user = await db.User.findOne({
-            where: {
-                email: email,
-                status: config.config.statusenum.AUTHENTICATED
-            },
-            include: [
-                {
-                    model: db.Role,
-                    where: { roleid: config.config.roleenum.USER }
-                }
-            ]
-        });
-        const accessToken = sign(user.userid, user.Role.rolename);
-        const refreshToken = signRefreshToken(user.userid, user.Role.rolename);
-
-        return {
-            user: {
-                userid: user.userid,
-                email: user.email,
-                username: user.username,
-                role: user.Role.rolename
-            },
-            accessToken: accessToken,
-            refreshToken: refreshToken
-        };
-    },
-    generateRandomPassword(length) {
-        const lower = "abcdefghijklmnopqrstuvwxyz";
-        const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        const digits = "0123456789";
-        const special = "!@#$%^&*()-_=+[]{}|:,.<>?";
-        const all = lower + upper + digits + special;   
-        const pwdArray = new Uint32Array(length);
-        crypto.getRandomValues(pwdArray);   
-        return Array.from(pwdArray, n => all[n % all.length]).join("");
-    },
-    async sendWelcomeEmail(email, password) {
-        // Implement email sending logic here
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: "duckcode145@gmail.com",
-                pass: process.env.APP_PASS,
-            },
-        });
-
-        const mailOptions = {
-            from: "duckcode145@gmail.com",
-            to: email,
-            subject: 'Welcome to Our Service',
-            text: `Welcome! Your account has been created. Your temporary password is: ${password}`,
-        };
-
-        await transporter.sendMail(mailOptions);
-    },
-    extractUserInfo(profile) {
-        const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
-        const username = profile.displayName || profile.username || `${this.provider}_${profile.id}`;
-        const firstName = profile.name?.givenName || '';
-        const lastName = profile.name?.familyName || '';
-        const avatarUrl = profile.photos && profile.photos[0] ? profile.photos[0].value : null;
-
-        return {
-            email,
-            username,
-            firstName,
-            lastName,
-            avatarUrl
-        };
+      
+        if (!provider) {
+            throw new Error("OAuth provider name is required");
+        }
+        
+        // Log for debugging
+        console.log(`Processing OAuth login for provider: ${provider}`);
+        
+        // Create provider instance through factory
+        const oauthProvider = OAuthProviderFactory.createProvider(provider);
+        console.log(`Using provider instance: ${oauthProvider.constructor.name}`);
+        try {
+            const userData = await oauthProvider.processOAuthProfile(profile);
+            console.log(`OAuth processing successful for provider: ${provider}`);
+            return userData;
+        } catch (processingError) {
+            console.error(`Error processing OAuth profile: ${processingError.message}`);
+            // console.error(processingError.stack);
+            throw new Error(`Failed to process ${provider} profile: ${processingError.message}`);
+        }
+    } catch (error) {
+      console.error(`OAuth ${provider || 'unknown'} authentication error:`, error);
+      throw new Error(`Authentication failed: ${error.message}`);
     }
+  },
 };
 
 module.exports = oauthService;

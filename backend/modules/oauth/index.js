@@ -10,3 +10,13 @@ if (config.config.oauth?.google?.clientID) {
     });
     passport.use("google", googleStrategy.createStrategy());
 }
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+// Deserialize user from the session
+passport.deserializeUser((obj, done) => {
+  done(null, obj);
+});
+
+module.exports = passport;

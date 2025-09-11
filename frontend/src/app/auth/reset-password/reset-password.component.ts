@@ -1,6 +1,6 @@
 import { Component, OnInit , PLATFORM_ID, Inject} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute} from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
@@ -24,10 +24,12 @@ export class ResetPasswordComponent implements OnInit {
   initialLang = 'en';
   isBrowser: boolean;
   loadingLang = false;
+  token = '';
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private translate: TranslateService,
     private authService: AuthService,
     private notificationService: NotificationService,
@@ -35,6 +37,9 @@ export class ResetPasswordComponent implements OnInit {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
+    this.token = this.route.snapshot.queryParams['token'] || '';
+    // check validate of token first
+    
     this.resetForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
     });

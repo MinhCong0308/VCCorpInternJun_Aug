@@ -342,9 +342,7 @@ const postService = {
         // check for suitable language
         const upperCaseLanguage = sourceLanguage.toUpperCase();
         const languageid = config.config.languageEnum[upperCaseLanguage];
-        // console.log("Here: ", languageid);
         if(!globalFilter.checkSuitableLanguage(text, languageid)) {
-            // console.log("Huhuhuhuhuhuhuhuhuhuhu");
             throw new Error('Inappropriate language detected');
         }
         const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';

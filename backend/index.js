@@ -5,7 +5,7 @@ require("rootpath")();
 const express = require("express");
 const bodyParser = require("body-parser");
 const router = require("routes/api");
-const passport = require("modules/oauth/passport");
+const passport = require("modules/oauth/index");
 const cookieParser = require("cookie-parser");
 const { swaggerUIServe,swaggerUISetup } = require("kernels/api-docs");
 const cors = require("cors");

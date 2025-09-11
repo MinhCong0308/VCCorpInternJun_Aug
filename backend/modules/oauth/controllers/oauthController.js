@@ -1,31 +1,70 @@
-const responseUtils = require("utils/responseUtils");
-const oauthService = require("modules/oauth/services/oauthService");
-const passport = require("modules/oauth/passport");
-const oauthController = {
-    loginWithGoogle: (req, res, next) => {
-        passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
-    },
-    googleCallback: async (req, res) => {
-        try {
-            const oauthResult = req.user; // User data from passport
-            res.cookie("accessToken", oauthResult.accessToken, {
-                httpOnly: true,
-                secure: false,
-                sameSite: 'lax',
-                maxAge: 3600000, // 1 hour
-            });
-            res.cookie("refreshToken", oauthResult.refreshToken, {
-                httpOnly: true,
-                secure: false,
-                sameSite: 'lax',
-                maxAge: 31536000000, // 1 year 
-            });
-            res.redirect("http://localhost:4200/login?oauth=success");
-        } catch (error) {
-            console.error("Google OAuth callback error:", error);
-            return responseUtils.error(res, error.message);
-        }
+const oauthService = require('modules/oauth/services/oauthService');
+const base_url = process.env.FRONTEND_URL || 'http://localhost:4200';
+const oauthController = { 
+  // Google OAuth callback
+  // In oauthController.js
+  googleCallback: async (req, res) => {
+    try {
+      const profile = req.user;
+      console.log('Google profile:', profile);
+      if (profile && profile.accessToken && profile.refreshToken) {
+        const result = profile;
+        // Set cookies
+        res.cookie('accessToken', result.accessToken, { httpOnly: true });
+        res.cookie('refreshToken', result.refreshToken, { httpOnly: true });
+        
+        // Redirect to frontend
+        const base_url = process.env.FRONTEND_URL || 'http://localhost:4200';
+        res.redirect(`${base_url}/login/success`);
+        return;
+      }      
+      const result = await oauthService.handleOAuthSuccess(profile, 'google');
+      
+      res.cookie('accessToken', result.accessToken, { httpOnly: true });
+      res.cookie('refreshToken', result.refreshToken, { httpOnly: true });
+      
+      const base_url = process.env.FRONTEND_URL || 'http://localhost:4200';
+      res.redirect(`${base_url}/login/success`);
+    } catch (error) {
+      console.error('Google OAuth error:', error);
+      const base_url = process.env.FRONTEND_URL || 'http://localhost:4200';
+      res.redirect(`${base_url}/login/error`);
     }
-
+  },
+  
+  // Facebook OAuth callback
+  facebookCallback: async (req, res) => {
+    try {
+      const profile = req.user;
+      const result = await oauthService.handleOAuthSuccess(profile, 'facebook');
+      
+      // Handle tokens
+      res.cookie('accessToken', result.accessToken, { httpOnly: true });
+      res.cookie('refreshToken', result.refreshToken, { httpOnly: true });
+      
+      res.redirect(`${process.env.FRONTEND_URL}/login/success`);
+    } catch (error) {
+      console.error('Facebook OAuth error:', error);
+      res.redirect(`${process.env.FRONTEND_URL}/login/error`);
+    }
+  },
+  
+  // GitHub OAuth callback
+  githubCallback: async (req, res) => {
+    try {
+      const profile = req.user;
+      const result = await oauthService.handleOAuthSuccess(profile, 'github');
+      
+      // Handle tokens
+      res.cookie('accessToken', result.accessToken, { httpOnly: true });
+      res.cookie('refreshToken', result.refreshToken, { httpOnly: true });
+      
+      res.redirect(`${process.env.FRONTEND_URL}/login/success`);
+    } catch (error) {
+      console.error('GitHub OAuth error:', error);
+      res.redirect(`${process.env.FRONTEND_URL}/login/error`);
+    }
+  }
 };
+
 module.exports = oauthController;

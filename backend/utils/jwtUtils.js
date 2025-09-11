@@ -13,7 +13,6 @@ module.exports = {
         expiresIn: config.jwt.ttl,
       }
     );
-
     return access_token;
   },
   signRefreshToken: (userId, userRole) => {
@@ -27,7 +26,6 @@ module.exports = {
         expiresIn: "1w"
       }
     );
-
     return refresh_token;
   },
 };

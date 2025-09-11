@@ -96,6 +96,7 @@ const authService = {
   },
   async requestOTP(email, isResetPassword = false) {
     const user = await db.User.findOne({ where: { email } });
+    await redis.del(email);
     if(!isResetPassword) {
       if (!user || user.status !== config.config.statusenum.NON_AUTHENTICATED) {
         throw new Error("User not found or already verified.");
@@ -176,7 +177,7 @@ const authService = {
       throw new Error("User not found or not authenticated.");
     }
     await redis.del(email);
-    const base_url = 'http://localhost:4200/auth/reset-password?token=';
+    const base_url = process.env.RESET_PASSWORD_URL || 'http://localhost:4200/auth/reset-password?token=';
     const otp = await this.genOTP();
     await redis.set(email, otp, { EX: 300 }); // 300s = 5 minutes
     const resetLink = `${base_url}${otp}`;

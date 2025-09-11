@@ -26,9 +26,11 @@ const postsController = require("modules/post/controllers/postsController");
 const dictionaryController = require("modules/dictionary/controllers/dictionaryController");
 const dictionaryValidation = require("modules/dictionary/validations/dictionaryValidation");
 const router = express.Router({ mergeParams: true });
-const oauthController = require("modules/oauth/controllers/oauthController");
+const oauthController = require('modules/oauth/controllers/oauthController');
+console.log('OAuth Controller loaded:', oauthController);
+console.log('Available methods:', Object.keys(oauthController));
+const passport = require('modules/oauth/index');
 const dashboardController = require("modules/dashboard/controllers/dashboardController");
-const passport = require("modules/oauth/passport");
 const manageTokenController = require("modules/manage_token/controllers/manageTokenController");
 const { uploads } = require("kernels/middlewares/multer");
 const multer = require("multer");
@@ -81,7 +83,9 @@ router.group("/auth", (router) => {
   router.post("/reset-password", authController.resetPassword);
   router.post("/verify-forget-password-token", authController.verifyForgetPasswordToken);
   router.group("/oauth", (router) => {
-    router.get("/google", oauthController.loginWithGoogle);
+    router.get("/google", passport.authenticate("google", { 
+      scope: ["profile", "email"] 
+    }));    
     router.get(
       "/google/callback",
       passport.authenticate("google", {
